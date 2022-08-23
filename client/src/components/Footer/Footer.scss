@@ -1,0 +1,50 @@
+.footer{
+    margin-top: 2rem;
+    background-color: #333333;
+    color: #FFF;
+    padding: 3rem 0 2rem 0;
+    font-size: .9rem;
+
+    &__main{
+        width: 80%;
+        margin: 0 auto;
+
+        .content{
+            margin-left: 5px;
+        }
+
+        .icon{
+            width: 20px;
+            margin-top: 5px;
+        }
+
+        .list-icon{
+            margin-top: 2rem;
+
+            button{
+                margin-right: 10px;
+            }
+        }
+    }
+
+    h1{
+        color: #FFF;
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 20px;
+        margin-bottom: 1rem;
+    }
+
+    li{
+        display: flex;
+        margin-bottom: 5px;
+    }
+
+    a{
+        color: #FFF;
+    }
+
+    .footer-col{
+        margin-bottom: 1rem;
+    }
+}

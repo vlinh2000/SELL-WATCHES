@@ -1,0 +1,30 @@
+.product-by-category{
+    width: 80%;
+    margin: 2rem auto;
+    min-height: 60vh;
+
+    .list-filter-item{
+        margin-top: 3rem;
+    }
+    
+}
+
+
+@media only screen and (max-width: 800px) {
+  
+    .breadcrumb-custom{
+        a{
+            font-size: 11px!important;
+        }
+    }
+
+  }
+
+@media only screen and (max-width: 663px) {
+  
+    .list-filter-item{
+        margin-top: 1rem!important;
+    }
+
+  }
+

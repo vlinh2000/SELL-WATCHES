@@ -1,0 +1,113 @@
+
+.product{
+    position: relative;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    padding: 16px 10px;
+
+    &__image{
+       height: 99%;
+       width: 99%;
+       object-fit: cover;
+       transform: scale(1);
+       transition: transform 200ms linear;
+    }
+
+    &__category{
+        color: #888;
+        text-transform: uppercase;
+        font-size: .6rem;
+        letter-spacing: 1px;
+        margin-top: 5px;
+    }
+    &__name{
+        color: #333;
+        font-size: 1rem;
+    }
+
+    &__name:hover{
+        color: #E2BA48!important;
+    }
+
+    &__price{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 8px;
+
+        .old-price{
+            text-decoration: line-through;
+            color: #888;
+            margin-right: 10px;
+        }
+        .price{
+            font-weight: 700;
+        }
+    }
+    &__btn-add-to-cart{
+        position: absolute;
+        top: 60%;
+        left: 17px;
+        transition: top 200ms linear;
+        cursor: pointer;
+        opacity: 0;
+
+
+        .add-to-cart-icon{
+            font-size: 30px;
+        }
+
+        .add-to-cart-icon::after{
+            content: '+';
+            font-size: 12px;
+            position: absolute;
+            top: 58%;
+            left: 36%;
+        }
+    }
+
+    &__out-of-stock{
+        position: absolute;
+        top: 90px ;
+        left: 0;
+        text-transform: uppercase;
+        font-weight: 500;
+        font-size: 15px;
+        background-color: rgba($color: #FFF, $alpha: 0.8);
+        width: 100%;
+        padding: 1rem 0;
+        color: #555;
+    }
+    &__discount{
+        // display: none;
+        position: absolute;
+        top: 30px;
+        left: -10px;
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        font-weight: bold;
+        text-align: center;
+        line-height: 40px;
+        font-size: 0.8rem;
+        color: #FFF;
+        background-color: #E2BA48;
+    }
+    &__discount::before{
+        content: '-';
+    }
+}
+
+.product:hover{
+    border: 1px dashed #ccc;
+
+    .product__btn-add-to-cart{
+     opacity: 1;
+     top: 55%;
+   }
+
+   .product__image{
+    transform: scale(1.05);
+   }
+}

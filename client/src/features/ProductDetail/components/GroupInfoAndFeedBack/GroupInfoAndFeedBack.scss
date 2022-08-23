@@ -1,0 +1,121 @@
+.group-info-and-feedback{
+    margin-top: 2rem;
+
+
+    .group-info{
+        padding: 0 2rem;
+        margin-bottom: 2rem;
+        .group-info-item{
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eaeaea;
+
+            .info-name{
+                text-transform: uppercase;
+            }
+            .info-value{}
+        }
+        
+    }
+
+    .feedback-wrapper{
+        &>p{
+            color: #555;
+        }
+
+        .form-feedback{
+            width: 100%;
+            .label{
+                color: #222;
+                font-weight: 500;
+            }
+
+            .comments{
+                margin: 1rem 0;
+            }
+        }
+
+
+        .total-feedback-wrapper{
+            margin-left: 3rem;
+            color: #333;
+
+            .ant-rate{
+                color: #fe8c23;
+            }
+
+            .total-feedback{
+                margin-bottom: 1rem;
+                margin-left:2rem;
+
+                .total-score{
+                    font-size: 20px;
+                    font-weight: bold;
+                    margin-right: 15px;
+                }
+            }
+
+            .feedback-item-vote{
+                display: flex;
+                align-items: center;
+                font-size: 12px;
+
+                .num-star{
+                    margin-right: 5px;
+                }
+
+                .range-vote{
+                    display: inline-block;
+                    width: 200px;
+                    margin: 0 10px;
+                    background-color: #ccc;
+                    height: 4px;
+                    position: relative;
+                }
+
+
+                .percent{
+                    content: ' ';
+                    position: absolute;
+                    height: 4px;
+                    top: 0;
+                    left: 0;
+                    width: 10%;
+                    background-color: #fe8c23;
+                }
+
+                .percent-vote{
+                    color: #2f80ed;
+                    font-weight: bold;
+                }
+            }
+        }
+
+    }
+
+    .feedback-list-wrapper{
+        margin-top: 2rem;
+    }
+
+    .category-name{
+        font-weight: bold;
+        padding-left: 1rem;
+        border-left: 1px solid #eaeaea;
+        text-transform: uppercase;
+        font-size: 12px;
+        color: #333;
+    }
+
+    .list-info{
+        padding-left: 1rem;
+        border-left: 1px solid #eaeaea;
+        li{
+            padding: 8px 0;
+            border-bottom: 1px solid #eaeaea;
+            color: #555;
+        }
+    }
+
+
+}

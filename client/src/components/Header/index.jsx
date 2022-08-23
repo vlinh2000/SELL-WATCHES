@@ -65,11 +65,11 @@ function CartInfo(props) {
                 </li> */}
             </ul>
             <div className='item total-price'>
-                <div>...</div>
+                {/* <div>...</div> */}
                 <strong className='total-price-title'>Tổng tiền:</strong> <strong className='total-price-num'>1.200.000&nbsp;₫</strong>
             </div>
-            <Link className='btnCustom' style={{ backgroundColor: '#c89979' }} to="/b">Xem giỏ hàng</Link>
-            <Link className='btnCustom' to="/a">Thanh toán</Link>
+            <Link className='btnCustom' style={{ backgroundColor: '#c89979' }} to="/cart">Xem giỏ hàng</Link>
+            <Link className='btnCustom' to="/payments">Thanh toán</Link>
         </div>
     );
 }
@@ -137,7 +137,7 @@ function Header(props) {
                     </div>
                     <div className="right">
                         <div className="badge-custom">
-                            <HeartOutlined className='icon' />
+                            <Link to="/wishlist"><HeartOutlined className='icon' /></Link>
                             <span className='num'>5</span>
                         </div>
                         <Popover placement='bottomLeft' content={<CartInfo />} trigger="click">
@@ -155,19 +155,19 @@ function Header(props) {
                             <Link to="" className='active'>Trang Chủ</Link>
                         </li>
                         <li className="navbar-item">
-                            <Link to="">Giới thiệu</Link>
+                            <Link to="/category/donghonam">Đồng hồ nam</Link>
                         </li>
                         <li className="navbar-item">
-                            <Link to="">Đồng hồ nam</Link>
+                            <Link to="/category/donghonu">Đồng hồ nữ</Link>
                         </li>
                         <li className="navbar-item">
-                            <Link to="">Đồng hồ nữ</Link>
+                            <Link to="/category/donghodoi">Đồng hồ đôi</Link>
                         </li>
                         <li className="navbar-item">
-                            <Link to="">Blogs</Link>
+                            <Link to="/category/phukien">Phụ kiện</Link>
                         </li>
                         <li className="navbar-item">
-                            <Link to="">Liên hệ</Link>
+                            <Link to="/contact">Liên hệ</Link>
                         </li>
                         <li className="navbar-item user-logged">
                             <Link to="">Đăng nhập</Link>

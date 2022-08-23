@@ -1,0 +1,83 @@
+.product-info{
+    margin-top: 1rem;
+
+    &__name{
+        font-size: 20px;
+        font-weight: 500;
+        padding-bottom: 10px;   
+        position: relative; 
+    }
+
+    &__name::after{
+        border-bottom: 3px solid #e4e4e4;
+        bottom: 3px;
+        content: "";
+        left: 0;
+        position: absolute;
+        right: 0;
+        width: 35px;
+        z-index: 1;
+    }
+
+    &__description{
+        margin: 1rem 0;
+        font-size: 14px;
+        color: #222;
+    }
+    &__status-stock{
+        margin-bottom: 1rem;
+        font-weight: bold;
+        color: #555;
+    }
+    &__group-quantity{
+        display: flex;
+
+        .btn-decrease,.btn-increase{
+            background: #eee;
+        }
+
+        .btn-increase{
+            margin-right: 1rem;
+        }
+
+        .current-quantity{
+            line-height: 1.5715;
+            position: relative;
+            display: inline-block;
+            font-weight: 400;
+            white-space: nowrap;
+            text-align: center;
+            background-image: none;
+            border: 1px solid transparent;
+            border-left: 0;
+            border-right: 0;
+            box-shadow: 0 2px 0 rgb(0 0 0 / 2%);
+            transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+            height: 32px;
+            padding: 4px 15px;
+            font-size: 14px;
+            border-radius: 2px;
+            color: rgba(0, 0, 0, 0.85);
+            border-color: #d9d9d9;
+            background: #fff;
+        }
+
+        .ant-btn:hover,.ant-btn:focus{
+            color: var(--mainColor);;
+            border-color: var(--mainColor);;
+        }
+    }
+
+    &__info-list{
+        margin-top: 1rem;
+
+        .info-item{
+            padding: 8px 0;
+            border-top: 1px solid #eee;
+            a{
+                color:#333
+            }
+        }
+
+    }
+}

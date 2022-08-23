@@ -13,6 +13,8 @@
     &__header{
         width: 80%;
         margin: 0 auto;
+        position: -webkit-sticky;
+    
 
         &__top-nav{
             display: flex;
@@ -89,7 +91,7 @@
                     color: #333333;
                     border-top-right-radius: 5px;
                     border-bottom-right-radius: 5px;
-                    background: #c89979;
+                    background: var(--mainColor);;
                     color: #FFF;
                     cursor: pointer;
                 }
@@ -136,7 +138,10 @@
             }
         }
         &__navbar{
+            
             .navbar-list{
+                position: sticky;
+                top: 0;
                 list-style: none;
                 margin: 0 auto;
                 text-align: center;
@@ -154,11 +159,11 @@
                     padding-bottom: 5px;
                 }
                 .navbar-item>a:hover{
-                    border-bottom: 1px solid #c89979;
+                    border-bottom: 1px solid var(--mainColor);;
                 }
                 .navbar-item>a.active{
-                    color: #c89979;
-                    border-bottom: 1px solid #c89979;
+                    color: var(--mainColor);;
+                    border-bottom: 1px solid var(--mainColor);;
                 }
 
                 .user-logged{
@@ -221,7 +226,7 @@
         text-align: center;
     }
     .total-price-title{
-        color: #C89979;
+        color: var(--mainColor);;
     }
 
     .total-price-num{
@@ -239,7 +244,7 @@
         font-weight: bold;
     }
     .btnCustom:hover{
-        background-color: #c89979;
+        background-color: var(--mainColor);;
         color: #FFF!important;
     }
 

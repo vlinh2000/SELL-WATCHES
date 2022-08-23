@@ -1,0 +1,35 @@
+.contact{
+   
+
+    .shop-info{
+        margin-top: 2rem;
+
+        .info-wrapper{
+            display: flex;
+            margin-bottom: 1rem;
+        }
+
+        .icon{
+            margin-right: 10px;
+            height: 40px;
+            width: 40px;
+            background-color: var(--mainColor);
+            color: #FFF;
+            line-height: 40px;
+            text-align: center;
+        }
+        
+        
+        .info{
+            p{
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 2px;
+            }
+            
+            div{
+                font-size: 13.5px;
+            }
+        }
+    }
+}

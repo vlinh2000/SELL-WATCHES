@@ -1,0 +1,94 @@
+.filter-item{
+    margin-bottom: 2rem;
+    &__name{
+
+        font-size: 14px;
+        text-transform: uppercase;
+
+        &::after{
+            content: ' ';
+            height: 3px;
+            display: block;
+            background-color: rgba(0,0,0,0.1);
+            margin: 1em 0 1em;
+            width: 100%;
+            max-width: 30px;
+        }
+
+    }
+    &__list-item{
+        padding: 13px 15px;
+        border: 1px solid #eaeaea;
+        font-size: .85rem;
+
+        .item{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+        
+        &:not(:first-child){
+            border-top: 1px solid #eaeaea;
+        }        
+
+        .quantity{
+            font-size: 10px;
+            color: #aaa;
+        }
+
+        a{
+            color: #333;
+        }
+        }
+
+
+    }
+
+    .slider-wrapper{
+        margin-top: 15px;
+        
+        .controls{
+            margin-top: 20px;
+            // display: flex;
+            // align-content: center;
+            // justify-content: space-between;
+        }
+
+        button{
+            border: 0;
+            outline: 0;
+            cursor: pointer;
+            font-weight: bold;
+            background-color: #666;
+            color: #FFF;
+            width: 50px;
+            height: 30px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .show-price-wrapper{
+            color: #555;
+            font-size: .85rem;
+       
+            .show-price{
+                font-weight: bold;
+            }
+        }
+
+
+        .ant-slider-handle{
+            border-color: #666;
+            background-color: #666;
+        }
+        
+        .ant-slider-track{
+            background-color: #aaa;
+        }
+
+        .ant-slider:hover .ant-slider-handle{
+            border-color: #666;
+        }
+    }
+}
