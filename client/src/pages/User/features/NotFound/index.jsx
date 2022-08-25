@@ -1,11 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import { Button, Result } from 'antd';
-import { Link, useNavigate } from 'react-router-dom';
-
-NotFound.propTypes = {
-
-};
+import { useNavigate } from 'react-router-dom';
 
 function NotFound(props) {
 
@@ -13,8 +7,8 @@ function NotFound(props) {
 
     return (
         <Result
-            status="403"
-            title="403"
+            status="404"
+            title="404"
             subTitle="Không tìm thấy trang"
             extra={<Button onClick={() => navigate('/')} type="primary">Trở lại</Button>}
         />

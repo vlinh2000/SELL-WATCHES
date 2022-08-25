@@ -5,8 +5,8 @@ import './ProductByCategory.scss';
 import BreadcrumbCustom from 'components/BreadcrumbCustom';
 import SortBy from 'components/SortBy';
 import { Col, Pagination, Row } from 'antd';
-import ListProducts from 'features/Home/Components/ListProducts';
 import FilterItem from './components/FilterItem';
+import ListProducts from '../Home/Components/ListProducts';
 
 ProductByCategory.propTypes = {
 

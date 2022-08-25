@@ -27,7 +27,7 @@
     }
 
     &__name:hover{
-        color: #E2BA48!important;
+        color: var(--mainColor)!important;
     }
 
     &__price{
@@ -67,6 +67,21 @@
         }
     }
 
+    &__btn-like{
+        position: absolute;
+        top: 10%;
+        right: 17px;
+        transition: top 200ms linear;
+        cursor: pointer;
+        opacity: 1;
+
+
+        .like-icon{
+            font-size: 30px;
+        }
+
+    }
+
     &__out-of-stock{
         position: absolute;
         top: 90px ;
@@ -92,8 +107,9 @@
         line-height: 40px;
         font-size: 0.8rem;
         color: #FFF;
-        background-color: #E2BA48;
+        background-color: var(--mainColor);
     }
+    
     &__discount::before{
         content: '-';
     }

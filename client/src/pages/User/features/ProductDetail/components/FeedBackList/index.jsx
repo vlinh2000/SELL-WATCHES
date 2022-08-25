@@ -1,10 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import './FeedBackList.scss';
-import { CheckCircleOutlined, DislikeFilled, DislikeOutlined, LikeFilled, LikeOutlined } from '@ant-design/icons';
-import { Avatar, Button, Comment, Rate, Tooltip } from 'antd';
-import moment from 'moment';
 import FeedBack from '../FeedBack';
+import './FeedBackList.scss';
 
 FeedBackList.propTypes = {
 

@@ -1,14 +1,11 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import './GroupInfoAndFeedBack.scss';
-import { Col, Form, Pagination, Rate, Row, Select, Tabs } from 'antd';
-import { StarFilled, StarOutlined } from '@ant-design/icons';
+import { StarFilled } from '@ant-design/icons';
+import { Col, Form, Pagination, Rate, Row, Tabs } from 'antd';
 import ButtonCustom from 'components/ButtonCustom';
+import SortBy from 'components/SortBy';
 import InputField from 'custom-fields/InputField';
 import { Link } from 'react-router-dom';
 import FeedBackList from '../FeedBackList';
-import SelectField from 'custom-fields/SelectField';
-import SortBy from 'components/SortBy';
+import './GroupInfoAndFeedBack.scss';
 
 GroupInfoAndFeedBack.propTypes = {
 

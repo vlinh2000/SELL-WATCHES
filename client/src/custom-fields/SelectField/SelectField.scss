@@ -13,4 +13,9 @@
     .ant-select:not(.ant-select-disabled):focus .ant-select-selector {
         border-color: var(--mainColor);
     }
+
+    .ant-form-item-label label {
+        font-size: 14px;
+        font-weight: 500;
+    }
 }

@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Breadcrumb, Col, Row } from 'antd';
-import CarouselCustom from 'features/Home/Components/CarouselCustom';
 import GroupProductImage from './components/GroupProductImage';
 import BreadcrumbCustom from 'components/BreadcrumbCustom';
 import ProductInfo from './components/ProductInfo';

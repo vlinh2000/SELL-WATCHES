@@ -106,3 +106,37 @@
     border-radius: 5px;
     font-weight: bold;
 }
+
+/*------ADMIN PAGE-------------*/
+.admin-page .main-wrapper{
+    padding: 1rem 1.75rem;
+    background: #f0f2f5;
+    min-height: 100vh;
+    color: #394b6a;
+}
+
+.admin-page .main-wrapper .box{
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    padding: 1rem;
+    background: #FFF;
+}
+
+.admin-page .main-wrapper .box .ant-table table{
+    display: block;
+    max-width: 100%;
+    overflow: auto;
+}
+
+.admin-page .main-wrapper .box .ant-table-thead > tr > th{
+    white-space: nowrap;
+}
+
+.admin-page .admin-custom-btn{
+    color: #FFF;
+    background: #394B6A;
+    font-weight: bold;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+

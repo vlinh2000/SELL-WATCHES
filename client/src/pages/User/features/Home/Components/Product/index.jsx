@@ -1,9 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import './Product.scss';
-import { Button, Col, Tooltip } from 'antd';
-import { CarTwoTone, ShopOutlined, ShoppingFilled, ShoppingOutlined } from '@ant-design/icons';
+import { HeartFilled, HeartOutlined, ShoppingOutlined } from '@ant-design/icons';
+import { Col, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
+import './Product.scss';
 
 Product.propTypes = {
 
@@ -26,6 +24,12 @@ function Product(props) {
                 <div className="product__btn-add-to-cart">
                     <Tooltip title="Thêm vào giỏ" placement='top'>
                         <ShoppingOutlined className='add-to-cart-icon' />
+                    </Tooltip>
+                </div>
+                <div className="product__btn-like">
+                    <Tooltip title="Thêm vào yêu thích" placement='top'>
+                        <HeartOutlined className='like-icon' />
+                        {/* <HeartFilled className='like-icon' /> */}
                     </Tooltip>
                 </div>
                 <div className="product__out-of-stock">Hết hàng</div>

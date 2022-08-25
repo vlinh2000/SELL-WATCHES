@@ -1,0 +1,15 @@
+.breadcrumb-v2{
+    font-weight: bold;
+    
+    .ant-breadcrumb{
+        li:last-child{
+            color: #394b6a;
+        }
+    }
+
+    .name-page{
+        // font-size: 20px;
+        text-transform: uppercase;
+        margin-top: 5px;
+    }
+}

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './GroupProductImage.scss';
-import CarouselCustom from 'features/Home/Components/CarouselCustom';
+import CarouselCustom from 'pages/User/features/Home/Components/CarouselCustom';
 
 GroupProductImage.propTypes = {
 

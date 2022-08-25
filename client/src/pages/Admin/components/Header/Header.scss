@@ -1,0 +1,46 @@
+.header-admin{
+    // height: 30px;
+    background-color: #2C3338;
+   
+    // padding: 1rem 24px;
+
+
+    .left-side{
+        text-align: center;
+        border-bottom: 1px solid #ececec;
+        
+
+        img{
+            width: 60px;
+            height: 35px;
+            object-fit: contain;
+        }
+    }
+
+    .right-side {
+        color: #FFF;
+        a{
+            text-transform: uppercase;
+            color: #FFF;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .position{
+            margin:0 5px;
+            font-size: 10px;
+            color: #2ECC40;
+        }
+
+        .icon-logout{
+            cursor: pointer;
+            margin-left: 10px;
+            transition: 200ms linear;
+        }
+
+        .icon-logout:hover{
+            color: var(--mainColor);
+        }
+    }
+
+}

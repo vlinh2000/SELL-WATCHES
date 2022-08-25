@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './Header.scss';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button, Col, Popover, Row, Tooltip } from 'antd'
 import { BarsOutlined, CloseOutlined, EnvironmentOutlined, FacebookFilled, FacebookOutlined, HeartOutlined, InstagramOutlined, PhoneOutlined, SearchOutlined, ShoppingCartOutlined, ShoppingOutlined, TwitterOutlined } from '@ant-design/icons';
 import ButtonCustom from 'components/ButtonCustom';
@@ -76,6 +76,10 @@ function CartInfo(props) {
 
 
 function Header(props) {
+
+    const { pathname } = useLocation();
+
+    console.log({ pathname })
 
     const handleShowNavbar = () => {
         document.querySelector('.hide-bg').style.display = 'block';

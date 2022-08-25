@@ -152,3 +152,25 @@
         padding: 10px 0rem;
     }
 }
+
+
+@media only screen and (max-width: 698px){
+
+    .ant-tabs {
+        display: block;
+    }
+
+    .ant-tabs-left > .ant-tabs-content-holder > .ant-tabs-content > .ant-tabs-tabpane, .ant-tabs-left > div > .ant-tabs-content-holder > .ant-tabs-content > .ant-tabs-tabpane {
+        padding-right: 24px;
+    }
+
+    .ant-tabs-content-holder{
+        margin-top: 2rem;
+        padding-top: 2rem;
+    }
+
+    .statistical{
+        margin-bottom: 1rem;
+    }
+}
+
