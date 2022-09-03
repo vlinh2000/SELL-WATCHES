@@ -5,6 +5,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button, Col, Popover, Row, Tooltip } from 'antd'
 import { BarsOutlined, CloseOutlined, EnvironmentOutlined, FacebookFilled, FacebookOutlined, HeartOutlined, InstagramOutlined, PhoneOutlined, SearchOutlined, ShoppingCartOutlined, ShoppingOutlined, TwitterOutlined } from '@ant-design/icons';
 import ButtonCustom from 'components/ButtonCustom';
+import { useDispatch, useSelector } from 'react-redux';
+import { switch_screenLogin } from 'pages/User/userSlice';
 
 Header.propTypes = {
 
@@ -78,6 +80,8 @@ function CartInfo(props) {
 function Header(props) {
 
     const { pathname } = useLocation();
+    const dispatch = useDispatch();
+    const { user } = useSelector(state => state.auth);
 
     console.log({ pathname })
 
@@ -124,7 +128,11 @@ function Header(props) {
                                 <TwitterOutlined />
                             </a>
                         </Tooltip>
-                        <Link className='user' to="/">Đăng nhập/đăng ký</Link>
+                        {
+                            user?.HO_TEN
+                                ? <Link className='user' to="/profile">{user.HO_TEN}</Link>
+                                : <Link className='user' to="" onClick={() => dispatch(switch_screenLogin(true))}>Đăng nhập/đăng ký</Link>
+                        }
                     </div>
                 </div>
                 <div className="header-wrapper__header__main-nav">

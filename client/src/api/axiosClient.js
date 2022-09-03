@@ -14,14 +14,10 @@ const axiosClient = axios.create({
 
 axiosClient.interceptors.request.use(async config => {
     //handle token when login username password
-    const { currentUser } = JSON.parse(localStorage.getItem('persist:auth'));
-
-    const { auth: { token } } = JSON.parse(currentUser);
-
+    const { token } = JSON.parse(localStorage.getItem('persist:auth'));
     if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        config.headers.Authorization = `Bearer ${JSON.parse(token)}`;
     }
-
     return config;
 })
 

@@ -12,6 +12,23 @@
         color: #FFF!important;
     }
 
+    .btn-logout{
+        height: 40px;
+        line-height: 40px;
+        padding-left: 24px;
+        color: rgba(255, 255, 255, 0.65);
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 11px;
+        font-weight: bold;
+        transition: 200ms linear;
+    }
+
+    .btn-logout:hover{
+        color: #fff;
+        background-color: transparent;
+    }
+
     .ant-menu-dark .ant-menu-item:hover a, .ant-menu-dark .ant-menu-item-active a, .ant-menu-dark .ant-menu-submenu-active a, .ant-menu-dark .ant-menu-submenu-open a, .ant-menu-dark .ant-menu-submenu-selected a, .ant-menu-dark .ant-menu-submenu-title:hover a{
         color: #FFF;
     }

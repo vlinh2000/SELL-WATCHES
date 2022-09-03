@@ -1,0 +1,13 @@
+.products{
+    img.product-image{
+        width: 60px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 10px;
+        display: block;
+        margin: 0 auto;
+    }
+    .ant-table-pagination-right{
+        justify-content: unset;
+    }
+}

@@ -1,140 +1,169 @@
+import { DeleteOutlined, EditOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
+import { Avatar, Button, Popconfirm, Table, Tag } from 'antd';
+import { nhanvienApi } from 'api/nhanvienApi';
+import { numberWithCommas } from 'assets/admin';
+import moment from 'moment';
+import { fetch_employees, prepareDataEdit, savePagination } from 'pages/Admin/adminSlice';
+import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
 import React from 'react';
-import PropTypes from 'prop-types';
-import { Button, Divider, Popconfirm, Radio, Table } from 'antd';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import toast from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 Employee.propTypes = {
 
 };
 
+const colorList = ['#f56a00', '#7265e6', '#ffbf00', '#00a2ae'];
+
 function Employee(props) {
 
-    const onEdit = (id) => {
-        alert(id)
+    const {
+        loading: { employees: isLoading },
+        data: { employees },
+        pagination: { employees: pagination } } = useSelector(state => state.adminInfo);
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    React.useEffect(() => {
+        dispatch(prepareDataEdit({ screen: 'employees', mode: "ADD" }))
+    }, [pagination._limit, pagination._page]);
+
+
+    const onEdit = (data) => {
+        const DIA_CHI = data.DIA_CHI ? data.DIA_CHI.split(', ') : ['', '', ''];
+        const [WARDS, DISTRICT, PROVINCES] = DIA_CHI;
+        const newData = { ...data, PROVINCES, DISTRICT, WARDS }
+        dispatch(prepareDataEdit({ screen: 'employees', mode: 'EDIT', data: newData }));
+        navigate('/admin/employees/edit');
     }
 
-    const onDelete = (id) => {
-        alert(id)
+    const onDelete = async (id) => {
+        try {
+            const { message } = await nhanvienApi.delete(id);
+            await dispatch(fetch_employees({ _limit: pagination._limit, _page: pagination._page }));
+            toast.success(message);
+        } catch (error) {
+            console.log({ error });
+            toast.error(error.response.data.message);
+        }
     }
+
+    const onHandleUser = async (id, isBlock) => {
+        try {
+            await nhanvienApi.update(id, { BI_KHOA: isBlock ? '1' : '0', TRANG_THAI: isBlock ? 'Bị khóa' : 'Đang hoạt động' });
+            await dispatch(fetch_employees({ _limit: pagination._limit, _page: pagination._page }));
+            toast.success(`${isBlock ? 'Khóa' : 'Mở khóa'} tài khoản [${id}] thành công.`);
+        } catch (error) {
+            console.log({ error });
+            toast.error(error.response.data.message);
+        }
+    }
+
 
     const columns = [
         {
             title: 'ID',
-            dataIndex: 'id'
+            dataIndex: 'NV_ID'
         },
         {
             title: 'Avatar',
-            dataIndex: 'avatar',
-            render: (text) => <img style={{ objectFit: 'contain' }} width={50} height={50} src={text} />
+            dataIndex: 'ANH_DAI_DIEN',
+            render: (text, record) => text ? <Avatar src={text} size="large"></Avatar> : <Avatar style={{ backgroundColor: colorList[Math.ceil(Math.random() * colorList.length) % colorList.length], verticalAlign: 'middle' }} size="large">{record?.HO_TEN?.charAt(0).toUpperCase() || '-'}</Avatar>
         },
         {
             title: 'Họ tên',
-            dataIndex: 'name'
+            dataIndex: 'HO_TEN'
         },
         {
             title: 'SĐT',
-            dataIndex: 'phone',
+            dataIndex: 'SO_DIEN_THOAI',
+        },
+        {
+            title: 'Email',
+            dataIndex: 'EMAIL',
         },
 
         {
             title: 'Địa chỉ',
-            dataIndex: 'address',
+            dataIndex: 'DIA_CHI',
         },
         {
             title: 'Giới tính',
-            dataIndex: 'gender',
-        },
-        {
-            title: 'Tài khoản',
-            dataIndex: 'userName',
+            dataIndex: 'GIOI_TINH',
         },
         {
             title: 'Chức vụ',
-            dataIndex: 'position',
+            dataIndex: 'TEN_CV',
         },
         {
             title: 'Lương',
-            dataIndex: 'money',
+            dataIndex: 'LUONG_CO_BAN',
+            render: (text) => numberWithCommas(text)
         },
         {
             title: 'Ngày tạo',
-            dataIndex: 'createAt',
+            dataIndex: 'NGAY_TAO',
+            render: (text) => moment(text).format('DD-MM-YYYY HH:mm:ss')
         },
         {
-            title: 'Cập nhật',
-            dataIndex: 'updateAt',
+            title: 'Trạng thái',
+            dataIndex: 'TRANG_THAI',
+            render: (text, record) => <Tag color={record.BI_KHOA === "1" ? "red" : "green"}>{text}</Tag>
         },
+        // {
+        //     title: 'Cập nhật',
+        //     dataIndex: 'CAP_NHAT',
+        //     render: (text) => moment(text).format('DD-MM-YYYY HH:mm:ss')
+        // },
         {
             title: 'Hành động',
-            dataIndex: 'id',
-            render: (text) => <> <Button onClick={() => { onEdit(text) }} icon={<EditOutlined />}></Button>
+            dataIndex: 'NV_ID',
+            render: (text, record) => <> <Button onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
                 <Popconfirm
-                    title={`Bạn có chắc muốn xóa nhân viên ID [${text}]`}
+                    placement='left'
+                    title={`Bạn có chắc muốn ${record.BI_KHOA === "0" ? 'khóa' : 'mở khóa'} tài khoản [${text}] ?`}
+                    onConfirm={() => { onHandleUser(text, record.BI_KHOA === '0') }}
+                    okText="Yes"
+                    cancelText="No">
+                    <Button style={{ marginLeft: 5 }} icon={record.BI_KHOA === "0" ? <LockOutlined /> : <UnlockOutlined />}></Button>
+                </Popconfirm>
+                <Popconfirm
+                    placement='left'
+                    title={`Bạn có chắc muốn xóa nhân viên ID [${text}] ?`}
                     onConfirm={() => { onDelete(text) }}
                     okText="Yes"
-                    cancelText="No"
-                >
-                    <Button style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
+                    cancelText="No">
+                    <Button style={{ marginTop: 5 }} danger icon={<DeleteOutlined />}></Button>
                 </Popconfirm>
             </>
         },
     ];
-    const data = [
-        {
-            key: '1',
-            id: '#1',
-            name: 'Việt linh',
-            avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Lionel_Messi_20180626.jpg',
-            address: 'Xuân Hòa, Kế Sách, Sóc Trăng',
-            gender: 'nam',
-            userName: 'linh_vip2000',
-            email: 'linh@gmail.com',
-            phone: '0387746557',
-            position: 'Bảo vệ',
-            money: 90432423,
-            createAt: '2022-8-19 11:11:00',
-            updateAt: '2022-8-19 12:00:00',
-        },
-        {
-            key: '2',
-            id: '#2',
-            name: 'Việt linh',
-            avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Lionel_Messi_20180626.jpg',
-            address: 'Xuân Hòa, Kế Sách, Sóc Trăng',
-            gender: 'nam',
-            userName: 'linh_vip2000',
-            email: 'linh@gmail.com',
-            phone: '0387746557',
-            position: 'Bảo vệ',
-            money: 90432423,
-            createAt: '2022-8-19 11:11:00',
-            updateAt: '2022-8-19 12:00:00',
-        },
-        {
-            key: '3',
-            id: '#3',
-            name: 'Việt linh',
-            avatar: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Lionel_Messi_20180626.jpg',
-            address: 'Xuân Hòa, Kế Sách, Sóc Trăng',
-            gender: 'nam',
-            userName: 'linh_vip2000',
-            email: 'linh@gmail.com',
-            phone: '0387746557',
-            position: 'Bảo vệ',
-            money: 90432423,
-            createAt: '2022-8-19 11:11:00',
-            updateAt: '2022-8-19 12:00:00',
-        }
-    ];
-
 
     return (
         <div className='employees box'>
-            <Table
-                size='small'
-                columns={columns}
-                dataSource={data}
-            />
+            {
+                isLoading ?
+                    <SkeletonCustom />
+                    :
+                    <>
+                        <p>Tổng số: {employees?.length < pagination?._limit ? employees.length : pagination._limit}/ {pagination._totalRecord} bản ghi</p>
+                        <Table
+                            size='small'
+                            columns={columns}
+                            dataSource={employees}
+                            pagination={
+                                {
+                                    current: pagination._page,
+                                    total: pagination._totalPage,
+                                    onChange: (page) => dispatch(savePagination({ screen: 'employees', page }))
+                                }
+                            }
+                        />
+                    </>
+
+            }
         </div>
     );
 }

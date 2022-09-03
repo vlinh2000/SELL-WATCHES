@@ -8,20 +8,26 @@ UploadField.propTypes = {
     name: PropTypes.string,
     disabled: PropTypes.bool,
     required: PropTypes.bool,
-    placeHolder: PropTypes.string,
+    showUploadList: PropTypes.bool,
+    saveData: PropTypes.func,
     label: PropTypes.string,
-    type: PropTypes.string,
-    rows: PropTypes.number
+    listType: PropTypes.string,
+    onRemove: PropTypes.func,
+    rules: PropTypes.array,
+    defaultFileList: PropTypes.array,
 };
 
 UploadField.defaultProps = {
     name: '',
     disabled: false,
     required: false,
-    placeHolder: '',
+    showUploadList: false,
+    saveData: null,
     label: '',
-    type: 'text',
-    rows: 10
+    listType: 'text',
+    onRemove: null,
+    rules: [],
+    defaultFileList: [],
 };
 
 const getBase64 = file => new Promise((resolve, reject) => {
@@ -44,29 +50,46 @@ const beforeUpload = (file) => {
 
 function UploadField(props) {
 
-    const { name, disabled, placeHolder, label, type, rows, required, getUrl, icon } = props;
-
+    const { name, disabled, saveData, label, listType, onRemove, required, getUrl, icon, showUploadList, rules, defaultFileList } = props;
+    const [fileList, setFileList] = React.useState(() => defaultFileList || []);
     const [loading, setLoading] = React.useState(false);
     const [imageUrl, setImageUrl] = React.useState();
 
-    const handleChange = async (info) => {
+    const handleChange = async ({ file, fileList: newFileList }) => {
         if (getUrl) {
-            const base64 = await getBase64(info.file);
+            const base64 = await getBase64(file);
             getUrl(base64);
         }
 
+        setFileList(newFileList);
+        handleSaveData([...newFileList]);
     };
+
+    const handleRemove = (file) => {
+        if (!onRemove) return;
+        onRemove(file)
+    }
+
+    const handleSaveData = (fileList) => {
+        if (!saveData) return;
+        saveData(fileList)
+        console.log({ fileList })
+    }
 
     return (
         <Form.Item
             className='input-field'
             required={required}
+            rules={rules}
             label={label}
             name={name}>
             <Upload
+                onRemove={(file) => handleRemove(file)}
+                fileList={fileList}
+                listType={listType}
                 name="avatar"
                 className="avatar-uploader"
-                showUploadList={false}
+                showUploadList={showUploadList}
                 beforeUpload={beforeUpload}
                 onChange={handleChange}>
                 <div className='upload-avatar'>

@@ -121,11 +121,33 @@
     background: #FFF;
 }
 
-.admin-page .main-wrapper .box .ant-table table{
-    display: block;
-    max-width: 100%;
-    overflow: auto;
+.admin-page .main-wrapper .box .ant-table-wrapper{
+    display: block; 
+    overflow-y: auto;
 }
+/*--------------------*/
+.table-detail{
+    overflow: hidden;
+    min-height: 20vh;
+    /* box-shadow: #394b6a 0px 1px 4px; */
+    border: 1px solid #c2c4c7;
+    /* border-top: none; */
+    padding: 8px;
+    margin-bottom: 1rem;
+}
+.table-detail th{
+    font-weight: 500;
+    color: #394b6a!important;
+    font-size: 12px;
+}
+.table-detail th, .table-detail td{
+    text-align: center!important;
+}
+
+.ant-table-expanded-row > td{
+    padding: 0 8px!important;
+}
+/*--------------------*/
 
 .admin-page .main-wrapper .box .ant-table-thead > tr > th{
     white-space: nowrap;

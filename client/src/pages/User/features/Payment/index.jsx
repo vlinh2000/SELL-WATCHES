@@ -6,6 +6,9 @@ import InputField from 'custom-fields/InputField';
 import SelectField from 'custom-fields/SelectField';
 import ButtonCustom from 'components/ButtonCustom';
 import './Payments.scss';
+import { useDispatch, useSelector } from 'react-redux';
+import { switch_screenLogin } from 'pages/User/userSlice';
+import * as yup from 'yup';
 
 Payments.propTypes = {
 
@@ -18,17 +21,38 @@ function NotFoundAddress() {
 }
 
 
+let schema = yup.object().shape({
+    HO_TEN: yup.string().required('Họ tên không được để trống.'),
+    SO_DIEN_THOAI: yup.string().required('Số điện thoại không được để trống.'),
+    EMAIL: yup.string().required('Email không được để trống.'),
+});
+
+const yupSync = {
+    async validator({ field }, value) {
+        await schema.validateSyncAt(field, { [field]: value });
+    },
+};
+
 function Payments(props) {
 
     const [showUseVoucherForm, setShowUseVoucherForm] = React.useState(false);
-
+    const { isAuth, user } = useSelector(state => state.auth);
+    const dispatch = useDispatch();
+    const [form] = Form.useForm();
+    const initialValues = {
+        HO_TEN: user?.HO_TEN || '',
+        SO_DIEN_THOAI: user?.SO_DIEN_THOAI || '',
+        EMAIL: user?.EMAIL || '',
+    }
     return (
         <div className='wrapper-content'>
             <div className="payments">
-                <div className='note'>
-                    Bạn đã có tài khoản? <a>Ấn vào đây để đăng nhập</a>
-
-                </div>
+                {
+                    !isAuth &&
+                    <div className='note'>
+                        Bạn đã có tài khoản? <a href='' onClick={dispatch(switch_screenLogin(true))}>Ấn vào đây để đăng nhập</a>
+                    </div>
+                }
                 <div className='note'>
                     <CodeOutlined />  Có mã ưu đãi? <a onClick={(e) => {
                         e.preventDefault();
@@ -53,18 +77,22 @@ function Payments(props) {
                         <Col xs={24} sm={24} md={10} lg={13}>
                             <div className="left-side">
                                 <h1>Thông tin thanh toán</h1>
-                                <Form layout='vertical'>
-                                    <InputField name='name' label='Họ tên' required />
-                                    <InputField name='phone' label='Số điện thoại' required />
-                                    <InputField name='email' label='Địa chỉ email' required />
+                                <Form
+                                    form={form}
+                                    initialValues={initialValues}
+                                    layout='vertical'>
+                                    <InputField name='HO_TEN' label='Họ tên' required rules={[yupSync]} />
+                                    <InputField name='SO_DIEN_THOAI' label='Số điện thoại' required rules={[yupSync]} />
+                                    <InputField name='EMAIL' label='Địa chỉ email' required rules={[yupSync]} />
                                     {/* <SelectField name='city' label='Tỉnh / Thành phố' options={[{ label: "a", value: "a" }]} required />
                                     <SelectField name='district' label='Quận / Huyện' options={[{ label: "a", value: "a" }]} required />
                                     <SelectField name='ward' label='Phường / Xã' options={[{ label: "a", value: "a" }]} required /> */}
                                     <InputField
-                                        name='note'
+                                        name='GHI_CHU'
                                         label='Ghi chú đơn hàng'
                                         type='textarea'
                                         placeHolder='Ghi chú về đơn hàng, ví dụ: thời gian hay chỉ dẫn địa điểm giao hàng chi tiết hơn.'
+                                        rules={[yupSync]}
                                     />
                                 </Form>
                             </div>
