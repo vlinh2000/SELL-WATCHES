@@ -1,9 +1,9 @@
 import axiosClient from "./axiosClient"
 
-export const donhangApi = {
+export const quyenApi = {
     getAll: (params) => {
         return new Promise((resolve, reject) => {
-            const url = `/donhangs`
+            const url = `/quyens`
             setTimeout(async () => {
                 try {
                     const response = await axiosClient.get(url, { params });
@@ -15,13 +15,9 @@ export const donhangApi = {
         })
 
     },
-    getThongKes: (params) => {
-        const url = `/donhangs/thongkes`
-        return axiosClient.get(url, { params });
-    },
     post: data => {
         return new Promise((resolve, reject) => {
-            const url = '/donhangs'
+            const url = '/quyens'
             setTimeout(async () => {
                 try {
                     const response = await axiosClient.post(url, data);
@@ -39,7 +35,7 @@ export const donhangApi = {
         return new Promise((resolve, reject) => {
             setTimeout(async () => {
                 try {
-                    const url = `/donhangs/${params}`
+                    const url = `/quyens/${params}`
                     const response = await axiosClient.patch(url, data);
                     resolve(response);
 
@@ -50,7 +46,7 @@ export const donhangApi = {
         })
     },
     delete: (params) => {
-        const url = `/donhangs/${params}`
+        const url = `/quyens/${params}`
         return axiosClient.delete(url);
     }
 }

@@ -177,6 +177,9 @@ function OrderConfirm(props) {
                             }
                         </Collapse>
                         {
+                            ordersConfirm?.length < 1 && <p style={{ marginTop: 5 }}>Hiện tại không có đơn cần xác nhận.</p>
+                        }
+                        {
                             pagination._totalPage != 0 &&
                             <Pagination
                                 style={{ marginTop: '9rem' }}

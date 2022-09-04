@@ -105,6 +105,26 @@ function getBreadcrumbFromSecond(path) {
             key = "11112";
             break;
         }
+        case '/admin/rules/edit': {
+            paths = ['Quản lý quyền', 'Cập nhật quyền'];
+            key = "12121";
+            break;
+        }
+        case '/admin/rules/view': {
+            paths = ['Quản lý quyền', 'Danh sách quyền'];
+            key = "12122";
+            break;
+        }
+        // case '/admin/vouchers/edit': {
+        //     paths = ['Quản lý phiếu giảm giá', 'Cập nhật phiếu giảm giá'];
+        //     key = "13131";
+        //     break;
+        // }
+        // case '/admin/vouchers/view': {
+        //     paths = ['Quản lý phiếu giảm giá', 'Danh sách phiếu giảm giá'];
+        //     key = "13132";
+        //     break;
+        // }
         case '/admin/dashboard': {
             paths = ['Dashboard'];
             key = "1"
@@ -125,4 +145,12 @@ function getStatusOrder(num) {
 
 }
 
-export { getBreadcrumbFromSecond, numberWithCommas, getStatusOrder };
+function formatDate(date, formart = "YYYY-MM-DD") {
+    let dateFormatted;
+    switch (date) {
+        case 'YYYY-MM-DD': dateFormatted = date.toJSON().slice(0, 10);
+    }
+    return dateFormatted;
+}
+
+export { getBreadcrumbFromSecond, numberWithCommas, getStatusOrder, formatDate };

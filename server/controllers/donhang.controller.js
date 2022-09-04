@@ -52,6 +52,25 @@ module.exports = {
             res.status(500).json({ message: "Đã xảy ra lỗi! Hãy thử lại sau." })
         }
     },
+    get_thongkes: async (req, res) => {
+        try {
+            const { dateFrom, dateTo } = req.query;
+            const sql = `SELECT  DATE_FORMAT(a.TG_DAT_HANG,'%Y-%m') as THANG, SUM(a.TONG_TIEN) as TONG_TIEN 
+                        FROM DON_HANG a
+                        WHERE 
+                            a.TG_DAT_HANG between '${dateFrom}' AND '${dateTo}' 
+                            AND ( a.TRANG_THAI = 2 OR a.DA_THANH_TOAN = '1') 
+                        GROUP BY MONTH(a.TG_DAT_HANG)`;
+            const donhangs = await executeQuery(sql);
+            res.json({
+                result: donhangs,
+                message: 'Thành công'
+            });
+        } catch (error) {
+            console.log({ error: error.message });
+            res.status(500).json({ message: "Đã xảy ra lỗi! Hãy thử lại sau." })
+        }
+    },
     post_donhangs: async (req, res) => {
         try {
             const { USER_ID, DIA_CHI_GH, GIAM_GIA, TONG_TIEN, DA_THANH_TOAN, HINH_THUC_THANH_TOAN, PHI_SHIP, GHI_CHU } = req.body;

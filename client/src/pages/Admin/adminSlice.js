@@ -7,7 +7,9 @@ import { nguoidungApi } from 'api/nguoidungApi';
 import { nhacungcapApi } from 'api/nhacungcapApi';
 import { nhanvienApi } from 'api/nhanvienApi';
 import { phieunhapApi } from 'api/phieunhapApi';
+import { quyenApi } from 'api/quyenApi';
 import { sanphamApi } from 'api/sanphamApi';
+import { thongkeApi } from 'api/thongkeApi';
 import { thuonghieuApi } from 'api/thuonghieuApi';
 
 export const fetch_positions = createAsyncThunk("adminPage/fetch_positions", async (params, { rejectWithValue }) => {
@@ -143,6 +145,30 @@ export const fetch_orders_pending = createAsyncThunk("adminPage/fetch_orders_pen
 
 })
 
+export const fetch_rules = createAsyncThunk("adminPage/fetch_rules", async (params, { rejectWithValue }) => {
+
+    try {
+        const { result, totalRecord } = await quyenApi.getAll(params);
+        return { result, totalRecord };
+
+    } catch (error) {
+        return rejectWithValue(error.respone.data)
+    }
+
+})
+
+export const fetch_statistical = createAsyncThunk("adminPage/fetch_statistical", async (params, { rejectWithValue }) => {
+
+    try {
+        const { result, totalRecord } = await thongkeApi.getAll(params);
+        return { result, totalRecord };
+
+    } catch (error) {
+        return rejectWithValue(error.respone.data)
+    }
+
+})
+
 const initialState = {
     screenUpdateOn: {
         employees: { mode: 'ADD' },
@@ -156,6 +182,7 @@ const initialState = {
         receipts: { mode: 'ADD' },
         products: { mode: 'ADD' },
         orders: { mode: 'ADD' },
+        rules: { mode: 'ADD' },
     },
     selectedKey: '1',
     loading: {},
@@ -222,6 +249,12 @@ const initialState = {
             _totalRecord: 0
         },
         ordersConfirm: {
+            _limit: 10,
+            _page: 1,
+            _totalPage: 1,
+            _totalRecord: 0
+        },
+        rules: {
             _limit: 10,
             _page: 1,
             _totalPage: 1,
@@ -411,7 +444,7 @@ const adminPage = createSlice({
             state.loading.orders = false;
             state.error.orders = action.error;
         },
-        // orders
+        // orders confirm
         [fetch_orders_pending.pending]: (state, action) => {
             state.loading.ordersConfirm = true;
         },
@@ -427,6 +460,35 @@ const adminPage = createSlice({
             state.loading.ordersConfirm = false;
             state.error.ordersConfirm = action.error;
         },
+        // rules
+        [fetch_rules.pending]: (state, action) => {
+            state.loading.rules = true;
+        },
+        [fetch_rules.fulfilled]: (state, action) => {
+            state.loading.rules = false;
+            state.data.rules = action.payload.result.map((e, idx) => ({ ...e, key: idx }));
+
+            const totalRecord = action.payload.totalRecord;
+            state.pagination.rules._totalRecord = totalRecord;
+            state.pagination.rules._totalPage = Math.ceil(totalRecord / state.pagination.rules._limit);
+        },
+        [fetch_rules.rejected]: (state, action) => {
+            state.loading.rules = false;
+            state.error.rules = action.error;
+        },
+        // statistical
+        [fetch_statistical.pending]: (state, action) => {
+            state.loading.statistical = true;
+        },
+        [fetch_statistical.fulfilled]: (state, action) => {
+            state.loading.statistical = false;
+            state.data.statistical = action.payload.result;
+        },
+        [fetch_statistical.rejected]: (state, action) => {
+            state.loading.statistical = false;
+            state.error.statistical = action.error;
+        },
+
     }
 })
 

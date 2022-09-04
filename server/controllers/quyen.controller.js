@@ -1,12 +1,18 @@
 const { executeQuery, checkIsExist, executeUpdateQuery } = require("../mysql");
+const { randomString } = require("../utils/global");
 
 module.exports = {
     get_quyens: async (req, res) => {
         try {
-            const sql = `SELECT * FROM QUYEN`;
+            const { _limit, _page } = req.query;
+            const sql = `SELECT * FROM QUYEN ORDER BY NGAY_TAO DESC ${(_page && _limit) ? ' LIMIT ' + _limit + ' OFFSET ' + _limit * (_page - 1) : ''}`;
             const quyens = await executeQuery(sql);
+            const sql_count = `SELECT COUNT(MA_QUYEN) as total FROM QUYEN`;
+            const data = await executeQuery(sql_count);
+
             res.json({
                 result: quyens,
+                totalRecord: data[0].total,
                 message: 'Thành công'
             });
         } catch (error) {
@@ -30,7 +36,7 @@ module.exports = {
     },
     post_quyens: async (req, res) => {
         try {
-            const { MA_QUYEN, TEN_QUYEN } = req.body;
+            const { TEN_QUYEN, MA_QUYEN } = req.body;
 
             const sql = `INSERT INTO QUYEN(MA_QUYEN,TEN_QUYEN) 
                                         VALUES ('${MA_QUYEN}','${TEN_QUYEN}')`;

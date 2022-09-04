@@ -14,7 +14,7 @@ import Dashboard from './features/DashBoard';
 import Positon from './features/Position';
 import PositionEdit from './features/Position/sub-pages';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetch_brands, fetch_categories, fetch_employees, fetch_orders, fetch_orders_pending, fetch_positions, fetch_products, fetch_productTypes, fetch_receipts, fetch_suppliers, fetch_users } from './adminSlice';
+import { fetch_brands, fetch_categories, fetch_employees, fetch_orders, fetch_orders_pending, fetch_positions, fetch_products, fetch_productTypes, fetch_receipts, fetch_rules, fetch_statistical, fetch_suppliers, fetch_users } from './adminSlice';
 import ProductType from './features/ProductType';
 import ProductTypeEdit from './features/ProductType/sub-pages';
 import Category from './features/Category';
@@ -31,6 +31,8 @@ import ProductEdit from './features/Product/sub-pages';
 import Order from './features/Order';
 import OrderEdit from './features/Order/sub-pages';
 import OrderConfirm from './features/Order/sub-pages';
+import Rule from './features/Rule';
+import RuleEdit from './features/Rule/RuleEdit';
 
 AdminPage.propTypes = {
 
@@ -85,6 +87,14 @@ function AdminPage(props) {
     React.useEffect(() => {
         dispatch(fetch_orders({ _limit: pagination.orders._limit, _page: pagination.orders._page }));
     }, [pagination.orders])
+
+    // React.useEffect(() => {
+    //     dispatch(fetch_rules({ _limit: pagination.rules._limit, _page: pagination.rules._page }));
+    // }, [pagination.rules])
+
+    React.useEffect(() => {
+        dispatch(fetch_statistical());
+    }, [])
 
     React.useEffect(() => {
         dispatch(fetch_orders_pending({ _limit: pagination.ordersConfirm._limit, _page: pagination.ordersConfirm._page, status: 0 }));
@@ -144,8 +154,10 @@ function AdminPage(props) {
                                 <Route path='view' element={<Order />}></Route>
                                 <Route path='confirm' element={<OrderConfirm />}></Route>
                             </Route>
-                            <Route path='b' element={<div>b</div>}></Route>
-                            <Route path='c' element={<div>c</div>}></Route>
+                            {/* <Route path='/rules'>
+                                <Route path='view' element={<Rule />}></Route>
+                                <Route path='edit' element={<RuleEdit />}></Route>
+                            </Route> */}
                         </Routes>
                     </div>
                 </Col>

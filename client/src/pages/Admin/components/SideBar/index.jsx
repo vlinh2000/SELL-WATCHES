@@ -3,11 +3,12 @@ import './SideBar.scss';
 
 import {
     AppstoreAddOutlined,
+    BarcodeOutlined,
     ClockCircleOutlined,
-    ClusterOutlined, DashboardOutlined, FieldTimeOutlined,
+    ClusterOutlined, CodeOutlined, DashboardOutlined, FieldTimeOutlined,
     GroupOutlined,
     InfoCircleOutlined,
-    LogoutOutlined, OrderedListOutlined, UsergroupAddOutlined,
+    LogoutOutlined, NodeExpandOutlined, OrderedListOutlined, UsergroupAddOutlined,
     UserOutlined,
     VideoCameraOutlined
 } from '@ant-design/icons';
@@ -75,6 +76,14 @@ function SideBar(props) {
             getItem('Cập nhật nhà cung cấp', '11111', <Link to="/admin/suppliers/edit"></Link>),
             getItem('Danh sách nhà cung cấp', '11112', <Link to="/admin/suppliers/view"></Link>),
         ]),
+        // getItem('Quản lý quyền', '12', <NodeExpandOutlined />, [
+        //     getItem('Cập nhật quyền', '12121', <Link to="/admin/rules/edit"></Link>),
+        //     getItem('Danh sách quyền', '12122', <Link to="/admin/rules/view"></Link>),
+        // ]),
+        // getItem('Quản lý phiếu giảm giá', '13', <BarcodeOutlined />, [
+        //     getItem('Cập nhật phiếu giảm giá', '13131', <Link to="/admin/vouchers/edit"></Link>),
+        //     getItem('Danh sách phiếu giảm giá', '13132', <Link to="/admin/vouchers/view"></Link>),
+        // ]),
     ];
 
     const { selectedKey } = useSelector(state => state.adminInfo);

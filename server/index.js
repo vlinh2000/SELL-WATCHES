@@ -26,6 +26,7 @@ const quyenRouter = require('./routes/quyen.route');
 const sanphamRouter = require('./routes/sanpham.route');
 const userRouter = require('./routes/user.route');
 const yeuthichRouter = require('./routes/yeuthich.route');
+const thongkeRouter = require('./routes/thongke.route');
 
 
 /*---CONNECT DATABASE---*/
@@ -52,6 +53,7 @@ app.use('/api/quyens', quyenRouter);
 app.use('/api/sanphams', sanphamRouter);
 app.use('/api/nguoidungs', userRouter);
 app.use('/api/yeuthichs', yeuthichRouter);
+app.use('/api/thongkes', thongkeRouter);
 
 app.listen(port, () => {
     console.log(`Server is listening on port ${port}`)
