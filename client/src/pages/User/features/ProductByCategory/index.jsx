@@ -88,7 +88,7 @@ function ProductByCategory(props) {
             <Row gutter={[40, 0]}>
                 <Col xs={24} sm={24} md={9} lg={7}>
                     <div className="side-bar-user">
-                        <BreadcrumbCustom />
+                        <BreadcrumbCustom more='Danh mục' />
                         <div className="list-filter-item">
                             <FilterItem title="Danh mục sản phẩm" name='MA_LOAI_SP' listItem={categories} />
                             <FilterItem title="Thương hiệu" name='MA_THUONG_HIEU' listItem={brands} />

@@ -102,16 +102,16 @@ module.exports = {
                                     LIMIT 1`;
             let data_checkSpam = await executeQuery(sql_checkSpam);
 
-            const distanceTime = (new Date().getTime() - new Date(data_checkSpam[0].NGAY_TAO).getTime()) / 1000;
-            const isLessThan5Minute = distanceTime < 5 * 60;
-            if (isLessThan5Minute) {
-                const availableTime = (5 * 60) - distanceTime;
-                console.log({ availableTime })
-                return res.status(400).json({ message: `Thao tác quá nhanh hãy thử lại sau ${availableTime > 60 ? Math.trunc(availableTime / 60) + " phút" : parseFloat(availableTime).toFixed(0) + ' giây'} nữa.` });
+            if (data_checkSpam.length > 0) {
+                const distanceTime = (new Date().getTime() - new Date(data_checkSpam[0].NGAY_TAO).getTime()) / 1000;
+                const isLessThan5Minute = distanceTime < 5 * 60;
+                if (isLessThan5Minute) {
+                    const availableTime = (5 * 60) - distanceTime;
+                    console.log({ availableTime })
+                    return res.status(400).json({ message: `Thao tác quá nhanh hãy thử lại sau ${availableTime > 60 ? Math.trunc(availableTime / 60) + " phút" : parseFloat(availableTime).toFixed(0) + ' giây'} nữa.` });
+                }
             }
-
             const MA_DG = randomString();
-
             const sql = `INSERT INTO DANH_GIA(MA_DG, USER_ID, MA_SP, NOI_DUNG, SO_SAO) 
                                         VALUES ('${MA_DG}','${USER_ID}','${MA_SP}','${NOI_DUNG}','${SO_SAO}')`;
             await executeQuery(sql);

@@ -4,8 +4,21 @@ const { randomString, getNow } = require("../utils/global");
 module.exports = {
     get_donhangs: async (req, res) => {
         try {
-            const { _limit, _page, status, action } = req.query;
+            const { _limit, _page, status, action, MA_SP } = req.query;
             const user = req.user?.data;
+
+            if (action === 'check_had_order') {
+                const sql = `SELECT COUNT(a.MA_DH) as total
+                             FROM DON_HANG a, CHI_TIET_SAN_PHAM b 
+                             WHERE a.USER_ID='${user?.USER_ID}' AND a.MA_DH=b.MA_DH AND b.MA_SP='${MA_SP}'`;
+                let data = await executeQuery(sql);
+                return res.json({
+                    // result: data,
+                    available: data[0].total > 0 ? true : false,
+                    message: 'Thành công'
+                });
+            }
+
             const sql = `SELECT a.MA_DH,a.HO_TEN_NGUOI_DAT,a.SDT_NGUOI_DAT,a.NV_ID,a.DON_VI_VAN_CHUYEN, b.HO_TEN, a.USER_ID, a.TG_DAT_HANG, a.TG_GIAO_HANG, a.DIA_CHI, a.GIAM_GIA, a.TONG_TIEN, a.TRANG_THAI, a.DA_THANH_TOAN, a.HINH_THUC_THANH_TOAN, a.PHI_SHIP, a.GHI_CHU, a.NGAY_TAO  
                         FROM DON_HANG a
                         LEFT JOIN NHAN_VIEN b ON a.NV_ID = b.NV_ID 
@@ -23,7 +36,7 @@ module.exports = {
                         ${status ? 'AND a.TRANG_THAI=' + status : ''} `;
             const data = await executeQuery(sql_count);
 
-            // get detail (CHI_TIET_PHIEU_NHAP)
+            // get detail (CHI_TIET_DON_HANG)
             const processes = donhangs?.map((dh, idx) => {
                 return new Promise(async (resolve, reject) => {
                     try {
@@ -109,12 +122,26 @@ module.exports = {
     patch_donhangs: async (req, res) => {
         try {
             const { donhangID } = req.params;
+            const { USER_ID, NV_ID } = req.user.data;
+            const { DA_THANH_TOAN, TRANG_THAI, action } = req.body;
+
             const isExist = await checkIsExist('DON_HANG', 'MA_DH', donhangID);
             if (!isExist) return res.status(400).json({ message: "Đơn hàng không tồn tại." });
 
-            req.body.CAP_NHAT = getNow();
+            const CAP_NHAT = getNow();
+            let data = {};
+            if (action === 'confirm' && NV_ID) {
+                data = { ...req.body, CAP_NHAT }
+            }
+            else if (action === 'received' && USER_ID) {
+                data = { TRANG_THAI: 2, CAP_NHAT }
+            }
+            else if (action === 'cancle' && USER_ID) {
+                data = { TRANG_THAI: 3, CAP_NHAT }
+            }
+
             const sql = `UPDATE DON_HANG SET ? WHERE MA_DH='${donhangID}'`;
-            await executeUpdateQuery(sql, { ...req.body });
+            await executeUpdateQuery(sql, data);
 
             res.json({ message: 'Cập nhật đơn hàng thành công.' });
         } catch (error) {

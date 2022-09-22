@@ -8,6 +8,7 @@ import GroupInfoAndFeedBack from './components/GroupInfoAndFeedBack';
 import { useParams } from 'react-router-dom';
 import { sanphamApi } from 'api/sanphamApi';
 import { danhgiaApi } from 'api/danhgiaApi';
+import { donhangApi } from 'api/donhangApi';
 
 ProductDetail.propTypes = {
 
@@ -20,6 +21,7 @@ function ProductDetail(props) {
 
     const [product, setProduct] = React.useState();
     const [feedBackList, setFeedBackList] = React.useState();
+    const [feedBackAvailable, setFeedBackAvailable] = React.useState(false);
 
     React.useEffect(() => {
         const fetchProduct = async () => {
@@ -35,6 +37,20 @@ function ProductDetail(props) {
         fetchProduct();
     }, [idProduct])
 
+    // check feedback available
+    React.useEffect(() => {
+        const checkFeedBackAvailable = async () => {
+            try {
+                const { available } = await donhangApi.get({ action: 'check_had_order' });
+                setFeedBackAvailable(available);
+            } catch (error) {
+                console.log({ error })
+            }
+        }
+
+        checkFeedBackAvailable();
+    }, [idProduct])
+
     return (
         <div className='product-detail-wrapper'>
             <Row>
@@ -42,11 +58,11 @@ function ProductDetail(props) {
                     <GroupProductImage imageList={product?.ANH_SAN_PHAM} />
                 </Col>
                 <Col xs={24} sm={12} md={12} lg={12}>
-                    <BreadcrumbCustom />
+                    <BreadcrumbCustom category={{ MA_LOAI_SP: product?.MA_LOAI_SP, TEN_LOAI_SP: product?.TEN_LOAI_SP, MA_SP: product?.MA_SP, TEN_SP: product?.TEN_SP }} />
                     <ProductInfo product={product} />
                 </Col>
             </Row>
-            <GroupInfoAndFeedBack product={product} />
+            <GroupInfoAndFeedBack product={product} feedBackAvailable={feedBackAvailable} />
         </div>
     );
 }

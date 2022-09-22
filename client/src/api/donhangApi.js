@@ -45,18 +45,8 @@ export const donhangApi = {
         })
     },
     update: (params, data) => {
-        return new Promise((resolve, reject) => {
-            setTimeout(async () => {
-                try {
-                    const url = `/donhangs/${params}`
-                    const response = await axiosClient.patch(url, data);
-                    resolve(response);
-
-                } catch (error) {
-                    reject(error)
-                }
-            }, 2000)
-        })
+        const url = `/donhangs/${params}`
+        return axiosClient.patch(url, data);
     },
     delete: (params) => {
         const url = `/donhangs/${params}`

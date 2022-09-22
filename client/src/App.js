@@ -9,6 +9,7 @@ import ProtectedRoute from 'components/ProtectedRoute';
 import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { getMe, getNewToken } from 'app/authSlice';
+import ScrollTop from 'components/ScrollTop';
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
           <Route path='admin/*' element={<ProtectedRoute isAllow={isAuth}> <Admin /></ProtectedRoute>}></Route>
         </Routes>
         <Toaster position="bottom-left" />
+        <ScrollTop />
       </BrowserRouter>
     </div>
   );

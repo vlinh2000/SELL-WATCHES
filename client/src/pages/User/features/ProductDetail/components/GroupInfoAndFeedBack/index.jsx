@@ -3,30 +3,34 @@ import { Alert, Col, Form, Pagination, Rate, Row, Tabs } from 'antd';
 import ButtonCustom from 'components/ButtonCustom';
 import SortBy from 'components/SortBy';
 import InputField from 'custom-fields/InputField';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import FeedBackList from '../FeedBackList';
 import './GroupInfoAndFeedBack.scss';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { switch_screenLogin } from 'pages/User/userSlice';
 import { danhgiaApi } from 'api/danhgiaApi';
-import React from 'react';
+import React, { useMemo } from 'react';
 import toast from 'react-hot-toast';
+import InputEmoijField from 'custom-fields/InputEmoijField';
 
 
 GroupInfoAndFeedBack.propTypes = {
     product: PropTypes.object,
+    feedBackAvailable: PropTypes.bool,
 };
 
 GroupInfoAndFeedBack.defaultProps = {
     product: {},
+    feedBackAvailable: false,
 };
 
 function GroupInfoAndFeedBack(props) {
     const { idProduct } = useParams();
-    const { product } = props;
+    const { product, feedBackAvailable } = props;
     const dispatch = useDispatch();
     const { user, isAuth } = useSelector(state => state.auth);
+    const { state } = useLocation();
 
     const onChange = (key) => {
         console.log(key);
@@ -44,7 +48,7 @@ function GroupInfoAndFeedBack(props) {
     const [pagination, setPagination] = React.useState({ _limit: 8, _page: 1, _totalPage: 3, _totalRecord: 0 });
     const [loading, setLoading] = React.useState({});
     const [sortBy, setSortBy] = React.useState('NGAY_TAO DESC');
-
+    const defaultActiveKey = useMemo(() => state?.feedbackFromOrder ? "3" : "1", [state?.feedbackFromOrder])
 
     React.useEffect(() => {
         const fetchFeedBackList = async () => {
@@ -99,7 +103,7 @@ function GroupInfoAndFeedBack(props) {
 
     return (
         <div className='group-info-and-feedback'>
-            <Tabs defaultActiveKey="1" onChange={onChange}>
+            <Tabs defaultActiveKey={defaultActiveKey} onChange={onChange}>
                 <Tabs.TabPane tab="Thông tin bổ sung & Chính sách bảo hành" key="1">
                     <Row justify='space-between'>
                         <Col xs={24} sm={24} md={12} lg={11}>
@@ -226,30 +230,39 @@ function GroupInfoAndFeedBack(props) {
                         <div className='my-feedback'>
                             {
                                 isAuth ?
-                                    <Form
-                                        onFinish={handleFeedBack}
-                                        form={form} initialValues={initialValues} className="form-feedback" layout='vertical'>
-                                        <div className="vote">
-                                            <div className='label'>Đánh giá của bạn</div>
-                                            <Form.Item
-                                                rules={[{ required: true, message: "Số sao không được để trống." }]}
-                                                name="SO_SAO">
-                                                <Rate count={5} />
-                                            </Form.Item>
-                                        </div>
-                                        <div className="comments">
-                                            <InputField rules={[{ required: true, message: "Nội dung không được để trống." }]} name="NOI_DUNG" label="Nhận xét của bạn" type="textarea" />
-                                        </div>
-                                        <Row gutter={[20, 0]}>
-                                            <Col xs={24} sm={12} md={12} lg={12}>
-                                                <InputField disabled name="HO_TEN" label="Tên" />
-                                            </Col>
-                                            <Col xs={24} sm={12} md={12} lg={12}>
-                                                <InputField disabled name="EMAIL" label="Email" />
-                                            </Col>
-                                        </Row>
-                                        <ButtonCustom type='submit' text="Gửi" isLoading={loading?.sendFeedBack} />
-                                    </Form>
+                                    (
+                                        feedBackAvailable ?
+                                            <Form
+                                                onFinish={handleFeedBack}
+                                                form={form} initialValues={initialValues} className="form-feedback" layout='vertical'>
+                                                <div className="vote">
+                                                    <div className='label'>Đánh giá của bạn</div>
+                                                    <Form.Item
+                                                        rules={[{ required: true, message: "Số sao không được để trống." }]}
+                                                        name="SO_SAO">
+                                                        <Rate count={5} />
+                                                    </Form.Item>
+                                                </div>
+                                                <div className="comments">
+                                                    <InputEmoijField
+                                                        rules={[{ required: true, message: "Nội dung không được để trống." }]} name="NOI_DUNG" label="Nhận xét của bạn"
+                                                    />
+                                                </div>
+                                                <Row gutter={[20, 0]}>
+                                                    <Col xs={24} sm={12} md={12} lg={12}>
+                                                        <InputField disabled name="HO_TEN" label="Tên" />
+                                                    </Col>
+                                                    <Col xs={24} sm={12} md={12} lg={12}>
+                                                        <InputField disabled name="EMAIL" label="Email" />
+                                                    </Col>
+                                                </Row>
+                                                <ButtonCustom type='submit' text="Gửi" isLoading={loading?.sendFeedBack} />
+                                            </Form>
+                                            :
+                                            <i>Chỉ những khách hàng đã mua sản phẩm mới có thể đánh giá.</i>
+
+                                    )
+
                                     :
                                     <p>Vui lòng <Link to="" onClick={() => dispatch(switch_screenLogin(true))}>đăng nhập</Link> để đánh giá</p>
                             }

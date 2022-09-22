@@ -1,13 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Collapse, Pagination, Row } from 'antd';
+import { Button, Col, Collapse, Pagination, Popconfirm, Row, Tooltip } from 'antd';
 import './HistoryOrder.scss';
-import { CarOutlined, HourglassOutlined, ShoppingOutlined, WarningOutlined } from '@ant-design/icons';
-import { getStatusOrder, numberWithCommas } from 'assets/admin';
+import { CarOutlined, HourglassOutlined, MessageOutlined, ShoppingOutlined, WarningOutlined } from '@ant-design/icons';
+import { getStatusOrder, getStatusOrderClassName, numberWithCommas } from 'assets/admin';
 import moment from 'moment';
 import ButtonCustom from 'components/ButtonCustom';
 import { useDispatch, useSelector } from 'react-redux';
-import { savePagination } from 'pages/User/userSlice';
+import { fetch_my_orders, savePagination } from 'pages/User/userSlice';
+import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { donhangApi } from 'api/donhangApi';
 HistoryOrder.propTypes = {
 
 };
@@ -18,7 +21,6 @@ function HistoryOrder(props) {
     const dispatch = useDispatch();
     const [statisticalOrders, setStatisticalOrders] = React.useState([0, 0, 0, 0]);
 
-
     React.useEffect(() => {
         const groupByStatusList = [0, 0, 0, 0];
         myOrders?.forEach(order => {
@@ -27,7 +29,17 @@ function HistoryOrder(props) {
         setStatisticalOrders(groupByStatusList);
     }, [myOrders])
 
-
+    const handleOrder = async (MA_DH, isReceived) => {
+        try {
+            const data = isReceived ? { action: 'received' } : { action: 'cancle' }
+            const { message } = await donhangApi.update(MA_DH, data);
+            dispatch(fetch_my_orders());
+            toast.success(message);
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.log({ error })
+        }
+    }
 
     return (
         <div>
@@ -65,7 +77,7 @@ function HistoryOrder(props) {
                         <Collapse>
                             {
                                 myOrders?.map((order, idx) =>
-                                    <Collapse.Panel header={`Đơn hàng: ${order.MA_DH}`} key={idx} extra={<span className='status-pending'>{getStatusOrder(order.TRANG_THAI)}</span>}>
+                                    <Collapse.Panel header={`Đơn hàng: ${order.MA_DH}`} key={idx} extra={<span className={getStatusOrderClassName(order.TRANG_THAI)}>{getStatusOrder(order.TRANG_THAI)}</span>}>
                                         <li className='history-bought__item'>
                                             <div className='history-bought__item__body'>
                                                 <div>
@@ -108,6 +120,11 @@ function HistoryOrder(props) {
                                                                         <a href='' className='name'>{sp.TEN_SP}</a>
                                                                         <span>x {sp.SO_LUONG}</span>
                                                                         <strong>{numberWithCommas(sp.GIA)}&nbsp;₫</strong>
+                                                                        <Link to={`/products/${sp.MA_SP}`} state={{ feedbackFromOrder: true }}>
+                                                                            <Tooltip title="Đánh giá sản phẩm này.">
+                                                                                <MessageOutlined />
+                                                                            </Tooltip>
+                                                                        </Link>
                                                                     </li>)
                                                             }
                                                         </ul>
@@ -115,8 +132,19 @@ function HistoryOrder(props) {
                                                 </Collapse>
                                             </div>
                                             <div className='history-bought__item__footer'>
-                                                <ButtonCustom className="btn-info-custom" text='Đánh giá' />
-                                                <ButtonCustom className="btn-success-custom" text='Đã nhận được hàng ?' />
+                                                {
+                                                    order.TRANG_THAI === 0 &&
+                                                    <Popconfirm title="Bạn muốn hủy đơn hàng này ?" onConfirm={() => handleOrder(order.MA_DH, false)}>
+                                                        <ButtonCustom className="btn-danger-custom" text='Hủy đơn hàng' />
+                                                    </Popconfirm>
+                                                }
+                                                {
+
+                                                    order.TRANG_THAI === 1 &&
+                                                    <Popconfirm title="Xác nhận rằng bạn đã nhận được hàng ?" onConfirm={() => handleOrder(order.MA_DH, true)}>
+                                                        <ButtonCustom className="btn-success-custom" text='Đã nhận được hàng ?' />
+                                                    </Popconfirm>
+                                                }
                                             </div>
                                         </li>
                                     </Collapse.Panel>

@@ -140,9 +140,11 @@ function numberWithCommas(x) {
 }
 
 function getStatusOrder(num) {
-
     return num == 0 ? 'Chờ xử lý' : num == 1 ? 'Đang giao' : num === 2 ? 'Đã giao' : num == 3 ? 'Đã hủy' : 'Không xác định';
+}
 
+function getStatusOrderClassName(num) {
+    return num == 0 ? 'status-pending' : num == 1 ? 'status-shipping' : num === 2 ? 'status-success' : 'status-fail';
 }
 
 function formatDate(date, formart = "YYYY-MM-DD") {
@@ -158,4 +160,4 @@ const toggleSideBar = () => {
     document.querySelector('.admin-page').classList.toggle('toggle-bg');
 }
 
-export { getBreadcrumbFromSecond, numberWithCommas, getStatusOrder, formatDate, toggleSideBar };
+export { getBreadcrumbFromSecond, numberWithCommas, getStatusOrder, getStatusOrderClassName, formatDate, toggleSideBar };
