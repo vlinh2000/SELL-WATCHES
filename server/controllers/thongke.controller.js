@@ -6,12 +6,16 @@ module.exports = {
         try {
             // total orders
             let result = {};
+            const today = new Date().toJSON().slice(0, 10);
 
             const sqls = [
                 { sql: 'SELECT COUNT(MA_DH) as total FROM DON_HANG', saveTo: 'TONG_DH' },
-                { sql: 'SELECT SUM(TONG_TIEN) as total FROM DON_HANG', saveTo: 'TONG_DOANH_THU' },
+                { sql: `SELECT SUM(TONG_TIEN) as total FROM DON_HANG WHERE TRANG_THAI = 2 OR DA_THANH_TOAN = '1'`, saveTo: 'TONG_DOANH_THU' },
                 { sql: 'SELECT COUNT(USER_ID) as total FROM USER', saveTo: 'TONG_USER' },
-                { sql: 'SELECT TG_DAT_HANG,HO_TEN_NGUOI_DAT,TONG_TIEN FROM quan_ly_dat_hang.don_hang ORDER BY TG_DAT_HANG DESC', saveTo: 'DON_HANG_MOI_NHAT' },
+                { sql: `SELECT TG_DAT_HANG FROM DON_HANG WHERE TRANG_THAI = 2 OR DA_THANH_TOAN = '1' ORDER BY TG_DAT_HANG ASC LIMIT 1`, saveTo: 'DH_TINH_TU_NGAY' },
+                { sql: `SELECT COUNT(USER_ID) as total FROM USER WHERE NGAY_TAO BETWEEN '${today + ' 00:00:00'}' AND '${today + ' 23:59:59'}'`, saveTo: 'SL_USER_HOM_NAY' },
+                { sql: `SELECT COALESCE(SUM(TONG_TIEN),0) as total FROM DON_HANG WHERE TG_DAT_HANG BETWEEN '${today + ' 00:00:00'}' AND '${today + ' 23:59:59'}'  AND (TRANG_THAI = 2 OR DA_THANH_TOAN = '1')`, saveTo: 'TONG_DOANH_THU_HOM_NAY' },
+                { sql: 'SELECT TG_DAT_HANG,HO_TEN_NGUOI_DAT,TONG_TIEN FROM DON_HANG ORDER BY TG_DAT_HANG DESC LIMIT 5', saveTo: 'DON_HANG_MOI_NHAT' },
                 {
                     sql: `SELECT b.MA_SP,c.TEN_SP,c.MO_TA,d.HINH_ANH,SUM(b.SO_LUONG) as DA_BAN 
                         FROM DON_HANG a, CHI_TIET_DON_HANG b, SAN_PHAM c, ANH_SAN_PHAM d 
@@ -49,6 +53,9 @@ module.exports = {
                     TONG_DH: result.TONG_DH[0].total,
                     TONG_DOANH_THU: result.TONG_DOANH_THU[0].total,
                     TONG_USER: result.TONG_USER[0].total,
+                    DH_TINH_TU_NGAY: result.DH_TINH_TU_NGAY[0].TG_DAT_HANG,
+                    SL_USER_HOM_NAY: result.SL_USER_HOM_NAY[0].total,
+                    TONG_DOANH_THU_HOM_NAY: result.TONG_DOANH_THU_HOM_NAY[0].total,
                     TOP_SP_BAN_CHAY: result.TOP_SP_BAN_CHAY,
                     DON_HANG_MOI_NHAT: result.DON_HANG_MOI_NHAT
                 },

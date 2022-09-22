@@ -1,17 +1,21 @@
 import './App.css';
 import 'assets/scss/common.scss';
 import 'aos/dist/aos.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import UserPage from 'pages/User';
 import Admin from 'pages/Admin';
 import { Toaster } from 'react-hot-toast';
 import ProtectedRoute from 'components/ProtectedRoute';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { getMe, getNewToken } from 'app/authSlice';
 
 
 function App() {
 
-  const { user, isAuth } = useSelector(state => state.auth);
+  const { isAuth } = useSelector(state => state.auth);
+
+
   return (
     <div className="App">
       <BrowserRouter>

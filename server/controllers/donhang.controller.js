@@ -4,20 +4,33 @@ const { randomString, getNow } = require("../utils/global");
 module.exports = {
     get_donhangs: async (req, res) => {
         try {
-            const { _limit, _page, status } = req.query;
-            const sql = `SELECT a.MA_DH,a.HO_TEN_NGUOI_DAT,a.NV_ID, b.HO_TEN, a.USER_ID, a.TG_DAT_HANG, a.TG_GIAO_HANG, a.DIA_CHI, a.GIAM_GIA, a.TONG_TIEN, a.TRANG_THAI, a.DA_THANH_TOAN, a.HINH_THUC_THANH_TOAN, a.PHI_SHIP, a.GHI_CHU, a.NGAY_TAO  
-                        FROM DON_HANG a, NHAN_VIEN b
-                        WHERE a.NV_ID = b.NV_ID ${status ? 'AND a.TRANG_THAI=' + status : ''} ORDER BY a.NGAY_TAO DESC ${(_page && _limit) ? ' LIMIT ' + _limit + ' OFFSET ' + _limit * (_page - 1) : ''}`;
+            const { _limit, _page, status, action } = req.query;
+            const user = req.user?.data;
+            const sql = `SELECT a.MA_DH,a.HO_TEN_NGUOI_DAT,a.SDT_NGUOI_DAT,a.NV_ID,a.DON_VI_VAN_CHUYEN, b.HO_TEN, a.USER_ID, a.TG_DAT_HANG, a.TG_GIAO_HANG, a.DIA_CHI, a.GIAM_GIA, a.TONG_TIEN, a.TRANG_THAI, a.DA_THANH_TOAN, a.HINH_THUC_THANH_TOAN, a.PHI_SHIP, a.GHI_CHU, a.NGAY_TAO  
+                        FROM DON_HANG a
+                        LEFT JOIN NHAN_VIEN b ON a.NV_ID = b.NV_ID 
+                        WHERE 1=1
+                        ${action === 'get_my_orders' ? ` AND a.USER_ID ='${user.USER_ID}'` : ''} 
+                        ${status ? 'AND a.TRANG_THAI=' + status : ''} 
+                        ORDER BY a.NGAY_TAO DESC ${(_page && _limit) ? ' LIMIT ' + _limit + ' OFFSET ' + _limit * (_page - 1) : ''}`;
             let donhangs = await executeQuery(sql);
 
-            const sql_count = `SELECT COUNT(a.MA_DH) as total FROM DON_HANG a, NHAN_VIEN b WHERE a.NV_ID = b.NV_ID ${status ? 'AND a.TRANG_THAI=' + status : ''}`;
+            const sql_count = `SELECT COUNT(a.MA_DH) as total 
+                        FROM DON_HANG a
+                        LEFT JOIN NHAN_VIEN b ON a.NV_ID = b.NV_ID 
+                        WHERE 1=1
+                        ${action === 'get_my_orders' ? ` AND a.USER_ID ='${user.USER_ID}'` : ''} 
+                        ${status ? 'AND a.TRANG_THAI=' + status : ''} `;
             const data = await executeQuery(sql_count);
 
             // get detail (CHI_TIET_PHIEU_NHAP)
             const processes = donhangs?.map((dh, idx) => {
                 return new Promise(async (resolve, reject) => {
                     try {
-                        const sql_detail = `SELECT a.MA_DH, a.SO_LUONG, a.DON_GIA, a.GIA, b.TEN_SP FROM CHI_TIET_DON_HANG a , SAN_PHAM b WHERE a.MA_SP = b.MA_SP AND a.MA_DH='${dh.MA_DH}'`;
+                        const sql_detail = `SELECT a.MA_DH, a.SO_LUONG, a.DON_GIA, a.GIA,b.MA_SP, b.TEN_SP, c.HINH_ANH
+                                            FROM CHI_TIET_DON_HANG a , SAN_PHAM b 
+                                            LEFT JOIN ANH_SAN_PHAM c ON b.MA_SP= c.MA_SP 
+                                            WHERE a.MA_SP = b.MA_SP AND a.MA_DH='${dh.MA_DH}'`;
                         donhangs[idx].SAN_PHAM = await executeQuery(sql_detail);
                         resolve(true);
                     } catch (error) {
@@ -76,7 +89,7 @@ module.exports = {
             const { USER_ID, DIA_CHI_GH, GIAM_GIA, TONG_TIEN, DA_THANH_TOAN, HINH_THUC_THANH_TOAN, PHI_SHIP, GHI_CHU } = req.body;
             const { MA_SP, SO_LUONG, DON_GIA } = req.body;
 
-            const MA_DH = randomString();
+            const MA_DH = 'DH_' + randomString();
             const sql = `INSERT INTO DON_HANG(MA_DH,USER_ID, DIA_CHI_GH, GIAM_GIA, TONG_TIEN, DA_THANH_TOAN, HINH_THUC_THANH_TOAN, PHI_SHIP, GHI_CHU) 
                                         VALUES ('${MA_DH}','${USER_ID}','${DIA_CHI_GH}','${GIAM_GIA}','${TONG_TIEN}','${DA_THANH_TOAN}','${HINH_THUC_THANH_TOAN}','${PHI_SHIP}','${GHI_CHU}')`;
             await executeQuery(sql);

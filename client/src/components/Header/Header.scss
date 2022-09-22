@@ -62,6 +62,8 @@
                 flex-basis: 50%;
                 .form-search{
                     width: 90%;
+                    position: relative;
+                    display: block;
                 }
 
                 .search-input{
@@ -172,6 +174,84 @@
             }
         }
 
+    }
+
+    .suggestions-wrapper::before{
+        content: ' ';
+        display: block;
+        width: 10px;
+        height: 10px;
+        background: #FFF;
+        position: absolute;
+        top: -3px;
+        transform: rotate(45deg);
+    }
+
+    .suggestions-wrapper{
+        padding: 0.75rem 1rem;
+        background-color: #FFF;
+        margin-top: 10px;
+        width: 80%;
+        position: absolute;
+        box-shadow: 0px 0px 10px 0px rgb(0 0 0 / 50%);
+        z-index: 999999;
+
+
+        &__item:not(:last-child){
+            border-bottom: 1px solid #ececec;
+        }
+
+        .view-all{
+            padding: 5px 0;
+            text-align: center;
+
+            a{
+                display: block;
+            }
+        }
+
+        &__item{
+            padding: 10px 0;
+            color: #555;
+
+            &__content{
+                display: flex;
+                align-items: center;
+
+                .info{
+                    margin-left: 10px;
+
+                    .category{
+                        color: #394b6a;
+                        font-weight: 500;
+                        font-style: italic;
+                        font-size: 10px;
+                    }
+                    .price{
+                        color: #b55f5a;
+                    }
+                }
+            }
+            a{
+                color: #555;
+            }
+
+            /*-----CUSTOM SKELETON----------*/
+            .ant-skeleton{
+                width: 100%;
+            }
+            
+            .ant-skeleton-image{
+                margin: 0 auto;
+            }
+            .ant-skeleton-paragraph{
+                li {
+                    height: 14px;
+                    margin-top: 5px;
+                }
+            }
+           
+        }
     }
 }
 

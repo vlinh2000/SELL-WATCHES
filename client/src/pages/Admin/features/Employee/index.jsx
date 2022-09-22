@@ -1,8 +1,7 @@
 import { DeleteOutlined, EditOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
-import { Avatar, Button, Popconfirm, Table, Tag } from 'antd';
+import { Avatar, Button, Divider, Pagination, Popconfirm, Table, Tag } from 'antd';
 import { nhanvienApi } from 'api/nhanvienApi';
 import { numberWithCommas } from 'assets/admin';
-import moment from 'moment';
 import { fetch_employees, prepareDataEdit, savePagination } from 'pages/Admin/adminSlice';
 import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
 import React from 'react';
@@ -88,6 +87,7 @@ function Employee(props) {
         {
             title: 'Địa chỉ',
             dataIndex: 'DIA_CHI',
+            render: (text) => <div style={{ width: 200 }}>{text}</div>
         },
         {
             title: 'Giới tính',
@@ -102,11 +102,11 @@ function Employee(props) {
             dataIndex: 'LUONG_CO_BAN',
             render: (text) => numberWithCommas(text)
         },
-        {
-            title: 'Ngày tạo',
-            dataIndex: 'NGAY_TAO',
-            render: (text) => moment(text).format('DD-MM-YYYY HH:mm:ss')
-        },
+        // {
+        //     title: 'Ngày tạo',
+        //     dataIndex: 'NGAY_TAO',
+        //     render: (text) => moment(text).format('DD-MM-YYYY HH:mm:ss')
+        // },
         {
             title: 'Trạng thái',
             dataIndex: 'TRANG_THAI',
@@ -120,7 +120,7 @@ function Employee(props) {
         {
             title: 'Hành động',
             dataIndex: 'NV_ID',
-            render: (text, record) => <> <Button onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
+            render: (text, record) => <div style={{ width: 120 }}> <Button onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
                 <Popconfirm
                     placement='left'
                     title={`Bạn có chắc muốn ${record.BI_KHOA === "0" ? 'khóa' : 'mở khóa'} tài khoản [${text}] ?`}
@@ -135,9 +135,9 @@ function Employee(props) {
                     onConfirm={() => { onDelete(text) }}
                     okText="Yes"
                     cancelText="No">
-                    <Button style={{ marginTop: 5 }} danger icon={<DeleteOutlined />}></Button>
+                    <Button style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
                 </Popconfirm>
-            </>
+            </div>
         },
     ];
 
@@ -153,14 +153,14 @@ function Employee(props) {
                             size='small'
                             columns={columns}
                             dataSource={employees}
-                            pagination={
-                                {
-                                    current: pagination._page,
-                                    total: pagination._totalPage,
-                                    onChange: (page) => dispatch(savePagination({ screen: 'employees', page }))
-                                }
-                            }
+                            pagination={false}
                         />
+                        <Divider />
+                        <Pagination
+                            pageSize={1}
+                            current={pagination._page}
+                            total={pagination._totalPage}
+                            onChange={(page) => dispatch(savePagination({ screen: 'employees', page }))} ></Pagination>
                     </>
 
             }

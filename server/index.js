@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 const nhanvienRouter = require('./routes/nhanvien.route');
 const chucvuRouter = require('./routes/chucvu.route');
-const danhmucRouter = require('./routes/danhmuc.route');
+const uudaiRouter = require('./routes/uudai.route');
 const loaisanphamRouter = require('./routes/loaisanpham.route');
 const diachighRouter = require('./routes/diachigh.route');
 const thuonghieuRouter = require('./routes/thuonghieu.route');
@@ -27,6 +27,8 @@ const sanphamRouter = require('./routes/sanpham.route');
 const userRouter = require('./routes/user.route');
 const yeuthichRouter = require('./routes/yeuthich.route');
 const thongkeRouter = require('./routes/thongke.route');
+const sukienRouter = require('./routes/sukien.route');
+const user_uudaiRouter = require('./routes/user_uudai.route');
 
 
 /*---CONNECT DATABASE---*/
@@ -40,7 +42,7 @@ con.connect(function (err) {
 
 app.use('/api/nhanviens', nhanvienRouter);
 app.use('/api/chucvus', chucvuRouter);
-app.use('/api/danhmucs', danhmucRouter);
+app.use('/api/uudais', uudaiRouter);
 app.use('/api/loaisanphams', loaisanphamRouter);
 app.use('/api/diachighs', diachighRouter);
 app.use('/api/thuonghieus', thuonghieuRouter);
@@ -54,6 +56,8 @@ app.use('/api/sanphams', sanphamRouter);
 app.use('/api/nguoidungs', userRouter);
 app.use('/api/yeuthichs', yeuthichRouter);
 app.use('/api/thongkes', thongkeRouter);
+app.use('/api/sukiens', sukienRouter);
+app.use('/api/user_uudais', user_uudaiRouter);
 
 app.listen(port, () => {
     console.log(`Server is listening on port ${port}`)

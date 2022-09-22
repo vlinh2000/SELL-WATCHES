@@ -14,14 +14,15 @@ const authPersistConfig = {
     whitelist: ['token', 'refreshToken']
 }
 
-// const cartPersistConfig = {
-//     key: 'cart',
-//     storage
-// }
+const userInfoConfig = {
+    key: 'userInfo',
+    storage,
+    whitelist: ['cart']
+}
 
 const rootReducers = combineReducers({
     adminInfo: adminSlice,
-    userInfo: userSlice,
+    userInfo: persistReducer(userInfoConfig, userSlice),
     auth: persistReducer(authPersistConfig, authSlice),
 });
 

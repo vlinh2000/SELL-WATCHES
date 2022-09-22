@@ -4,11 +4,13 @@ import './SideBar.scss';
 import {
     AppstoreAddOutlined,
     BarcodeOutlined,
+    BarsOutlined,
     ClockCircleOutlined,
+    CloseCircleOutlined,
     ClusterOutlined, CodeOutlined, DashboardOutlined, FieldTimeOutlined,
     GroupOutlined,
     InfoCircleOutlined,
-    LogoutOutlined, NodeExpandOutlined, OrderedListOutlined, UsergroupAddOutlined,
+    LogoutOutlined, MenuOutlined, NodeExpandOutlined, OrderedListOutlined, UsergroupAddOutlined,
     UserOutlined,
     VideoCameraOutlined
 } from '@ant-design/icons';
@@ -61,9 +63,9 @@ function SideBar(props) {
             getItem('Cập nhật phiếu nhập kho', '661', <Link to="/admin/receipts/edit"></Link>),
             getItem('Danh sách phiếu nhập kho', '662', <Link to="/admin/receipts/view"></Link>),
         ]),
-        getItem('Quản lý danh mục', '7', <ClusterOutlined />, [
-            getItem('Cập nhật danh mục', '771', <Link to="/admin/categories/edit"></Link>),
-            getItem('Danh sách danh mục', '772', <Link to="/admin/categories/view"></Link>),
+        getItem('Quản lý ưu đãi', '7', <ClusterOutlined />, [
+            getItem('Cập nhật ưu đãi', '771', <Link to="/admin/vouchers/edit"></Link>),
+            getItem('Danh sách ưu đãi', '772', <Link to="/admin/vouchers/view"></Link>),
         ]),
         getItem('Quản lý thương hiệu', '8', <VideoCameraOutlined />, [
             getItem('Cập nhật thương hiệu', '881', <Link to="/admin/brands/edit"></Link>),
@@ -76,11 +78,11 @@ function SideBar(props) {
             getItem('Cập nhật nhà cung cấp', '11111', <Link to="/admin/suppliers/edit"></Link>),
             getItem('Danh sách nhà cung cấp', '11112', <Link to="/admin/suppliers/view"></Link>),
         ]),
-        // getItem('Quản lý quyền', '12', <NodeExpandOutlined />, [
-        //     getItem('Cập nhật quyền', '12121', <Link to="/admin/rules/edit"></Link>),
-        //     getItem('Danh sách quyền', '12122', <Link to="/admin/rules/view"></Link>),
-        // ]),
-        // getItem('Quản lý phiếu giảm giá', '13', <BarcodeOutlined />, [
+        getItem('Quản lý sự kiện', '12', <NodeExpandOutlined />, [
+            getItem('Cập nhật sự kiện', '12121', <Link to="/admin/events/edit"></Link>),
+            getItem('Danh sách sự kiện', '12122', <Link to="/admin/events/view"></Link>),
+        ]),
+        // getItem('Quản lý sự kiện', '13', <BarcodeOutlined />, [
         //     getItem('Cập nhật phiếu giảm giá', '13131', <Link to="/admin/vouchers/edit"></Link>),
         //     getItem('Danh sách phiếu giảm giá', '13132', <Link to="/admin/vouchers/view"></Link>),
         // ]),
@@ -90,7 +92,13 @@ function SideBar(props) {
 
     return (
         <div className='sidebar'>
+            <div className="logo">
+                <Link to="/">
+                    <img src='https://mauweb.monamedia.net/donghohaitrieu/wp-content/uploads/2019/07/logo-mona-2.png' alt='img' />
+                </Link>
+            </div>
             <Menu
+                style={{ marginTop: '-4px' }}
                 // openKeys={}
                 // onClick={({ item, key, keyPath, domEvent }) => console.log(key)}
                 selectedKeys={[selectedKey]}

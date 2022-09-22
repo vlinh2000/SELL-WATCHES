@@ -1,14 +1,13 @@
 
 import { UploadOutlined } from '@ant-design/icons';
 import { Button, Col, Form, Row } from 'antd';
-import { danhmucApi } from 'api/danhmucApi';
 import { loaisanphamApi } from 'api/loaisanphamApi';
 import { sanphamApi } from 'api/sanphamApi';
 import { thuonghieuApi } from 'api/thuonghieuApi';
 import InputField from 'custom-fields/InputField';
 import SelectField from 'custom-fields/SelectField';
 import UploadField from 'custom-fields/UploadField';
-import { fetch_prod, fetch_products, productsucts } from 'pages/Admin/adminSlice';
+import { fetch_products } from 'pages/Admin/adminSlice';
 import React from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,7 +19,7 @@ ProductEdit.propTypes = {
 };
 
 let schema = yup.object().shape({
-    MA_DANH_MUC: yup.string().required('Danh mục không được để trống.'),
+    MA_LOAI_SP: yup.string().required('Loại sản phẩm không được để trống.'),
     MA_THUONG_HIEU: yup.string().required('Thương hiệu không được để trống.'),
     TEN_SP: yup.string().required('Tên sản phẩm không được để trống.'),
     GIA_GOC: yup.number().positive().integer().required('Giá gốc không được để trống.').typeError('Vui lòng nhập giá hợp lệ.'),
@@ -32,6 +31,7 @@ let schema = yup.object().shape({
     PIN: yup.string().required('Pin không được để trống.'),
     MUC_CHONG_NUOC: yup.string().required('Mức chống nước không được để trống.'),
     HINH_DANG_MAT_SO: yup.string().required('Hình dạng mặt số không được để trống.'),
+    MAU_MAT_SO: yup.string().required('Màu mặt số không được để trống.'),
     KICH_THUOC_MAT_SO: yup.string().required('Kích thước mặt số không được để trống.'),
 });
 
@@ -53,7 +53,7 @@ function ProductEdit(props) {
     const dispatch = useDispatch()
 
     const initialValues = {
-        MA_DANH_MUC: currentSelected?.MA_DANH_MUC || '',
+        MA_LOAI_SP: currentSelected?.MA_LOAI_SP || '',
         MA_THUONG_HIEU: currentSelected?.MA_THUONG_HIEU || '',
         TEN_SP: currentSelected?.TEN_SP || '',
         GIA_GOC: currentSelected?.GIA_GOC || '',
@@ -65,8 +65,9 @@ function ProductEdit(props) {
         PIN: currentSelected?.PIN || '',
         MUC_CHONG_NUOC: currentSelected?.MUC_CHONG_NUOC || '',
         HINH_DANG_MAT_SO: currentSelected?.HINH_DANG_MAT_SO || '',
+        MAU_MAT_SO: currentSelected?.MAU_MAT_SO || '',
         KICH_THUOC_MAT_SO: currentSelected?.KICH_THUOC_MAT_SO || '',
-        ANH_SAN_PHAM: currentSelected?.ANH_SAN_PHAM || [],
+        ANH_SAN_PHAM: currentSelected?.HINH_ANH || [],
     }
 
     const handleSave = async (values) => {
@@ -79,7 +80,7 @@ function ProductEdit(props) {
             const ANH_SAN_PHAM_REMOVE = removeList;
             console.log({ ANH_SAN_PHAM_NEW, ANH_SAN_PHAM_REMOVE })
             const data = new FormData();
-            data.append('MA_DANH_MUC', values.MA_DANH_MUC);
+            data.append('MA_LOAI_SP', values.MA_LOAI_SP);
             data.append('MA_THUONG_HIEU', values.MA_THUONG_HIEU);
             data.append('TEN_SP', values.TEN_SP);
             data.append('GIA_GOC', values.GIA_GOC);
@@ -91,6 +92,7 @@ function ProductEdit(props) {
             data.append('PIN', values.PIN);
             data.append('MUC_CHONG_NUOC', values.MUC_CHONG_NUOC);
             data.append('HINH_DANG_MAT_SO', values.HINH_DANG_MAT_SO);
+            data.append('MAU_MAT_SO', values.MAU_MAT_SO);
             data.append('KICH_THUOC_MAT_SO', values.KICH_THUOC_MAT_SO);
 
             ANH_SAN_PHAM_NEW?.forEach(f => {
@@ -118,8 +120,8 @@ function ProductEdit(props) {
     React.useEffect(() => {
         const fetchAllcategory = async () => {
             try {
-                const { result } = await danhmucApi.getAll();
-                setOptions_category(result.map((e) => ({ label: e.MA_DANH_MUC + ' - ' + e.TEN_DANH_MUC, value: e.MA_DANH_MUC })))
+                const { result } = await loaisanphamApi.getAll();
+                setOptions_category(result.map((e) => ({ label: e.MA_LOAI_SP + ' - ' + e.TEN_LOAI_SP, value: e.MA_LOAI_SP })))
             } catch (error) {
                 console.log({ error });
             }
@@ -150,7 +152,7 @@ function ProductEdit(props) {
                 layout='vertical'>
                 <Row gutter={[40, 0]}>
                     <Col xs={24} sm={24} md={12} lg={12}>
-                        <SelectField name='MA_DANH_MUC' label='Danh mục' options={options_category} rules={[yupSync]} />
+                        <SelectField name='MA_LOAI_SP' label='Loại sản phẩm' options={options_category} rules={[yupSync]} />
                         <SelectField name='MA_THUONG_HIEU' label='Thương hiệu' options={options_brand} rules={[yupSync]} />
                         <InputField name='TEN_SP' label='Tên sản phẩm' rules={[yupSync]} />
                         <InputField name='GIA_GOC' label='Giá gốc' rules={[yupSync]} />
@@ -165,7 +167,8 @@ function ProductEdit(props) {
                         <InputField name='PIN' label='Pin' rules={[yupSync]} />
                         <InputField name='MUC_CHONG_NUOC' label='Mức chống nước' rules={[yupSync]} />
                         <InputField name='HINH_DANG_MAT_SO' label='Hình dạng mặt số' rules={[yupSync]} />
-                        <InputField name='KICH_THUOC_MAT_SO' label='Kích thướt mặt số' rules={[yupSync]} />
+                        <InputField name='MAU_MAT_SO' label='Màu mặt số' rules={[yupSync]} />
+                        <InputField name='KICH_THUOC_MAT_SO' label='Kích thước mặt số' rules={[yupSync]} />
                         <UploadField saveData={(fileList) => form.setFieldValue("ANH_SAN_PHAM", fileList)} onRemove={(file) => {
                             if (!file.originFileObj) setRemoveList(prev => [...prev, file.uid])
                         }}

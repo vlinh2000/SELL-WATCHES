@@ -22,13 +22,15 @@ import { formatDate } from 'assets/admin';
 Chart.propTypes = {
     onFilter: PropTypes.func,
     options: PropTypes.object,
-    data: PropTypes.object
+    data: PropTypes.object,
+    isLoading: PropTypes.bool,
 };
 
 Chart.defaultProps = {
     onFilter: null,
     options: {},
-    data: {}
+    data: {},
+    isLoading: false,
 };
 
 
@@ -45,10 +47,8 @@ ChartJS.register(
 );
 
 export function Chart(props) {
-    const { onFilter, options, data } = props;
+    const { onFilter, options, data, isLoading } = props;
     const [date, setDate] = React.useState(() => ([moment().startOf('year'), moment()]))
-    const [isLoading, setIsLoading] = React.useState(false);
-
 
     React.useEffect(() => {
         handleFilter();

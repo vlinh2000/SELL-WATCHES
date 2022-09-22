@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Col, Divider, Popconfirm, Row, Skeleton, Table } from 'antd';
+import { Button, Col, Divider, Pagination, Popconfirm, Row, Skeleton, Table } from 'antd';
 import { chucvuApi } from 'api/chucvuApi';
 import { numberWithCommas } from 'assets/admin';
 import { fetch_rules, prepareDataEdit, savePagination } from 'pages/Admin/adminSlice';
@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
-import { danhmucApi } from 'api/danhmucApi';
+import { danhmucApi } from 'api/uudaiApi';
 import { quyenApi } from 'api/quyenApi';
 
 Rule.propTypes = {
@@ -86,14 +86,14 @@ function Rule(props) {
                             size='small'
                             columns={columns}
                             dataSource={rules}
-                            pagination={
-                                {
-                                    current: pagination._page,
-                                    total: pagination._totalPage,
-                                    onChange: (page) => dispatch(savePagination({ screen: 'rules', page }))
-                                }
-                            }
+                            pagination={false}
                         />
+                        <Divider />
+                        <Pagination
+                            pageSize={1}
+                            current={pagination._page}
+                            total={pagination._totalPage}
+                            onChange={(page) => dispatch(savePagination({ screen: 'rules', page }))} ></Pagination>
                     </>
 
             }

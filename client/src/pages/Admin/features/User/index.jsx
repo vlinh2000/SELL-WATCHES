@@ -1,15 +1,14 @@
 import React from 'react';
 
-import { BlockOutlined, DeleteOutlined, EditOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
-import { Avatar, Button, Popconfirm, Table, Tag } from 'antd';
-import { danhmucApi } from 'api/danhmucApi';
+import { DeleteOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
+import { Avatar, Button, Divider, Pagination, Popconfirm, Table, Tag } from 'antd';
+import { nguoidungApi } from 'api/nguoidungApi';
+import moment from 'moment';
 import { fetch_users, prepareDataEdit, savePagination } from 'pages/Admin/adminSlice';
 import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import moment from 'moment';
-import { nguoidungApi } from 'api/nguoidungApi';
 
 User.propTypes = {
 
@@ -147,14 +146,14 @@ function User(props) {
                             size='small'
                             columns={columns}
                             dataSource={users}
-                            pagination={
-                                {
-                                    current: pagination._page,
-                                    total: pagination._totalPage,
-                                    onChange: (page) => dispatch(savePagination({ screen: 'users', page }))
-                                }
-                            }
+                            pagination={false}
                         />
+                        <Divider />
+                        <Pagination
+                            pageSize={1}
+                            current={pagination._page}
+                            total={pagination._totalPage}
+                            onChange={(page) => dispatch(savePagination({ screen: 'users', page }))} ></Pagination>
                     </>
 
             }

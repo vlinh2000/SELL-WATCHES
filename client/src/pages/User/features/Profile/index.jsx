@@ -1,27 +1,54 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Collapse, Form, Pagination, Row, Tabs, Tooltip } from 'antd';
+import { Alert, Col, Collapse, Divider, Form, Pagination, Row, Tabs, Tooltip } from 'antd';
 import { AndroidOutlined, AppleOutlined, CameraOutlined, CarOutlined, HistoryOutlined, HourglassOutlined, LogoutOutlined, SettingOutlined, ShoppingOutlined, UserOutlined, WarningOutlined } from '@ant-design/icons';
 import InputField from 'custom-fields/InputField';
 import ButtonCustom from 'components/ButtonCustom';
 import UploadField from 'custom-fields/UploadField';
 import './Profile.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from 'app/authSlice';
+import { getMe, getNewToken, logout } from 'app/authSlice';
 import { Link } from 'react-router-dom';
+import { defaultAvatar, isAccountOfThisSite } from 'constants/commonContants';
+import { nguoidungApi } from 'api/nguoidungApi';
+import { nhanvienApi } from 'api/nhanvienApi';
+import toast from 'react-hot-toast';
+import * as yup from 'yup';
+import { getStatusOrder, numberWithCommas } from 'assets/admin';
+import moment from 'moment';
+import HistoryOrder from 'pages/User/components/HistoryOrder';
 
 Profile.propTypes = {
 
 };
 
+let schema = yup.object().shape({
+    HO_TEN: yup.string().required('Họ tên không được để trống.'),
+    SO_DIEN_THOAI: yup.string()
+        .required("Số điện thoại không được để trống.")
+        .matches(/^[0-9]+$/, "Vui lòng nhập số.")
+        .min(10, 'Số điện thoại chưa hợp lệ (yêu cầu 10 or 11 số)')
+        .max(11, 'Số điện thoại chưa hợp lệ (yêu cầu 10 or 11 số)'),
+    DIA_CHI: yup.string().required('Địa chỉ không được để trống.')
+});
+
+const yupSync = {
+    async validator({ field }, value) {
+        await schema.validateSyncAt(field, { [field]: value });
+    },
+};
+
+
 function Profile(props) {
 
     const { user } = useSelector(state => state.auth);
-    const [currentAvatar, setCurrentAvatar] = React.useState(() => user?.ANH_DAI_DIEN || 'https://www.seekpng.com/png/detail/428-4287240_no-avatar-user-circle-icon-png.png');
+    const { data: { myOrders } } = useSelector(state => state.userInfo);
+    const [currentAvatar, setCurrentAvatar] = React.useState(() => user?.ANH_DAI_DIEN || defaultAvatar);
+    const [loading, setLoading] = React.useState(false);
     const dispatch = useDispatch();
 
     const initialValues = {
-        ...user
+        ...user, USER_ID: user?.USER_ID || user?.NV_ID
     }
 
     React.useEffect(() => {
@@ -30,7 +57,26 @@ function Profile(props) {
     }, [user])
 
     const [form] = Form.useForm();
-    console.log({ initialValues })
+
+    const handleUpdateInfo = async (values) => {
+
+        try {
+            setLoading(true);
+            const data = new FormData();
+            data.append('HO_TEN', values.HO_TEN);
+            data.append('SO_DIEN_THOAI', values.SO_DIEN_THOAI);
+            data.append('DIA_CHI', values.DIA_CHI);
+            data.append('ANH_DAI_DIEN', values.ANH_DAI_DIEN.file || values.ANH_DAI_DIEN);
+            const { message } = user.USER_ID ? await nguoidungApi.update(values.USER_ID, data) : await nhanvienApi.update(values.USER_ID, data);
+            setLoading(false);
+            toast.success(message);
+            dispatch(getMe());
+        } catch (error) {
+            setLoading(false);
+            console.log({ error })
+            toast.error(error.response.data.message);
+        }
+    }
 
     return (
         <div className='wrapper-content'>
@@ -46,10 +92,11 @@ function Profile(props) {
                         key="1">
 
                         <Row justify='center'>
-                            <Col xs={24} sm={24} md={24} lg={12}>
+                            <Col xs={24} sm={24} md={24} lg={14}>
                                 <Form
-                                    onFinish={(values) => console.log({ values })}
+                                    onFinish={handleUpdateInfo}
                                     form={form}
+                                    disabled={user?.USER_ID && user?.LOAI_TAI_KHOAN !== isAccountOfThisSite}
                                     initialValues={initialValues}
                                     layout='vertical'>
                                     <div className='avatar-wrapper'>
@@ -57,163 +104,50 @@ function Profile(props) {
                                             <div className='show-avatar'>
                                                 <img src={currentAvatar} alt='avatar'></img>
                                             </div>
-                                            <UploadField name='ANH_DAI_DIEN' icon={<CameraOutlined className='icon-camera' />} getUrl={(url) => setCurrentAvatar(url)} />
+                                            <UploadField
+                                                name='ANH_DAI_DIEN'
+                                                icon={<CameraOutlined className='icon-camera' />}
+                                                getUrl={(url) => setCurrentAvatar(url)} />
                                         </div>
                                     </div>
+                                    {
+                                        (user.USER_ID && user.LOAI_TAI_KHOAN !== isAccountOfThisSite) && <>
+                                            <Alert
+                                                banner
+                                                message={<div>Đây là tài khoản <strong>{user?.LOAI_TAI_KHOAN?.split('_')[0]?.toUpperCase()}</strong> do đó không thể cập nhật thông tin tại đây.</div>}
+                                            />
+                                            <Divider />
+                                        </>
+                                    }
                                     <InputField name='USER_ID' label='Mã người dùng' disabled />
-                                    <InputField name='HO_TEN' label='Họ tên' />
-                                    <InputField name='SO_DIEN_THOAI' label='Số điện thoại' />
-                                    <InputField name='EMAIL' label='Email' />
-                                    <InputField name='DIA_CHI' label='Địa chỉ' type='textarea' rows={5} />
-                                    <ButtonCustom type='submit' text='Lưu'></ButtonCustom>
+                                    <InputField name='EMAIL' disabled label='Email' />
+                                    <InputField name='HO_TEN' label='Họ tên' rules={[yupSync]} />
+                                    <InputField name='SO_DIEN_THOAI' label='Số điện thoại' rules={[yupSync]} />
+                                    <InputField name='DIA_CHI' label='Địa chỉ' type='textarea'
+                                        rules={[yupSync]}
+                                        rows={5} disabled={user?.USER_ID && user?.LOAI_TAI_KHOAN !== isAccountOfThisSite} />
+
+                                    {
+                                        (user.NV_ID || user?.LOAI_TAI_KHOAN === isAccountOfThisSite) &&
+                                        <ButtonCustom isLoading={loading} type='submit' text='Lưu'></ButtonCustom>
+                                    }
                                 </Form>
                             </Col>
                         </Row>
 
                     </Tabs.TabPane>
                     {
-                        user?.USER_ID && <Tabs.TabPane
+                        user?.USER_ID &&
+                        <Tabs.TabPane
                             tab={
                                 <span>
                                     <HistoryOutlined />
-                                    Lịch sử mua hàng (20)
+                                    Lịch sử mua hàng ({myOrders?.length})
                                 </span>
                             }
                             key="2"
                         >
-
-                            <Row justify='center'>
-                                <Col xs={24} sm={20} md={20} lg={20}>
-                                    <div className="current-orders">
-                                        <Row justify='center'>
-                                            <Col xs={24} sm={12} md={8} lg={6}>
-                                                <div className='statistical'>
-                                                    <HourglassOutlined />
-                                                    <div className='statistical-text'>Chờ xử lý (5)</div>
-                                                </div>
-                                            </Col>
-                                            <Col xs={24} sm={12} md={8} lg={6}>
-                                                <div className='statistical'>
-                                                    <CarOutlined />
-                                                    <div className='statistical-text'>Đang vận chuyển (4)</div>
-                                                </div>
-                                            </Col>
-                                            <Col xs={24} sm={12} md={8} lg={6}>
-                                                <div className='statistical'>
-                                                    <ShoppingOutlined />
-                                                    <div className='statistical-text'>Đã giao (1)</div>
-                                                </div>
-                                            </Col>
-                                            <Col xs={24} sm={12} md={8} lg={6}>
-                                                <div className='statistical'>
-                                                    <WarningOutlined />
-                                                    <div className='statistical-text'>Đã hủy (10)</div>
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                    </div>
-                                    <ul className="history-bought">
-                                        <Collapse>
-                                            <Collapse.Panel header="Đơn hàng: HD019302329" key="1" extra={<span className='status-pending'>Chờ xử lý</span>}>
-                                                <li className='history-bought__item'>
-                                                    <div className='history-bought__item__body'>
-                                                        <div>
-                                                            <div className='category-label'>
-                                                                <span className='category-label-key'>Họ tên người đặt </span><span className='category-label-value'>Trương Việt Linh</span>
-                                                            </div>
-                                                            <div className='category-label'>
-                                                                <span className='category-label-key'>Số điện thoại</span><span className='category-label-value'>01213032</span>
-                                                            </div>
-                                                            <div className='category-label'>
-                                                                <span className='category-label-key'>Đơn vị vận chuyển </span><span className='category-label-value'>Giao hàng nhanh (GHN)</span>
-                                                            </div>
-                                                            <div className='category-label'>
-                                                                <span className='category-label-key'>Mã ưu đãi </span><span className='category-label-value'>không áp dụng</span>
-                                                            </div>
-                                                            <div className='category-label'>
-                                                                <span className='category-label-key'>Ngày đặt hàng</span><span className='category-label-value'>2022/8/11</span>
-                                                            </div>
-                                                            <div className='category-label'>
-                                                                <span className='category-label-key'>Địa chỉ</span><span className='category-label-value'>ấp Hòa Phú xã Xuân Hòa huyện Kế Sách , tỉnh Sóc Trăng</span>
-                                                            </div>
-                                                            <div className='category-label'>
-                                                                <span className='category-label-key'>Tổng cộng </span><strong className='category-label-value' style={{ fontSize: 20 }}>28,852,000 ₫</strong>
-                                                            </div>
-                                                            <br />
-                                                        </div>
-                                                        <Collapse>
-                                                            <Collapse.Panel header="Chi tiết sản phẩm" key="1">
-                                                                <ul className='list-products'>
-                                                                    <li>
-                                                                        <img src='https://mauweb.monamedia.net/dongho/wp-content/uploads/2018/03/13900AA05.BDC102-600x600-300x300.jpg' />
-                                                                        <a className='name'>ĐỒNG HỒ LOUIS ERARD 13900AA05.BDC102 NAM PIN DÂY DA</a>
-                                                                        <span>x 1</span>
-                                                                        <strong>18,195,000&nbsp;₫</strong>
-                                                                    </li>
-                                                                </ul>
-                                                            </Collapse.Panel>
-                                                        </Collapse>
-                                                    </div>
-                                                    <div className='history-bought__item__footer'>
-                                                        <ButtonCustom className="btn-info-custom" text='Đánh giá' />
-                                                        <ButtonCustom className="btn-success-custom" text='Đã nhận được hàng ?' />
-                                                    </div>
-                                                </li>
-                                            </Collapse.Panel>
-                                            <Collapse.Panel header="Đơn hàng: HD019302330" key="2" extra={<span className='status-success'>Đã giao</span>}>
-                                                <li className='history-bought__item'>
-                                                    <div className='history-bought__item__body'>
-                                                        <div>
-                                                            <div className='category-label'>
-                                                                <span className='category-label-key'>Họ tên người đặt </span><span className='category-label-value'>Trương Việt Linh</span>
-                                                            </div>
-                                                            <div className='category-label'>
-                                                                <span className='category-label-key'>Số điện thoại</span><span className='category-label-value'>01213032</span>
-                                                            </div>
-                                                            <div className='category-label'>
-                                                                <span className='category-label-key'>Đơn vị vận chuyển </span><span className='category-label-value'>Giao hàng nhanh (GHN)</span>
-                                                            </div>
-                                                            <div className='category-label'>
-                                                                <span className='category-label-key'>Mã ưu đãi </span><span className='category-label-value'>không áp dụng</span>
-                                                            </div>
-                                                            <div className='category-label'>
-                                                                <span className='category-label-key'>Ngày đặt hàng</span><span className='category-label-value'>2022/8/11</span>
-                                                            </div>
-                                                            <div className='category-label'>
-                                                                <span className='category-label-key'>Địa chỉ</span><span className='category-label-value'>ấp Hòa Phú xã Xuân Hòa huyện Kế Sách , tỉnh Sóc Trăng</span>
-                                                            </div>
-                                                            <div className='category-label'>
-                                                                <span className='category-label-key'>Tổng cộng </span><strong className='category-label-value' style={{ fontSize: 20 }}>28,852,000 ₫</strong>
-                                                            </div>
-                                                            <br />
-                                                        </div>
-                                                        <Collapse>
-                                                            <Collapse.Panel header="Chi tiết sản phẩm" key="1">
-                                                                <ul className='list-products'>
-                                                                    <li>
-                                                                        <img src='https://mauweb.monamedia.net/dongho/wp-content/uploads/2018/03/13900AA05.BDC102-600x600-300x300.jpg' />
-                                                                        <a className='name'>ĐỒNG HỒ LOUIS ERARD 13900AA05.BDC102 NAM PIN DÂY DA</a>
-                                                                        <span>x 1</span>
-                                                                        <strong>18,195,000&nbsp;₫</strong>
-                                                                    </li>
-                                                                </ul>
-                                                            </Collapse.Panel>
-                                                        </Collapse>
-                                                    </div>
-                                                    <div className='history-bought__item__footer'>
-                                                        <ButtonCustom className="btn-info-custom" text='Đánh giá' />
-                                                        <ButtonCustom className="btn-success-custom" text='Đã nhận được hàng ?' />
-                                                    </div>
-                                                </li>
-                                            </Collapse.Panel>
-                                        </Collapse>
-
-
-                                    </ul>
-                                    <br />
-                                    <Pagination current={1} total={10} pageSize={1} />
-                                </Col>
-                            </Row>
+                            <HistoryOrder myOrders={myOrders} />
                         </Tabs.TabPane>
                     }
                     {

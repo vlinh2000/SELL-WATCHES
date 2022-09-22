@@ -1,6 +1,6 @@
 import { Button, Drawer, Form } from 'antd';
 import { nguoidungApi } from 'api/nguoidungApi';
-import { login } from 'app/authSlice';
+import { getMe, login, login_socialMedia, saveAuthInfo } from 'app/authSlice';
 import axios from 'axios';
 import ButtonCustom from 'components/ButtonCustom';
 import InputField from 'custom-fields/InputField';
@@ -40,6 +40,8 @@ const yupSync = {
         await schema.validateSyncAt(field, { [field]: value });
     },
 };
+
+const REDIRECT_URI = window.location.href;
 
 function Auth(props) {
 
@@ -146,12 +148,38 @@ function Auth(props) {
 
     }, [addressCode.districtCode])
 
+
+    const onLoginSuccess = async ({ provider, data }) => {
+        const token = data.access_token || data.accessToken;
+        const accountType = provider + "_mxh";
+        const HO_TEN = (data.family_name && data.given_name) ? data.family_name + ' ' + data.given_name : '';
+        const user = {
+            USER_ID: data.id,
+            HO_TEN: data.name || HO_TEN,
+            SO_DIEN_THOAI: data.phone || '',
+            EMAIL: data.email,
+            ANH_DAI_DIEN: data.picture?.data?.url || data.picture,
+            LOAI_TAI_KHOAN: accountType
+        }
+        console.log({ data, user })
+        // send to sever
+        await dispatch(login_socialMedia(user));
+        dispatch(switch_screenLogin(false));
+
+    }
+
+    const onLoginError = (error) => {
+        toast.error("Có lỗi xảy ra vui lòng thử lại sau ít phút.")
+    }
+
     return (
         <div className='auth-wrapper'>
             {
                 <Drawer
                     onClose={() => dispatch(switch_screenLogin(false))}
-                    visible={isVisibleScreenLogin} title={isLoginMode ? 'Đăng nhập' : 'Đăng ký'} placement="right" >
+                    visible={isVisibleScreenLogin}
+                    title={isLoginMode ? 'Đăng nhập' : 'Đăng ký'}
+                    placement="right" >
                     {/* login */}
                     {
                         isLoginMode ?
@@ -173,35 +201,30 @@ function Auth(props) {
                                 <div className="group-login-social-media">
                                     <p>or</p>
                                     <LoginSocialFacebook
-                                        isOnlyGetToken
-                                        appId={process.env.REACT_APP_FB_APP_ID || ''}
-                                        onLoginStart=""
-                                        onResolve=""
-                                        onReject=""
-                                    >
+                                        appId={process.env.REACT_APP_FB_CLIENT_ID || ''}
+                                        onResolve={onLoginSuccess}
+                                        onReject={onLoginError}>
                                         <FacebookLoginButton className='btn-social-media' />
                                     </LoginSocialFacebook>
 
                                     <LoginSocialGoogle
-                                        isOnlyGetToken
-                                        appId={process.env.REACT_APP_GG_APP_ID || ''}
-                                        onLoginStart=""
-                                        onResolve=""
-                                        onReject=""
-                                    >
+                                        client_id={process.env.REACT_APP_GG_CLIENT_ID || ''}
+                                        scope='https://www.googleapis.com/auth/userinfo.email'
+                                        onResolve={onLoginSuccess}
+                                        onReject={onLoginError}>
                                         <GoogleLoginButton className='btn-social-media' />
                                     </LoginSocialGoogle>
 
-                                    <LoginSocialGithub
-                                        isOnlyGetToken
-                                        client_id={process.env.REACT_APP_GITHUB_APP_ID || ''}
-                                        client_secret={process.env.REACT_APP_GITHUB_APP_SECRET || ''}
-                                        onLoginStart=""
-                                        onResolve=""
-                                        onReject=""
+                                    {/* <LoginSocialGithub
+                                        redirect_uri='http://localhost:3000/'
+                                        client_id={process.env.REACT_APP_GITHUB_CLIENT_ID || ''}
+                                        client_secret={process.env.REACT_APP_GITHUB_CLIENT_SECRET || ''}
+                                        onResolve={(values) => console.log({ values })}
+                                        allow_signup={true}
+                                        onReject={onLoginError}
                                     >
-                                        <GithubLoginButton className='btn-social-media' />
-                                    </LoginSocialGithub>
+                                        <GithubLoginButton className='btn-social-media' /> */}
+                                    {/* </LoginSocialGithub> */}
 
                                 </div>
                             </Form> :

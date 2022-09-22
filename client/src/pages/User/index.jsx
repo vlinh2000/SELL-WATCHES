@@ -16,6 +16,8 @@ import ProductByCategory from './features/ProductByCategory';
 import { useDispatch, useSelector } from 'react-redux';
 import { getMe, getNewToken } from 'app/authSlice';
 import ProtectedRoute from 'components/ProtectedRoute';
+import { isAccountOfThisSite } from 'constants/commonContants';
+import { fetch_productTypes, fetch_favouriteList, fetch_my_vouchers, fetch_my_orders } from './userSlice';
 
 UserPage.propTypes = {
 
@@ -23,22 +25,35 @@ UserPage.propTypes = {
 
 function UserPage(props) {
 
-    const { token, refreshToken, isAuth } = useSelector(state => state.auth);
+    const { token, refreshToken, isAuth, user } = useSelector(state => state.auth);
+    const { data: { productTypeList, myOrders }, pagination } = useSelector(state => state.userInfo);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
     React.useEffect(() => {
         const handleGetInfo = async () => {
             if (!token || isAuth) return;
             const { error, payload } = await dispatch(getMe());
             if (error) {
                 // get token mới;
-                await dispatch(getNewToken(refreshToken));
-            } else if (payload.NV_ID) navigate('/admin/dashboard', { replace: true });
+                await dispatch(getNewToken({ isUser: user.USER_ID, refreshToken }));
+            }
+            else if (payload.NV_ID) navigate('/admin/dashboard', { replace: true });
         }
 
         handleGetInfo();
     }, [token])
+
+
+    React.useEffect(() => {
+        isAuth && dispatch(fetch_favouriteList());
+        isAuth && dispatch(fetch_my_vouchers());
+        !productTypeList && dispatch(fetch_productTypes());
+    }, [isAuth])
+
+    React.useEffect(() => {
+        console.log({})
+        !Array.isArray(myOrders) && user?.USER_ID && dispatch(fetch_my_orders({ action: 'get_my_orders', _limit: pagination.myOrders._limit, _page: pagination.myOrders._page }));
+    }, [pagination.myOrders, user?.USER_ID, myOrders])
 
     return (
         <>

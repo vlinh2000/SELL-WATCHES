@@ -1,12 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './Header.scss';
-import { Link, useLocation } from 'react-router-dom';
-import { Button, Col, Popover, Row, Tooltip } from 'antd'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, Divider, Popover, Row, Skeleton, Tooltip } from 'antd'
 import { BarsOutlined, CloseOutlined, EnvironmentOutlined, FacebookFilled, FacebookOutlined, HeartOutlined, InstagramOutlined, PhoneOutlined, SearchOutlined, ShoppingCartOutlined, ShoppingOutlined, TwitterOutlined } from '@ant-design/icons';
 import ButtonCustom from 'components/ButtonCustom';
 import { useDispatch, useSelector } from 'react-redux';
-import { switch_screenLogin } from 'pages/User/userSlice';
+import { onFilter, onSearch, removeFromCart, switch_screenLogin, switch_suggestionModal } from 'pages/User/userSlice';
+import { numberWithCommas } from 'assets/admin';
+import { getTotalPrice } from 'assets/common';
+import { sanphamApi } from 'api/sanphamApi';
 
 Header.propTypes = {
 
@@ -14,61 +17,41 @@ Header.propTypes = {
 
 
 function CartInfo(props) {
+    const { productList } = props;
+    console.log({ productList })
+    const dispatch = useDispatch();
     return (
         <div className='cart-info'>
             <ul className="list-item">
-                <li className="item">
-                    <Row>
-                        <Col className='item-image' span={6}>
-                            <img src='https://mauweb.monamedia.net/dongho/wp-content/uploads/2018/03/dong-ho-candino-c4433_3-nu-pin-day-inox-600x600-300x300.jpg' alt='image' />
-                        </Col>
-                        <Col className='item-info' span={14}>
-                            <Link to="" className='item-name'>ĐỒNG HỒ TISSOT T063.907.11.058.00 NAM TỰ ĐỘNG DÂY INOX </Link>
-                            <span className='item-quantity-price'>1 x <strong>500,000&nbsp;₫</strong></span>
-                        </Col>
-                        <Col span={4} style={{ textAlign: 'right' }}>
-                            <Button size='small' icon={<CloseOutlined />} shape="circle" />
-                        </Col>
-                    </Row>
-                </li>
-                <li className="item">
-                    <Row>
-                        <Col className='item-image' span={6}>
-                            <img src='https://mauweb.monamedia.net/dongho/wp-content/uploads/2018/03/dong-ho-candino-c4433_3-nu-pin-day-inox-600x600-300x300.jpg' alt='image' />
-                        </Col>
-                        <Col className='item-info' span={14}>
-                            <Link to="" className='item-name'>ĐỒNG HỒ TISSOT T063.907.11.058.00 NAM TỰ ĐỘNG DÂY INOX </Link>
-                            <span className='item-quantity-price'>1 x <strong>500,000&nbsp;₫</strong></span>
-                        </Col>
-                        <Col span={4} style={{ textAlign: 'right' }}>
-                            <Button size='small' icon={<CloseOutlined />} shape="circle" />
-                        </Col>
-                    </Row>
-                </li>
-                <li className="item">
-                    <Row>
-                        <Col className='item-image' span={6}>
-                            <img src='https://mauweb.monamedia.net/dongho/wp-content/uploads/2018/03/dong-ho-candino-c4433_3-nu-pin-day-inox-600x600-300x300.jpg' alt='image' />
-                        </Col>
-                        <Col className='item-info' span={14}>
-                            <Link to="" className='item-name'>ĐỒNG HỒ TISSOT T063.907.11.058.00 NAM TỰ ĐỘNG DÂY INOX </Link>
-                            <span className='item-quantity-price'>1 x <strong>500,000&nbsp;₫</strong></span>
-                        </Col>
-                        <Col span={4} style={{ textAlign: 'right' }}>
-                            <Button size='small' icon={<CloseOutlined />} shape="circle" />
-                        </Col>
-                    </Row>
-                </li>
-
-
+                {
+                    productList?.map((product, idx) =>
+                        <li key={idx} className="item">
+                            <Row>
+                                <Col className='item-image' span={6}>
+                                    <img src={(product?.ANH_SAN_PHAM?.length > 0 && product?.ANH_SAN_PHAM[0]?.HINH_ANH) || product?.HINH_ANH} alt='image' />
+                                </Col>
+                                <Col className='item-info' span={14}>
+                                    <Link to="" className='item-name'>{product?.TEN_SP}</Link>
+                                    <div className='item-quantity-price'>{product?.SL_TRONG_GIO} x <strong>{numberWithCommas(product?.GIA_BAN || 0)}&nbsp;₫</strong></div>
+                                </Col>
+                                <Col span={4} style={{ textAlign: 'right' }}>
+                                    <Button size='small' onClick={() => dispatch(removeFromCart(product?.MA_SP))} icon={<CloseOutlined />} shape="circle" />
+                                </Col>
+                            </Row>
+                        </li>
+                    )
+                }
                 {/* not item in cart */}
-                {/* <li>
-                    <p style={{ color: '#777' }}>Chưa có sản phẩm trong giỏ hàng.</p>
-                </li> */}
+                {
+                    productList?.length === 0 &&
+                    <li>
+                        <p style={{ color: '#777' }}>Chưa có sản phẩm trong giỏ hàng.</p>
+                    </li>
+                }
             </ul>
             <div className='item total-price'>
                 {/* <div>...</div> */}
-                <strong className='total-price-title'>Tổng tiền:</strong> <strong className='total-price-num'>1.200.000&nbsp;₫</strong>
+                <strong className='total-price-title'>Tổng tiền:</strong> <strong className='total-price-num'>{numberWithCommas(getTotalPrice(productList, 'GIA_BAN', 'SL_TRONG_GIO'))}&nbsp;₫</strong>
             </div>
             <Link className='btnCustom' style={{ backgroundColor: '#c89979' }} to="/cart">Xem giỏ hàng</Link>
             <Link className='btnCustom' to="/payments">Thanh toán</Link>
@@ -81,9 +64,14 @@ function Header(props) {
 
     const { pathname } = useLocation();
     const dispatch = useDispatch();
-    const { user } = useSelector(state => state.auth);
-
-    console.log({ pathname })
+    const navigate = useNavigate();
+    const { user, isAuth } = useSelector(state => state.auth);
+    const { cart, data: { favouriteList, productTypeList }, isVisibleSuggestionModal } = useSelector(state => state.userInfo);
+    const typingTimeoutRef = React.useRef(null);
+    const [searchValue, setSearchValue] = React.useState('');
+    const [loading, setLoading] = React.useState(false);
+    const [productSuggestions, setProductSuggestions] = React.useState([]);
+    const [totalSearchFound, setTotalSearchFound] = React.useState(0);
 
     const handleShowNavbar = () => {
         document.querySelector('.hide-bg').style.display = 'block';
@@ -101,6 +89,42 @@ function Header(props) {
         navbar.style.width = '0';
 
     }
+
+    const handleChange = ({ target }) => {
+
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+
+        typingTimeoutRef.current = setTimeout(() => {
+            setSearchValue(target.value);
+        }, 500)
+    }
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        dispatch(onSearch(searchValue))
+        setSearchValue("");
+        dispatch(switch_suggestionModal(false))
+        navigate('/category/all');
+    }
+
+    React.useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const { result, totalRecord } = await sanphamApi.getAll({ searchValue, _limit: 4, _page: 1 });
+                setProductSuggestions(result);
+                setTotalSearchFound(totalRecord)
+                setLoading(false);
+            } catch (error) {
+                console.log({ error })
+                setLoading(false);
+            }
+        }
+
+        fetchData();
+    }, [searchValue])
 
     return (
         <div className='header-wrapper'>
@@ -129,8 +153,8 @@ function Header(props) {
                             </a>
                         </Tooltip>
                         {
-                            user?.HO_TEN
-                                ? <Link className='user' to="/profile">{user.HO_TEN}</Link>
+                            isAuth
+                                ? <Link className='user' to="/profile">{user?.HO_TEN || user?.EMAIL}</Link>
                                 : <Link className='user' to="" onClick={() => dispatch(switch_screenLogin(true))}>Đăng nhập/đăng ký</Link>
                         }
                     </div>
@@ -141,21 +165,74 @@ function Header(props) {
                     </div>
                     <div className="search">
                         <form className='form-search'>
-                            <input className='search-input' name='searchValue' type="text" placeholder="Tìm kiếm ..." />
-                            <button className='btn-search' type='submit'>
+                            <input
+                                onBlur={() => dispatch(switch_suggestionModal(false))}
+                                onFocus={() => dispatch(switch_suggestionModal(true))} onChange={handleChange} className='search-input' name='searchValue' type="text" placeholder="Tìm kiếm ..." />
+                            <button className='btn-search' type='submit' onClick={handleSearch}>
                                 <SearchOutlined />
                             </button>
+                            <ul
+                                tabIndex={0}
+                                style={{ display: isVisibleSuggestionModal ? 'block' : 'none' }}
+                                className='suggestions-wrapper'>
+                                {
+                                    loading ? new Array(4).fill(0).map((_, idx) =>
+                                        <li
+                                            key={idx} className='suggestions-wrapper__item'>
+                                            <Row>
+                                                <Col xs={24} sm={12} md={5}>
+                                                    <Skeleton.Image style={{ width: 50, height: 40 }} size="small" active={true} />
+                                                </Col>
+                                                <Col xs={24} sm={12} md={19}>
+                                                    <Skeleton title={false} paragraph={{ rows: 2 }} active={true} size="small" />
+                                                </Col>
+                                            </Row>
+                                        </li>
+                                    )
+                                        :
+                                        productSuggestions?.map((product, idx) =>
+                                            <li key={idx} className='suggestions-wrapper__item'>
+                                                <Link
+                                                    onMouseDown={() => {
+                                                        setSearchValue("")
+                                                        document.querySelector('input[name="searchValue"]').value = "";
+                                                        navigate(`/products/${product.MA_SP}`)
+                                                    }
+                                                    }
+                                                    onClick={() => dispatch(switch_suggestionModal(false))}
+                                                    to="" className='suggestions-wrapper__item__content'>
+                                                    <img width={40} height={50} src={product.HINH_ANH} />
+                                                    <div className='info'>
+                                                        <div>{product.TEN_SP}</div>
+                                                        <div><span className='category'>{product.TEN_DANH_MUC}</span><Divider type="vertical" /><strong className='price'>{numberWithCommas(product.GIA_BAN || 0)}&nbsp;₫</strong></div>
+                                                    </div>
+                                                </Link>
+                                            </li>
+                                        )
+                                }
+                                {
+                                    totalSearchFound === 0 && <li className='suggestions-wrapper__item'>
+                                        <div>Không tìm thấy sản phẩm phù hợp.</div>
+                                    </li>
+                                }
+                                {
+                                    totalSearchFound > 4 && !loading &&
+                                    <li className='suggestions-wrapper__item view-all'>
+                                        <Link to="" onMouseDown={handleSearch} className='suggestions-wrapper__item__content'>Xem tất cả {totalSearchFound} sản phẩm</Link>
+                                    </li>
+                                }
+                            </ul>
                         </form>
                     </div>
                     <div className="right">
                         <div className="badge-custom">
                             <Link to="/wishlist"><HeartOutlined className='icon' /></Link>
-                            <span className='num'>5</span>
+                            {favouriteList?.length > 0 && <span className='num'>{favouriteList.length}</span>}
                         </div>
-                        <Popover placement='bottomLeft' content={<CartInfo />} trigger="click">
+                        <Popover placement='bottomLeft' content={<CartInfo productList={cart} />} trigger="click">
                             <div className="card-custom">
                                 <ShoppingOutlined className='icon' />
-                                <span className='num'>2</span>
+                                {cart?.length > 0 && <span className='num'>{cart.length}</span>}
                             </div>
                         </Popover>
                         <BarsOutlined className="menu-custom" onClick={handleShowNavbar} />
@@ -164,22 +241,17 @@ function Header(props) {
                 <div className="header-wrapper__header__navbar">
                     <ul className='navbar-list'>
                         <li className="navbar-item">
-                            <Link to="" className='active'>Trang Chủ</Link>
+                            <Link to="" className={pathname === '/' ? 'active' : ''}>Trang Chủ</Link>
                         </li>
+                        {
+                            productTypeList?.map((category, idx) =>
+                                <li key={idx} className="navbar-item">
+                                    <Link className={pathname?.includes(category.MA_LOAI_SP) ? 'active' : ''} to={`/category/${category.MA_LOAI_SP}`}>{category.TEN_LOAI_SP}</Link>
+                                </li>
+                            )
+                        }
                         <li className="navbar-item">
-                            <Link to="/category/donghonam">Đồng hồ nam</Link>
-                        </li>
-                        <li className="navbar-item">
-                            <Link to="/category/donghonu">Đồng hồ nữ</Link>
-                        </li>
-                        <li className="navbar-item">
-                            <Link to="/category/donghodoi">Đồng hồ đôi</Link>
-                        </li>
-                        <li className="navbar-item">
-                            <Link to="/category/phukien">Phụ kiện</Link>
-                        </li>
-                        <li className="navbar-item">
-                            <Link to="/contact">Liên hệ</Link>
+                            <Link to="/contact" className={pathname?.includes('contact') ? 'active' : ''} >Liên hệ</Link>
                         </li>
                         <li className="navbar-item user-logged">
                             <Link to="">Đăng nhập</Link>

@@ -1,3 +1,4 @@
+import axios from "axios"
 import axiosClient from "./axiosClient"
 
 export const nhanvienApi = {
@@ -38,5 +39,15 @@ export const nhanvienApi = {
     delete: (params, data) => {
         const url = `/nhanviens/${params}`
         return axiosClient.delete(url, data);
-    }
+    },
+    getNewToken: (refreshToken) => {
+        const url = `/nhanviens/get_new_token`
+        return axios.get(url, {
+            baseURL: process.env.REACT_APP_API_URL,
+            headers: {
+                "content-type": 'application/json',
+                authorization: `Bearer ${refreshToken}`
+            }
+        });
+    },
 }

@@ -1,6 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { chucvuApi } from 'api/chucvuApi';
-import { danhmucApi } from 'api/danhmucApi';
 import { donhangApi } from 'api/donhangApi';
 import { loaisanphamApi } from 'api/loaisanphamApi';
 import { nguoidungApi } from 'api/nguoidungApi';
@@ -9,14 +8,27 @@ import { nhanvienApi } from 'api/nhanvienApi';
 import { phieunhapApi } from 'api/phieunhapApi';
 import { quyenApi } from 'api/quyenApi';
 import { sanphamApi } from 'api/sanphamApi';
+import { sukienApi } from 'api/sukienApi';
 import { thongkeApi } from 'api/thongkeApi';
 import { thuonghieuApi } from 'api/thuonghieuApi';
+import { uudaiApi } from 'api/uudaiApi';
 
 export const fetch_positions = createAsyncThunk("adminPage/fetch_positions", async (params, { rejectWithValue }) => {
 
     try {
-        console.log({ params })
         const { result, totalRecord } = await chucvuApi.getAll(params);
+        return { result, totalRecord };
+
+    } catch (error) {
+        return rejectWithValue(error.respone.data)
+    }
+
+})
+
+export const fetch_vouchers = createAsyncThunk("adminPage/fetch_vouchers", async (params, { rejectWithValue }) => {
+
+    try {
+        const { result, totalRecord } = await uudaiApi.getAll(params);
         return { result, totalRecord };
 
     } catch (error) {
@@ -37,17 +49,6 @@ export const fetch_productTypes = createAsyncThunk("adminPage/fetch_productTypes
 
 })
 
-export const fetch_categories = createAsyncThunk("adminPage/fetch_categories", async (params, { rejectWithValue }) => {
-
-    try {
-        const { result, totalRecord } = await danhmucApi.getAll(params);
-        return { result, totalRecord };
-
-    } catch (error) {
-        return rejectWithValue(error.respone.data)
-    }
-
-})
 
 export const fetch_brands = createAsyncThunk("adminPage/fetch_brands", async (params, { rejectWithValue }) => {
 
@@ -169,6 +170,18 @@ export const fetch_statistical = createAsyncThunk("adminPage/fetch_statistical",
 
 })
 
+export const fetch_events = createAsyncThunk("adminPage/fetch_events", async (params, { rejectWithValue }) => {
+
+    try {
+        const { result, totalRecord } = await sukienApi.getAll(params);
+        return { result, totalRecord };
+
+    } catch (error) {
+        return rejectWithValue(error.respone.data)
+    }
+
+})
+
 const initialState = {
     screenUpdateOn: {
         employees: { mode: 'ADD' },
@@ -183,6 +196,8 @@ const initialState = {
         products: { mode: 'ADD' },
         orders: { mode: 'ADD' },
         rules: { mode: 'ADD' },
+        vouchers: { mode: 'ADD' },
+        events: { mode: 'ADD' },
     },
     selectedKey: '1',
     loading: {},
@@ -260,6 +275,18 @@ const initialState = {
             _totalPage: 1,
             _totalRecord: 0
         },
+        vouchers: {
+            _limit: 10,
+            _page: 1,
+            _totalPage: 1,
+            _totalRecord: 0
+        },
+        events: {
+            _limit: 10,
+            _page: 1,
+            _totalPage: 1,
+            _totalRecord: 0
+        },
     },
     error: {}
 }
@@ -285,6 +312,7 @@ const adminPage = createSlice({
         },
     },
     extraReducers: {
+        //positions
         [fetch_positions.pending]: (state, action) => {
             state.loading.positions = true;
         },
@@ -299,6 +327,22 @@ const adminPage = createSlice({
         [fetch_positions.rejected]: (state, action) => {
             state.loading.positions = false;
             state.error.positions = action.error;
+        },
+        // vouchers
+        [fetch_vouchers.pending]: (state, action) => {
+            state.loading.vouchers = true;
+        },
+        [fetch_vouchers.fulfilled]: (state, action) => {
+            state.loading.vouchers = false;
+            state.data.vouchers = action.payload.result.map((e, idx) => ({ ...e, key: idx }));
+
+            const totalRecord = action.payload.totalRecord;
+            state.pagination.vouchers._totalRecord = totalRecord;
+            state.pagination.vouchers._totalPage = Math.ceil(totalRecord / state.pagination.vouchers._limit);
+        },
+        [fetch_vouchers.rejected]: (state, action) => {
+            state.loading.vouchers = false;
+            state.error.vouchers = action.error;
         },
         // productTypes
         [fetch_productTypes.pending]: (state, action) => {
@@ -315,22 +359,6 @@ const adminPage = createSlice({
         [fetch_productTypes.rejected]: (state, action) => {
             state.loading.productTypes = false;
             state.error.productTypes = action.error;
-        },
-        // categories
-        [fetch_categories.pending]: (state, action) => {
-            state.loading.categories = true;
-        },
-        [fetch_categories.fulfilled]: (state, action) => {
-            state.loading.categories = false;
-            state.data.categories = action.payload.result.map((e, idx) => ({ ...e, key: idx }));
-
-            const totalRecord = action.payload.totalRecord;
-            state.pagination.categories._totalRecord = totalRecord;
-            state.pagination.categories._totalPage = Math.ceil(totalRecord / state.pagination.categories._limit);
-        },
-        [fetch_categories.rejected]: (state, action) => {
-            state.loading.categories = false;
-            state.error.categories = action.error;
         },
         // brands
         [fetch_brands.pending]: (state, action) => {
@@ -487,6 +515,22 @@ const adminPage = createSlice({
         [fetch_statistical.rejected]: (state, action) => {
             state.loading.statistical = false;
             state.error.statistical = action.error;
+        },
+        // events
+        [fetch_events.pending]: (state, action) => {
+            state.loading.events = true;
+        },
+        [fetch_events.fulfilled]: (state, action) => {
+            state.loading.events = false;
+            state.data.events = action.payload.result.map((e, idx) => ({ ...e, key: idx }));
+
+            const totalRecord = action.payload.totalRecord;
+            state.pagination.events._totalRecord = totalRecord;
+            state.pagination.events._totalPage = Math.ceil(totalRecord / state.pagination.events._limit);
+        },
+        [fetch_events.rejected]: (state, action) => {
+            state.loading.events = false;
+            state.error.events = action.error;
         },
 
     }

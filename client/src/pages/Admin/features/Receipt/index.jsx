@@ -1,17 +1,15 @@
 import React from 'react';
 
-import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
-import { Button, Col, Divider, Popconfirm, Row, Skeleton, Table } from 'antd';
-import { chucvuApi } from 'api/chucvuApi';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, Divider, Pagination, Popconfirm, Table } from 'antd';
+import { phieunhapApi } from 'api/phieunhapApi';
 import { numberWithCommas } from 'assets/admin';
+import moment from 'moment';
 import { fetch_receipts, prepareDataEdit, savePagination } from 'pages/Admin/adminSlice';
+import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
+import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
-import { danhmucApi } from 'api/danhmucApi';
-import moment from 'moment';
-import { phieunhapApi } from 'api/phieunhapApi';
 
 Receipt.propTypes = {
 
@@ -136,13 +134,7 @@ function Receipt(props) {
                             size='small'
                             columns={columns}
                             dataSource={receipts}
-                            pagination={
-                                {
-                                    current: pagination._page,
-                                    total: pagination._totalPage,
-                                    onChange: (page) => dispatch(savePagination({ screen: 'receipts', page }))
-                                }
-                            }
+                            pagination={false}
                             expandable={{
                                 expandedRowRender: (record) => (
                                     <Table
@@ -155,6 +147,12 @@ function Receipt(props) {
                                 ),
                             }}
                         />
+                        <Divider />
+                        <Pagination
+                            pageSize={1}
+                            current={pagination._page}
+                            total={pagination._totalPage}
+                            onChange={(page) => dispatch(savePagination({ screen: 'receipts', page }))} ></Pagination>
                     </>
 
             }

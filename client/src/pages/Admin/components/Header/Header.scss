@@ -1,19 +1,23 @@
 .header-admin{
-    // height: 30px;
+    height: 35px;
     background-color: #2C3338;
-   
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    line-height: 35px;
     // padding: 1rem 24px;
 
 
     .left-side{
         text-align: center;
-        border-bottom: 1px solid #ececec;
-        
 
-        img{
-            width: 60px;
-            height: 35px;
-            object-fit: contain;
+        .menu-btn{
+            color: #FFF;
+            position: absolute;
+            left: 10px;
+            top: -8px;
+            font-size: 18px;
+            display: none;
         }
     }
 
@@ -44,5 +48,4 @@
             color: var(--mainColor);
         }
     }
-
 }

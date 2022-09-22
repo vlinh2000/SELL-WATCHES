@@ -70,13 +70,13 @@ function getBreadcrumbFromSecond(path) {
             key = "662";
             break;
         }
-        case '/admin/categories/edit': {
-            paths = ['Quản lý danh mục', 'Cập nhật danh mục'];
+        case '/admin/vouchers/edit': {
+            paths = ['Quản lý ưu đãi', 'Cập nhật ưu đãi'];
             key = "771";
             break;
         }
-        case '/admin/categories/view': {
-            paths = ['Quản lý danh mục', 'Danh sách danh mục'];
+        case '/admin/vouchers/view': {
+            paths = ['Quản lý ưu đãi', 'Danh sách ưu đãi'];
             key = "772";
             break;
         }
@@ -115,16 +115,16 @@ function getBreadcrumbFromSecond(path) {
             key = "12122";
             break;
         }
-        // case '/admin/vouchers/edit': {
-        //     paths = ['Quản lý phiếu giảm giá', 'Cập nhật phiếu giảm giá'];
-        //     key = "13131";
-        //     break;
-        // }
-        // case '/admin/vouchers/view': {
-        //     paths = ['Quản lý phiếu giảm giá', 'Danh sách phiếu giảm giá'];
-        //     key = "13132";
-        //     break;
-        // }
+        case '/admin/events/edit': {
+            paths = ['Quản lý sự kiện', 'Cập nhật sự kiện'];
+            key = "13131";
+            break;
+        }
+        case '/admin/events/view': {
+            paths = ['Quản lý sự kiện', 'Danh sách sự kiện'];
+            key = "13132";
+            break;
+        }
         case '/admin/dashboard': {
             paths = ['Dashboard'];
             key = "1"
@@ -153,4 +153,9 @@ function formatDate(date, formart = "YYYY-MM-DD") {
     return dateFormatted;
 }
 
-export { getBreadcrumbFromSecond, numberWithCommas, getStatusOrder, formatDate };
+const toggleSideBar = () => {
+    document.querySelector('.admin-page .sidebar').classList.toggle('active-sidebar');
+    document.querySelector('.admin-page').classList.toggle('toggle-bg');
+}
+
+export { getBreadcrumbFromSecond, numberWithCommas, getStatusOrder, formatDate, toggleSideBar };

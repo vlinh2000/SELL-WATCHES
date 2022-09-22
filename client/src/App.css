@@ -2,6 +2,10 @@
     --mainColor:#c89979
 }
 
+.app{
+    position: relative;
+}
+
 .wrapper{
     min-height: 50vh;
     margin-top: 2rem;
@@ -121,6 +125,15 @@
     background: #FFF;
 }
 
+.admin-page .main-wrapper .box .ant-timeline-item-content{
+    font-size: 13.5px;
+}
+
+.admin-page .main-wrapper .box .ant-list-item-meta-description{
+    font-size: 13.5px;
+    color: rgba(0, 0, 0, 0.7);
+}
+
 .admin-page .main-wrapper .box .ant-table-wrapper{
     display: block; 
     overflow-y: auto;
@@ -162,3 +175,25 @@
 }
 
 
+/*---CUSTOM SCROLL BAR---*/
+/* width */
+::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey; 
+    border-radius: 10px;
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #999; 
+    border-radius: 10px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #888;
+  }

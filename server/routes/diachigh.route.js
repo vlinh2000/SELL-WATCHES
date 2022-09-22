@@ -1,11 +1,12 @@
 var express = require('express');
 var router = express.Router();
+const { isAuth } = require('../middleware/auth.middleware');
 
 const diachighController = require('../controllers/diachigh.controller');
 
-router.get('/', diachighController.get_diachighs);
+router.get('/', isAuth, diachighController.get_diachighs);
 router.get('/:diachighID', diachighController.get_diachigh);
-router.post('/', diachighController.post_diachighs);
+router.post('/', isAuth, diachighController.post_diachighs);
 router.patch('/:diachighID', diachighController.patch_diachighs);
 router.delete('/:diachighID', diachighController.delete_diachighs);
 

@@ -1,17 +1,15 @@
 import React from 'react';
 
-import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
-import { Button, Col, Divider, Popconfirm, Row, Skeleton, Table, Tag } from 'antd';
-import { chucvuApi } from 'api/chucvuApi';
+import { DeleteOutlined } from '@ant-design/icons';
+import { Button, Divider, Pagination, Popconfirm, Table, Tag } from 'antd';
+import { donhangApi } from 'api/donhangApi';
 import { getStatusOrder, numberWithCommas } from 'assets/admin';
+import moment from 'moment';
 import { fetch_orders, prepareDataEdit, savePagination } from 'pages/Admin/adminSlice';
+import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
+import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
-import { danhmucApi } from 'api/danhmucApi';
-import moment from 'moment';
-import { donhangApi } from 'api/donhangApi';
 import './Order.scss';
 
 Order.propTypes = {
@@ -127,7 +125,7 @@ function Order(props) {
         },
         {
             title: 'Hành động',
-            dataIndex: 'MA_PHIEU_NHAP',
+            dataIndex: 'MA_DH',
             // fixed: 'right',
             // key: 'operation',
             render: (text, record) => <>
@@ -180,13 +178,7 @@ function Order(props) {
                             size='small'
                             columns={columns}
                             dataSource={orders}
-                            pagination={
-                                {
-                                    current: pagination._page,
-                                    total: pagination._totalPage,
-                                    onChange: (page) => dispatch(savePagination({ screen: 'orders', page }))
-                                }
-                            }
+                            pagination={false}
                             expandable={{
                                 expandedRowRender: (record) => (
                                     <Table
@@ -199,6 +191,12 @@ function Order(props) {
                                 ),
                             }}
                         />
+                        <Divider />
+                        <Pagination
+                            pageSize={1}
+                            current={pagination._page}
+                            total={pagination._totalPage}
+                            onChange={(page) => dispatch(savePagination({ screen: 'orders', page }))} ></Pagination>
                     </>
 
             }

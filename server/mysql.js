@@ -5,7 +5,7 @@ var con = mysql.createConnection({
     user: "root",
     password: "",
     port: 3308,
-    database: "quan_ly_dat_hang"
+    database: "quan_ly_ban_hang"
 });
 
 function executeQuery(sql) {
@@ -31,7 +31,7 @@ function checkIsExist(table, fieldName, id) {
         const sql = `SELECT * FROM ${table} WHERE ${fieldName}='${id}'`;
         con.query(sql, function (err, results) {
             if (err) reject(err);
-            resolve(results.length > 0 ? true : false);
+            resolve(results?.length > 0 ? true : false);
         })
     })
 }

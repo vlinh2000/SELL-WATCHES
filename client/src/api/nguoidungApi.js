@@ -16,6 +16,10 @@ export const nguoidungApi = {
         })
 
     },
+    saveUserSocialMedia: (data) => {
+        const url = `/nguoidungs/save_user_social_media`
+        return axiosClient.post(url, data);
+    },
     update: (params, data) => {
         const url = `/nguoidungs/${params}`
         return axiosClient.patch(url, data);

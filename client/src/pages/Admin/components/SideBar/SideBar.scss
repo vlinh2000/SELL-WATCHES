@@ -1,9 +1,28 @@
 .sidebar{
-    padding-top: 1rem;
     background-color: #2C3338;
-    height: 100%;
-    // position: fixed;
+    height: 100vh;
+    position: sticky;
+    top: 0;
 
+    .logo{
+        text-align: center;
+
+        img{
+            width: 60px;
+            height: 35px;
+            object-fit: contain;
+        }
+
+        .menu-btn{
+            color: #FFF;
+            position: absolute;
+            left: 10px;
+            top: 8px;
+            font-size: 18px;
+            display: none;
+        }
+    }
+    
     a{
         color: #67645c;
     }
@@ -29,7 +48,12 @@
         background-color: transparent;
     }
 
-    .ant-menu-dark .ant-menu-item:hover a, .ant-menu-dark .ant-menu-item-active a, .ant-menu-dark .ant-menu-submenu-active a, .ant-menu-dark .ant-menu-submenu-open a, .ant-menu-dark .ant-menu-submenu-selected a, .ant-menu-dark .ant-menu-submenu-title:hover a{
+    .ant-menu-dark .ant-menu-item:hover a, 
+    .ant-menu-dark .ant-menu-item-active a, 
+    .ant-menu-dark .ant-menu-submenu-active a, 
+    .ant-menu-dark .ant-menu-submenu-open a, 
+    .ant-menu-dark .ant-menu-submenu-selected a, 
+    .ant-menu-dark .ant-menu-submenu-title:hover a{
         color: #FFF;
     }
 
@@ -51,4 +75,10 @@
         font-size: 10px;
         font-weight: 500;
     }
+}
+.active-sidebar{
+        width: 300px !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        
 }

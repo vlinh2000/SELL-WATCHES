@@ -19,7 +19,7 @@ function Banner(props) {
                             <h4>Mona Watch</h4>
                             <h1>Đồng hồ classico</h1>
                             <p>Cùng với sự phát triển không ngừng của thời trang thế giới, rất nhiều thương hiệu cho ra đời những mẫu đồng hồ nam chính hãng đa dạng về phong cách, kiểu dáng, màu sắc, kích cỡ…</p>
-                            <Link className='view-product' to="">Xem sản phẩm</Link>
+                            <Link className='view-product' to="/category/all">Xem sản phẩm</Link>
                         </div>
                     </div>
                 </div>
@@ -29,7 +29,7 @@ function Banner(props) {
                             <h4>Mona Watch</h4>
                             <h1>Đồng hồ classico</h1>
                             <p>Cùng với sự phát triển không ngừng của thời trang thế giới, rất nhiều thương hiệu cho ra đời những mẫu đồng hồ nam chính hãng đa dạng về phong cách, kiểu dáng, màu sắc, kích cỡ…</p>
-                            <Link className='view-product' to="">Xem sản phẩm</Link>
+                            <Link className='view-product' to="/category/all">Xem sản phẩm</Link>
                         </div>
                     </div>
                 </div>

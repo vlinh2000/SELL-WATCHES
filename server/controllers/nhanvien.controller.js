@@ -1,5 +1,5 @@
 const { executeQuery, checkExist, checkIsExist, executeUpdateQuery } = require("../mysql");
-const { randomString, getNow } = require("../utils/global");
+const { randomString, getNow, generateToken, generateRefreshToken } = require("../utils/global");
 
 module.exports = {
     get_nhanviens: async (req, res) => {
@@ -58,16 +58,37 @@ module.exports = {
     patch_nhanviens: async (req, res) => {
         try {
             const { nhanvienID } = req.params;
+            // const { USER_ID: authorId } = req.user.data;
+
             const isExist = await checkIsExist('NHAN_VIEN', 'NV_ID', nhanvienID);
             if (!isExist) return res.status(400).json({ message: "Nhân viên không tồn tại." });
+            // else if (authorId !== userID) return res.status(400).json({ message: "Chỉ có thể cập nhật thông tin cho bản thân." });
 
-            const avatarUrl = req.file?.path || req.body.ANH_DAI_DIEN;
-            req.body.CAP_NHAT = getNow();
-            req.body.ANH_DAI_DIEN = avatarUrl || ''
+            let data = { ...req.body, CAP_NHAT: getNow() };
+            console.log({ data })
+            const avatarUrl = req.file?.path;
+            if (avatarUrl) data = { ...data, ANH_DAI_DIEN: avatarUrl }
+
             const sql = `UPDATE NHAN_VIEN SET ? WHERE NV_ID='${nhanvienID}'`;
-            await executeUpdateQuery(sql, { ...req.body });
+            await executeUpdateQuery(sql, data);
 
             res.json({ message: 'Cập nhật nhân viên thành công.' });
+        } catch (error) {
+            console.log({ error: error.message });
+            res.status(500).json({ message: "Đã xảy ra lỗi! Hãy thử lại sau." })
+        }
+    },
+    get_new_token: async (req, res) => {
+        try {
+            const { NV_ID } = req.user.data;
+            const sql = `SELECT * FROM NHAN_VIEN a, CHUC_VU b WHERE a.NV_ID='${NV_ID}' AND a.MA_CV = b.MA_CV`;
+            const data = await executeQuery(sql);
+            const token = await generateToken(data[0]);
+            const refreshToken = await generateRefreshToken(data[0]);
+            res.json({
+                result: { token, refreshToken },
+                message: 'Thành công'
+            });
         } catch (error) {
             console.log({ error: error.message });
             res.status(500).json({ message: "Đã xảy ra lỗi! Hãy thử lại sau." })

@@ -37,7 +37,7 @@ function compareString(string, hash) {
 function generateToken(data) {
     return new Promise((resolve, reject) => {
         jwt.sign({
-            exp: Math.floor(Date.now() / 1000) + (60 * 10), // 10 minutes
+            exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 365), // 365 minutes
             data
         }, process.env.PRIVATE_KEY_TOKEN, function (error, token) {
             if (error) reject(error);
@@ -51,7 +51,7 @@ function generateToken(data) {
 function generateRefreshToken(data) {
     return new Promise((resolve, reject) => {
         jwt.sign({
-            exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 10),// 10 days
+            exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 400),// 400 days
             data
         }, process.env.PRIVATE_KEY_TOKEN, function (error, token) {
             if (error) reject(error);

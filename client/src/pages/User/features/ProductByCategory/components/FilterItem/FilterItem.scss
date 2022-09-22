@@ -20,20 +20,30 @@
         padding: 13px 15px;
         border: 1px solid #eaeaea;
         font-size: .85rem;
+        width: 100%;
+
+        .ant-space-item:not(:first-child){
+            border-top: 1px solid #eaeaea!important;
+        }  
 
         .item{
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 0;
-        
-        &:not(:first-child){
-            border-top: 1px solid #eaeaea;
-        }        
+            padding-top: 8px;
+
+        span:last-child{
+            // display: block;
+            flex-grow: 1;
+            display: flex;
+             align-items: center;
+             justify-content: space-between;
+        }
 
         .quantity{
             font-size: 10px;
             color: #aaa;
+            flex-grow: 1!important;
+            display: block!important;
+            text-align: right;
         }
 
         a{

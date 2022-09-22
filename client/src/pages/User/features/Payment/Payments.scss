@@ -99,15 +99,26 @@
 }
 
 .ant-modal-body  .radio-item{
-    display: flex;
-    width: 100%;
+    // display: flex;
+    // width: 100%;
+    vertical-align: top;
 
-    div{
-        flex-grow: 1;
+    tr{
+        border: 1px solid #000;
     }
 
-    span.anticon{
+    a{
         margin-top: 0.5rem;
         margin-left: 10px;
+    }
+}
+
+.ant-modal-body{
+    .ant-table-thead > tr > th{
+        white-space: nowrap;
+    }
+
+    .ant-form-item{
+        margin-bottom: 0;
     }
 }

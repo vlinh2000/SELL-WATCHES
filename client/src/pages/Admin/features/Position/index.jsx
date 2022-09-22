@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Col, Divider, Popconfirm, Row, Skeleton, Table } from 'antd';
+import { Button, Col, Divider, Pagination, Popconfirm, Row, Skeleton, Table } from 'antd';
 import { chucvuApi } from 'api/chucvuApi';
 import { numberWithCommas } from 'assets/admin';
 import { fetch_positions, prepareDataEdit, savePagination } from 'pages/Admin/adminSlice';
@@ -91,14 +91,14 @@ function Positon(props) {
                             size='small'
                             columns={columns}
                             dataSource={positions}
-                            pagination={
-                                {
-                                    current: pagination._page,
-                                    total: pagination._totalPage,
-                                    onChange: (page) => dispatch(savePagination({ screen: 'positions', page }))
-                                }
-                            }
+                            pagination={false}
                         />
+                        <Divider />
+                        <Pagination
+                            pageSize={1}
+                            current={pagination._page}
+                            total={pagination._totalPage}
+                            onChange={(page) => dispatch(savePagination({ screen: 'positions', page }))} ></Pagination>
                     </>
 
             }

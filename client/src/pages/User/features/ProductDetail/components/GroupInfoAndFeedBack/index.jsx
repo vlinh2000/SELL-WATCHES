@@ -1,21 +1,101 @@
 import { StarFilled } from '@ant-design/icons';
-import { Col, Form, Pagination, Rate, Row, Tabs } from 'antd';
+import { Alert, Col, Form, Pagination, Rate, Row, Tabs } from 'antd';
 import ButtonCustom from 'components/ButtonCustom';
 import SortBy from 'components/SortBy';
 import InputField from 'custom-fields/InputField';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import FeedBackList from '../FeedBackList';
 import './GroupInfoAndFeedBack.scss';
+import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import { switch_screenLogin } from 'pages/User/userSlice';
+import { danhgiaApi } from 'api/danhgiaApi';
+import React from 'react';
+import toast from 'react-hot-toast';
+
 
 GroupInfoAndFeedBack.propTypes = {
+    product: PropTypes.object,
+};
 
+GroupInfoAndFeedBack.defaultProps = {
+    product: {},
 };
 
 function GroupInfoAndFeedBack(props) {
+    const { idProduct } = useParams();
+    const { product } = props;
+    const dispatch = useDispatch();
+    const { user, isAuth } = useSelector(state => state.auth);
 
     const onChange = (key) => {
         console.log(key);
     };
+
+    const [form] = Form.useForm();
+    const initialValues = {
+        ...user, SO_SAO: 0, NOI_DUNG: ''
+    }
+
+    const [feedBackList, setFeedBackList] = React.useState();
+    const [mediumScoreOfFeedBack, setMediumScoreOfFeedBack] = React.useState(0);
+    const [groupByFeedBackByNumStar, setGroupByFeedBackByNumStar] = React.useState([]);
+    const [reloadFeedBackList, setReloadFeedBackList] = React.useState(false);
+    const [pagination, setPagination] = React.useState({ _limit: 8, _page: 1, _totalPage: 3, _totalRecord: 0 });
+    const [loading, setLoading] = React.useState({});
+    const [sortBy, setSortBy] = React.useState('NGAY_TAO DESC');
+
+
+    React.useEffect(() => {
+        const fetchFeedBackList = async () => {
+            try {
+                setLoading(prev => ({ ...prev, feedBackList: true }));
+                const { result, totalRecord } = await danhgiaApi.getAll({ _page: pagination._page, _limit: pagination._limit, MA_SP: idProduct, sortBy });
+                setFeedBackList(result)
+                setPagination(prev => ({ ...prev, _totalPage: Math.ceil(totalRecord / pagination._limit), _totalRecord: totalRecord }))
+                setLoading(prev => ({ ...prev, feedBackList: false }));
+            } catch (error) {
+                setLoading(prev => ({ ...prev, feedBackList: false }));
+                console.log({ error })
+            }
+        }
+
+        fetchFeedBackList();
+    }, [idProduct, reloadFeedBackList, pagination._page, pagination._limit, sortBy])
+
+    React.useEffect(() => {
+        const fetchGroupFeedBackByNumStar = async () => {
+            try {
+                const { result } = await danhgiaApi.getAll({ MA_SP: idProduct, action: 'groupByFeedBackByNumStar' });
+                const totalRows = result.reduce((a, b) => a + b.TONG_SO, 0);
+                setMediumScoreOfFeedBack(parseFloat(result.reduce((a, b) => a + b.TONG_DIEM, 0) / totalRows).toFixed(1));
+                const groupByNumStarList = new Array(5).fill(0);
+                result.forEach(fb => {
+                    groupByNumStarList[fb.SO_SAO - 1] = fb.TONG_SO;
+                });
+                console.log({ groupByNumStarList })
+                setGroupByFeedBackByNumStar(groupByNumStarList?.map(num => parseFloat((num / totalRows) * 100).toFixed(0) + '%').reverse());
+            } catch (error) {
+                console.log({ error })
+            }
+        }
+
+        fetchGroupFeedBackByNumStar();
+    }, [idProduct, reloadFeedBackList, pagination._totalRecord])
+
+    const handleFeedBack = async (values) => {
+        try {
+            setLoading(prev => ({ ...prev, sendFeedBack: true }));
+            const { message } = await danhgiaApi.post({ SO_SAO: values.SO_SAO, NOI_DUNG: values.NOI_DUNG, MA_SP: product.MA_SP });
+            toast.success(message)
+            form.resetFields();
+            setReloadFeedBackList(prev => !prev);
+            setLoading(prev => ({ ...prev, sendFeedBack: false }));
+        } catch (error) {
+            setLoading(prev => ({ ...prev, sendFeedBack: false }));
+            toast.error(error.response.data.message);
+        }
+    }
 
     return (
         <div className='group-info-and-feedback'>
@@ -26,43 +106,43 @@ function GroupInfoAndFeedBack(props) {
                             <ul className="group-info">
                                 <li className="group-info-item">
                                     <span className='info-name'>bộ máy & năng lượng</span>
-                                    <span className='info-value'>Cơ (Automatic)</span>
+                                    <span className='info-value'>{product.PIN}</span>
                                 </li>
                                 <li className="group-info-item">
                                     <span className='info-name'>CHẤT LIỆU DÂY</span>
-                                    <span className='info-value'>Dây Kim Loại</span>
+                                    <span className='info-value'>{product.CHAT_LIEU_DAY}</span>
                                 </li>
                                 <li className="group-info-item">
                                     <span className='info-name'>CHẤT LIỆU MẶT KÍNH</span>
-                                    <span className='info-value'>Kính Sapphire</span>
+                                    <span className='info-value'>{product.CHAT_LIEU_MAT_KINH}</span>
                                 </li>
-                                <li className="group-info-item">
+                                {/* <li className="group-info-item">
                                     <span className='info-name'>GIỚI TÍNH</span>
-                                    <span className='info-value'>Nữ</span>
-                                </li>
+                                    <span className='info-value'>{product.PIN}</span>
+                                </li> */}
                                 <li className="group-info-item">
                                     <span className='info-name'>HÌNH DẠNG MẶT SỐ</span>
-                                    <span className='info-value'>Tròn</span>
+                                    <span className='info-value'>{product.HINH_DANG_MAT_SO}</span>
                                 </li>
                                 <li className="group-info-item">
                                     <span className='info-name'>KÍCH THƯỚC MẶT SỐ</span>
-                                    <span className='info-value'>&lt; 29 mm</span>
+                                    <span className='info-value'>{product.KICH_THUOC_MAT_SO}</span>
                                 </li>
                                 <li className="group-info-item">
                                     <span className='info-name'>MÀU MẶT SỐ</span>
-                                    <span className='info-value'>Trắng</span>
+                                    <span className='info-value'>{product.MAU_MAT_SO}</span>
                                 </li>
                                 <li className="group-info-item">
                                     <span className='info-name'>MỨC CHỐNG NƯỚC</span>
-                                    <span className='info-value'>Đi Mưa Nhỏ (3 ATM)</span>
+                                    <span className='info-value'>{product.MUC_CHONG_NUOC}</span>
                                 </li>
                                 <li className="group-info-item">
                                     <span className='info-name'>THƯƠNG HIỆU</span>
-                                    <span className='info-value'>Tissot</span>
+                                    <span className='info-value'>{product.TEN_THUONG_HIEU}</span>
                                 </li>
                                 <li className="group-info-item">
                                     <span className='info-name'>XUẤT XỨ</span>
-                                    <span className='info-value'>Thụy Sĩ</span>
+                                    <span className='info-value'>{product.QUOC_GIA}</span>
                                 </li>
 
                             </ul>
@@ -102,54 +182,77 @@ function GroupInfoAndFeedBack(props) {
                         </Col>
                     </Row>
                 </Tabs.TabPane>
-                <Tabs.TabPane tab="Đánh giá (0)" key="2">
-                    <div className="feedback-wrapper">
-                        <div className="total-feedback-wrapper">
-                            <div className='total-feedback'><span className='total-score'>4.7</span> <Rate disabled defaultValue={5} /></div>
-                            <div className='feedback-item-vote'><span className='num-star'>5</span> <StarFilled /> <span className='range-vote'><span className="percent" style={{ width: "50%" }}></span></span> <span className='percent-vote'>50%</span></div>
-                            <div className='feedback-item-vote'><span className='num-star'>4</span> <StarFilled /> <span className='range-vote'><span className="percent" style={{ width: "20%" }}></span></span><span className='percent-vote'>20%</span></div>
-                            <div className='feedback-item-vote'><span className='num-star'>3</span> <StarFilled /> <span className='range-vote'><span className="percent" style={{ width: "10%" }}></span></span><span className='percent-vote'>10%</span></div>
-                            <div className='feedback-item-vote'><span className='num-star'>2</span> <StarFilled /> <span className='range-vote'><span className="percent" style={{ width: "20%" }}></span></span><span className='percent-vote'>20%</span></div>
-                            <div className='feedback-item-vote'><span className='num-star'>1</span> <StarFilled /> <span className='range-vote'><span className="percent" style={{ width: "0%" }}></span></span><span className='percent-vote'>0%</span></div>
-                        </div>
-                        <div className='feedback-list-wrapper'>
-                            <SortBy
-                                style={{ width: 150 }}
-                                label="Sắp xếp theo"
-                                name="sortBy"
-                                options={[
-                                    { label: 'Mới nhất', value: 'new', },
-                                    { label: 'Cũ nhất', value: 'old', },
-                                    { label: 'Đánh giá cao', value: 'high', },
-                                    { label: 'Đánh giá thấp', value: 'low', },
-                                ]} />
-                            <FeedBackList />
-                            <Pagination defaultCurrent={1} total={50} />
-                        </div>
-                    </div>
+                <Tabs.TabPane tab={`Đánh giá (${pagination._totalRecord || 0})`} key="2">
+                    {
+                        feedBackList?.length < 1 ?
+                            <Alert
+                                message="Chưa có đánh giá về sản phẩm này."
+                                type="info"
+                                showIcon
+                            />
+                            :
+                            <div className="feedback-wrapper">
+                                <div className="total-feedback-wrapper">
+                                    <div className='total-feedback'><span className='total-score'>~{parseFloat(Math.ceil(mediumScoreOfFeedBack)).toFixed(1)}</span> <Rate disabled value={Math.ceil(mediumScoreOfFeedBack)} /></div>
+                                    {
+                                        groupByFeedBackByNumStar?.map((num, idx) =>
+                                            <div key={idx} className='feedback-item-vote'><span className='num-star'>{5 - idx}</span> <StarFilled /> <span className='range-vote'><span className="percent" style={{ width: num }}></span></span> <span className='percent-vote'>{num}</span></div>
+                                        )
+                                    }
+                                </div>
+                                <div className='feedback-list-wrapper'>
+                                    <Form
+                                        onValuesChange={(values) => setSortBy(values.sortBy)}
+                                        initialValues={{ sortBy: 'NGAY_TAO DESC' }}>
+                                        <SortBy
+                                            style={{ width: 150 }}
+                                            label="Sắp xếp theo"
+                                            name="sortBy"
+                                            options={[
+                                                { label: 'Mới nhất', value: 'NGAY_TAO DESC', },
+                                                { label: 'Cũ nhất', value: 'NGAY_TAO ASC', },
+                                                { label: 'Đánh giá cao', value: 'SO_SAO DESC', },
+                                                { label: 'Đánh giá thấp', value: 'SO_SAO ASC', },
+                                            ]} />
+                                    </Form>
+                                    <FeedBackList feedBackList={feedBackList} isLoading={loading?.feedBackList} />
+                                    <Pagination onChange={(_page) => setPagination(prev => ({ ...prev, _page }))} current={pagination._page} total={pagination._totalPage} pageSize={1} />
+                                </div>
+                            </div>
+                    }
                 </Tabs.TabPane>
                 <Tabs.TabPane tab="Viết đánh giá" key="3">
                     <div className="feedback-wrapper">
                         <div className='my-feedback'>
-                            <p>Vui lòng <Link to="">đăng nhập</Link> để đánh giá</p>
-                            <Form className="form-feedback" layout='vertical'>
-                                <div className="vote">
-                                    <div className='label'>Đánh giá của bạn</div>
-                                    <Rate count={5} />
-                                </div>
-                                <div className="comments">
-                                    <InputField name="comment" label="Nhận xét của bạn" type="textarea" />
-                                </div>
-                                <Row gutter={[20, 0]}>
-                                    <Col xs={24} sm={12} md={12} lg={12}>
-                                        <InputField name="name" label="Tên" />
-                                    </Col>
-                                    <Col xs={24} sm={12} md={12} lg={12}>
-                                        <InputField name="email" label="Email" />
-                                    </Col>
-                                </Row>
-                            </Form>
-                            <ButtonCustom text="Gửi" />
+                            {
+                                isAuth ?
+                                    <Form
+                                        onFinish={handleFeedBack}
+                                        form={form} initialValues={initialValues} className="form-feedback" layout='vertical'>
+                                        <div className="vote">
+                                            <div className='label'>Đánh giá của bạn</div>
+                                            <Form.Item
+                                                rules={[{ required: true, message: "Số sao không được để trống." }]}
+                                                name="SO_SAO">
+                                                <Rate count={5} />
+                                            </Form.Item>
+                                        </div>
+                                        <div className="comments">
+                                            <InputField rules={[{ required: true, message: "Nội dung không được để trống." }]} name="NOI_DUNG" label="Nhận xét của bạn" type="textarea" />
+                                        </div>
+                                        <Row gutter={[20, 0]}>
+                                            <Col xs={24} sm={12} md={12} lg={12}>
+                                                <InputField disabled name="HO_TEN" label="Tên" />
+                                            </Col>
+                                            <Col xs={24} sm={12} md={12} lg={12}>
+                                                <InputField disabled name="EMAIL" label="Email" />
+                                            </Col>
+                                        </Row>
+                                        <ButtonCustom type='submit' text="Gửi" isLoading={loading?.sendFeedBack} />
+                                    </Form>
+                                    :
+                                    <p>Vui lòng <Link to="" onClick={() => dispatch(switch_screenLogin(true))}>đăng nhập</Link> để đánh giá</p>
+                            }
                         </div>
                     </div>
                 </Tabs.TabPane>

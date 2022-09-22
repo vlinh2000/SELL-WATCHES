@@ -15,6 +15,7 @@ SelectField.propTypes = {
     options: PropTypes.array,
     rules: PropTypes.array,
     onChange: PropTypes.func,
+    defaultValues: PropTypes.string,
 };
 
 SelectField.defaultProps = {
@@ -29,11 +30,12 @@ SelectField.defaultProps = {
     options: [],
     rules: [],
     onChange: null,
+    defaultValues: '',
 };
 
 function SelectField(props) {
 
-    const { name, disabled, placeHolder, label, required, options, style, labelInValue, mode, rules, onChange } = props;
+    const { name, disabled, placeHolder, label, required, options, style, labelInValue, mode, rules, onChange, defaultValues } = props;
 
     return (
         <Form.Item
@@ -42,7 +44,7 @@ function SelectField(props) {
             label={label}
             rules={rules}
             name={name}>
-            <Select onChange={onChange} mode={mode} labelInValue={labelInValue} style={style} options={options} />
+            <Select disabled={disabled} onChange={onChange} mode={mode} labelInValue={labelInValue} style={style} options={options} />
         </Form.Item>
     );
 }

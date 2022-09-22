@@ -16,8 +16,17 @@ export const donhangApi = {
 
     },
     getThongKes: (params) => {
-        const url = `/donhangs/thongkes`
-        return axiosClient.get(url, { params });
+        return new Promise((resolve, reject) => {
+            const url = `/donhangs/thongkes`
+            setTimeout(async () => {
+                try {
+                    const response = await axiosClient.get(url, { params });
+                    resolve(response);
+                } catch (error) {
+                    reject(error)
+                }
+            }, 500)
+        })
     },
     post: data => {
         return new Promise((resolve, reject) => {

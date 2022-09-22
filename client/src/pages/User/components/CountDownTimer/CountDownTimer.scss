@@ -1,0 +1,32 @@
+.timer{
+    margin-left: 10px;
+    &__main-box{
+        display: flex;
+        align-items: flex-end;
+        // ;
+
+        .split{
+            font-size: 20px;
+            margin: 0 5px;
+            padding: 5px;
+                // border: 1px solid #e9e9e9;
+        }
+        &__box{
+            // margin-right: 5px;
+            min-width: 30px;
+            text-align: center;
+            .text{
+                margin-bottom: 5px;
+            }
+            .num{
+                padding: 5px;
+                border: 1px solid #aaa;
+                font-size: 20px;
+                display: inline-block;
+                width: 100%;
+                border-radius: 5px;
+                // text-align: center;
+            }
+        }
+    }
+}

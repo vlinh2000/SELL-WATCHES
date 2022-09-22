@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Col, Divider, Popconfirm, Row, Skeleton, Table } from 'antd';
+import { Button, Col, Divider, Pagination, Popconfirm, Row, Skeleton, Table } from 'antd';
 import { chucvuApi } from 'api/chucvuApi';
 import { numberWithCommas } from 'assets/admin';
 import { fetch_productTypes, prepareDataEdit, savePagination } from 'pages/Admin/adminSlice';
@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
-import { danhmucApi } from 'api/danhmucApi';
 import { loaisanphamApi } from 'api/loaisanphamApi';
 
 ProductType.propTypes = {
@@ -86,14 +85,14 @@ function ProductType(props) {
                             size='small'
                             columns={columns}
                             dataSource={productTypes}
-                            pagination={
-                                {
-                                    current: pagination._page,
-                                    total: pagination._totalPage,
-                                    onChange: (page) => dispatch(savePagination({ screen: 'productTypes', page }))
-                                }
-                            }
+                            pagination={false}
                         />
+                        <Divider />
+                        <Pagination
+                            pageSize={1}
+                            current={pagination._page}
+                            total={pagination._totalPage}
+                            onChange={(page) => dispatch(savePagination({ screen: 'productTypes', page }))} ></Pagination>
                     </>
 
             }

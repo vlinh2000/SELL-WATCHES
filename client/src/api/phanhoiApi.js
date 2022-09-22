@@ -1,9 +1,9 @@
 import axiosClient from "./axiosClient"
 
-export const danhmucApi = {
+export const phanhoiApi = {
     getAll: (params) => {
         return new Promise((resolve, reject) => {
-            const url = `/danhmucs`
+            const url = `/phanhois`
             setTimeout(async () => {
                 try {
                     const response = await axiosClient.get(url, { params });
@@ -17,7 +17,7 @@ export const danhmucApi = {
     },
     post: data => {
         return new Promise((resolve, reject) => {
-            const url = '/danhmucs'
+            const url = '/phanhois'
             setTimeout(async () => {
                 try {
                     const response = await axiosClient.post(url, data);
@@ -35,7 +35,7 @@ export const danhmucApi = {
         return new Promise((resolve, reject) => {
             setTimeout(async () => {
                 try {
-                    const url = `/danhmucs/${params}`
+                    const url = `/phanhois/${params}`
                     const response = await axiosClient.patch(url, data);
                     resolve(response);
 
@@ -46,7 +46,7 @@ export const danhmucApi = {
         })
     },
     delete: (params) => {
-        const url = `/danhmucs/${params}`
+        const url = `/phanhois/${params}`
         return axiosClient.delete(url);
     }
 }

@@ -1,38 +1,35 @@
+import { CloseCircleOutlined } from '@ant-design/icons';
+import { Col, Row } from 'antd';
+import { toggleSideBar } from 'assets/admin';
 import React from 'react';
-import PropTypes from 'prop-types';
-import SideBar from './components/SideBar';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import Header from './components/Header';
-import { Breadcrumb, Col, Row } from 'antd';
-import toast, { Toaster } from 'react-hot-toast';
-import BreadcrumbCustom from 'components/BreadcrumbCustom';
-import { HomeOutlined, UserOutlined } from '@ant-design/icons';
-import BreadcrumbCustomv2 from './components/BreadcrumbCustomv2';
-import EmployeeEdit from './features/Employee/sub-pages';
-import Employee from './features/Employee';
-import Dashboard from './features/DashBoard';
-import Positon from './features/Position';
-import PositionEdit from './features/Position/sub-pages';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetch_brands, fetch_categories, fetch_employees, fetch_orders, fetch_orders_pending, fetch_positions, fetch_products, fetch_productTypes, fetch_receipts, fetch_rules, fetch_statistical, fetch_suppliers, fetch_users } from './adminSlice';
-import ProductType from './features/ProductType';
-import ProductTypeEdit from './features/ProductType/sub-pages';
-import Category from './features/Category';
-import CategoryEdit from './features/Category/sub-pages/CategoryEdit';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { fetch_brands, fetch_employees, fetch_events, fetch_orders, fetch_orders_pending, fetch_positions, fetch_products, fetch_productTypes, fetch_receipts, fetch_statistical, fetch_suppliers, fetch_users, fetch_vouchers } from './adminSlice';
+import BreadcrumbCustomv2 from './components/BreadcrumbCustomv2';
+import Header from './components/Header';
+import SideBar from './components/SideBar';
 import Brand from './features/Brand';
 import BrandEdit from './features/Brand/sub-pages';
-import User from './features/User';
-import Supplier from './features/Supplier';
-import SupplierEdit from './features/Supplier/sub-pages';
-import Receipt from './features/Receipt';
-import ReceiptEdit from './features/Receipt/sub-pages';
+import Dashboard from './features/DashBoard';
+import Employee from './features/Employee';
+import EmployeeEdit from './features/Employee/sub-pages';
+import Event from './features/Event';
+import EventEdit from './features/Event/EventEdit';
+import Order from './features/Order';
+import OrderConfirm from './features/Order/sub-pages';
+import Positon from './features/Position';
+import PositionEdit from './features/Position/sub-pages';
 import Product from './features/Product';
 import ProductEdit from './features/Product/sub-pages';
-import Order from './features/Order';
-import OrderEdit from './features/Order/sub-pages';
-import OrderConfirm from './features/Order/sub-pages';
-import Rule from './features/Rule';
-import RuleEdit from './features/Rule/RuleEdit';
+import ProductType from './features/ProductType';
+import ProductTypeEdit from './features/ProductType/sub-pages';
+import Receipt from './features/Receipt';
+import ReceiptEdit from './features/Receipt/sub-pages';
+import Supplier from './features/Supplier';
+import SupplierEdit from './features/Supplier/sub-pages';
+import User from './features/User';
+import Voucher from './features/Voucher';
+import VoucherEdit from './features/Voucher/VoucherEdit';
 
 AdminPage.propTypes = {
 
@@ -51,10 +48,6 @@ function AdminPage(props) {
     React.useEffect(() => {
         dispatch(fetch_productTypes({ _limit: pagination.productTypes._limit, _page: pagination.productTypes._page }));
     }, [pagination.productTypes])
-
-    React.useEffect(() => {
-        dispatch(fetch_categories({ _limit: pagination.categories._limit, _page: pagination.categories._page }));
-    }, [pagination.categories])
 
     React.useEffect(() => {
         dispatch(fetch_brands({ _limit: pagination.brands._limit, _page: pagination.brands._page }));
@@ -88,9 +81,13 @@ function AdminPage(props) {
         dispatch(fetch_orders({ _limit: pagination.orders._limit, _page: pagination.orders._page }));
     }, [pagination.orders])
 
-    // React.useEffect(() => {
-    //     dispatch(fetch_rules({ _limit: pagination.rules._limit, _page: pagination.rules._page }));
-    // }, [pagination.rules])
+    React.useEffect(() => {
+        dispatch(fetch_vouchers({ _limit: pagination.vouchers._limit, _page: pagination.vouchers._page }));
+    }, [pagination.vouchers])
+
+    React.useEffect(() => {
+        dispatch(fetch_events({ _limit: pagination.events._limit, _page: pagination.events._page }));
+    }, [pagination.events])
 
     React.useEffect(() => {
         dispatch(fetch_statistical());
@@ -102,13 +99,14 @@ function AdminPage(props) {
 
     return (
         <div className='admin-page'>
-            <Header />
             <Row>
-                <Col xs={24} sm={24} md={7} lg={4}>
+                <Col xs={24} sm={24} md={8} lg={4}>
                     <SideBar />
                 </Col>
-                <Col xs={24} sm={24} md={17} lg={20}>
+                <Col xs={24} sm={24} md={16} lg={20}>
+                    <Header />
                     <div className="main-wrapper">
+                        <CloseCircleOutlined onClick={toggleSideBar} className='close-btn' />
                         <BreadcrumbCustomv2 />
                         <br />
                         <Routes>
@@ -126,9 +124,9 @@ function AdminPage(props) {
                                 <Route path='view' element={<ProductType />}></Route>
                                 <Route path='edit' element={<ProductTypeEdit />}></Route>
                             </Route>
-                            <Route path='/categories'>
-                                <Route path='view' element={<Category />}></Route>
-                                <Route path='edit' element={<CategoryEdit />}></Route>
+                            <Route path='/events'>
+                                <Route path='view' element={<Event />}></Route>
+                                <Route path='edit' element={<EventEdit />}></Route>
                             </Route>
                             <Route path='/brands'>
                                 <Route path='view' element={<Brand />}></Route>
@@ -154,10 +152,10 @@ function AdminPage(props) {
                                 <Route path='view' element={<Order />}></Route>
                                 <Route path='confirm' element={<OrderConfirm />}></Route>
                             </Route>
-                            {/* <Route path='/rules'>
-                                <Route path='view' element={<Rule />}></Route>
-                                <Route path='edit' element={<RuleEdit />}></Route>
-                            </Route> */}
+                            <Route path='/vouchers'>
+                                <Route path='view' element={<Voucher />}></Route>
+                                <Route path='edit' element={<VoucherEdit />}></Route>
+                            </Route>
                         </Routes>
                     </div>
                 </Col>

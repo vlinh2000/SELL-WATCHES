@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Popconfirm, Table } from 'antd';
+import { Button, Divider, Pagination, Popconfirm, Table } from 'antd';
 import { sanphamApi } from 'api/sanphamApi';
 import { fetch_products, prepareDataEdit, savePagination } from 'pages/Admin/adminSlice';
 import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
@@ -50,8 +50,8 @@ function Product(props) {
     const columns = [
         {
             title: 'Ảnh sản phẩm',
-            dataIndex: 'ANH_SAN_PHAM',
-            render: (anhsanphams) => <img className='product-image' src={anhsanphams.length > 0 && anhsanphams[0].HINH_ANH} alt="anhsanpham" />
+            dataIndex: 'HINH_ANH',
+            render: (anhsanphams) => <img className='product-image' src={anhsanphams} alt="anhsanpham" />
         },
         {
             title: 'Tên sản phẩm',
@@ -59,8 +59,8 @@ function Product(props) {
             render: (text) => <div style={{ width: 200 }}>{text}</div>
         },
         {
-            title: 'Danh mục',
-            dataIndex: 'TEN_DANH_MUC'
+            title: 'Loại sản phẩm',
+            dataIndex: 'TEN_LOAI_SP'
         },
         {
             title: 'Thương hiệu',
@@ -111,6 +111,10 @@ function Product(props) {
             dataIndex: 'KICH_THUOC_MAT_SO'
         },
         {
+            title: 'Màu mặt số',
+            dataIndex: 'MAU_MAT_SO'
+        },
+        {
             title: 'Trạng thái',
             dataIndex: 'TRANG_THAI'
         },
@@ -142,14 +146,15 @@ function Product(props) {
                             size='small'
                             columns={columns}
                             dataSource={products}
-                            pagination={
-                                {
-                                    current: pagination._page,
-                                    total: pagination._totalPage,
-                                    onChange: (page) => dispatch(savePagination({ screen: 'products', page }))
-                                }
-                            }
+                            pagination={false}
                         />
+                        <Divider />
+                        <Pagination
+                            pageSize={1}
+                            current={pagination?._page}
+                            total={pagination?._totalPage}
+                            onChange={(page) => dispatch(savePagination({ screen: 'products', page }))} ></Pagination>
+
                     </>
 
             }

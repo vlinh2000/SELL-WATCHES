@@ -1,7 +1,5 @@
 
 import { Button, Form } from 'antd';
-import { danhmucApi } from 'api/danhmucApi';
-import { loaisanphamApi } from 'api/loaisanphamApi';
 import { nhacungcapApi } from 'api/nhacungcapApi';
 import axios from 'axios';
 import InputField from 'custom-fields/InputField';

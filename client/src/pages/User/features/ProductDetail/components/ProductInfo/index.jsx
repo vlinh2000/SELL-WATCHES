@@ -5,33 +5,49 @@ import './ProductInfo.scss';
 import ButtonCustom from 'components/ButtonCustom';
 import { Link } from 'react-router-dom';
 import { Button } from 'antd';
-ProductInfo.propTypes = {
+import { useDispatch } from 'react-redux';
+import { addToCart } from 'pages/User/userSlice';
+import toast from 'react-hot-toast';
 
+ProductInfo.propTypes = {
+    product: PropTypes.object
+};
+
+ProductInfo.defaultProps = {
+    product: {}
 };
 
 function ProductInfo(props) {
+    const { product } = props;
+    const [quantity, setQuantity] = React.useState(1);
+    const dispatch = useDispatch();
+
+    const handleAddToCart = () => {
+        dispatch(addToCart({ product, quantity }))
+        toast.success("Đã thêm sản phẩm vào giỏ hàng");
+    }
+
     return (
         <div className='product-info'>
-            <div className='product-info__name'>ĐỒNG HỒ CASIO GA-110GB-1ADR NAM PIN DÂY NHỰA</div>
-            <div className='product-info__description'>Đồng hồ nam CASIO GA-110GB-1AVDF có thiết kế mới sử dụng kim loại màu vàng làm vạch số và kim nổi bật, sang trọng hơn so với thiết kế cũ nên mẫu GA-110GB-1AVDF rất được lòng giới trẻ hiện nay.</div>
-            <div className="product-info__status-stock">Sản phẩm này đã hết hàng hoặc không có sẵn.</div>
-
+            <div className='product-info__name'>{product.TEN_SP}</div>
+            <div className='product-info__description'>{product.MO_TA}</div>
+            {product.SO_LUONG < 1 && <div className="product-info__status-stock">Sản phẩm này đã hết hàng hoặc không có sẵn.</div>}
             <div className="product-info__group-quantity">
-                <Button className='btn-decrease'>-</Button>
-                <div className='current-quantity'>0</div>
-                <Button className='btn-increase'>+</Button>
-                <ButtonCustom className="btn-add-to-cart" text="Thêm vào giỏ"></ButtonCustom>
+                <Button className='btn-decrease' disabled={quantity < 2} onClick={() => setQuantity(prev => prev - 1)}>-</Button>
+                <div className='current-quantity'>{quantity}</div>
+                <Button className='btn-increase' disabled={quantity === product.SO_LUONG} onClick={() => setQuantity(prev => prev + 1)}>+</Button>
+                <ButtonCustom onClick={handleAddToCart} className="btn-add-to-cart" text="Thêm vào giỏ"></ButtonCustom>
             </div>
 
             <ul className="product-info__info-list">
                 <li className="info-item">
-                    Mã: 654 TASMAN
+                    Mã: {product.MA_SP}
                 </li>
                 <li className="info-item">
-                    Danh mục: <Link to="">Dây Da ZRC</Link>,<Link to="">Phụ kiện</Link>
+                    Danh mục: <Link to={`/category/${product.MA_LOAI_SP}`}>{product.TEN_LOAI_SP}</Link>
                 </li>
                 <li className="info-item">
-                    Tags: <Link to="">Dây Da ZRC</Link>,<Link to="">Phụ kiện</Link>
+                    Tags: <Link to={`/category/${product.MA_LOAI_SP}`}>{product.TEN_LOAI_SP}</Link>
                 </li>
             </ul>
 

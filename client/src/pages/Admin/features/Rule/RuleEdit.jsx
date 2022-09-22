@@ -1,6 +1,6 @@
 
 import { Button, Form } from 'antd';
-import { danhmucApi } from 'api/danhmucApi';
+import { danhmucApi } from 'api/uudaiApi';
 import { loaisanphamApi } from 'api/loaisanphamApi';
 import { quyenApi } from 'api/quyenApi';
 import InputField from 'custom-fields/InputField';

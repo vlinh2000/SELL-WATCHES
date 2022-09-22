@@ -84,6 +84,7 @@ function UploadField(props) {
             label={label}
             name={name}>
             <Upload
+                disabled={disabled}
                 onRemove={(file) => handleRemove(file)}
                 fileList={fileList}
                 listType={listType}
