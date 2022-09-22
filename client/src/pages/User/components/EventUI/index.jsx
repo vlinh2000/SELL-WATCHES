@@ -50,7 +50,8 @@ function EventUI(props) {
         if (moment().isBefore(eventNearest.TG_KET_THUC)) {
             const dateStart = new Date(eventNearest.TG_BAT_DAU).toJSON().slice(0, 10) + ' ' + eventNearest.KHUNG_GIO_TU;
             // truoc su kien
-            if (moment().isBefore(dateStart)) {
+            console.log(moment().isBefore(moment(dateStart)), dateStart)
+            if (moment().isBefore(moment(dateStart))) {
                 var duration = moment.duration(moment(dateStart).diff(moment()));
                 second = Math.trunc(duration._milliseconds / 1000);
 
