@@ -4,8 +4,15 @@ const { randomString } = require("../utils/global");
 module.exports = {
     get_sukiens: async (req, res) => {
         try {
-            const { _limit, _page } = req.query;
-            const sql = `SELECT * FROM SU_KIEN ORDER BY NGAY_TAO DESC ${(_page && _limit) ? ' LIMIT ' + _limit + ' OFFSET ' + _limit * (_page - 1) : ''}`;
+            const { _limit, _page, action } = req.query;
+            const d = new Date();
+            const sql = `SELECT * 
+                        FROM SU_KIEN
+                        WHERE 1=1
+                        ${action === 'nearest' ? ` AND TG_KET_THUC >= '${d.toJSON().slice(0, 10)} ${d.toJSON().slice(11, 19)}' ` : ''}
+                        ORDER BY ${action === 'nearest' ? 'TG_BAT_DAU ASC' : 'NGAY_TAO DESC'} ${(_page && _limit) ? ' LIMIT ' + _limit + ' OFFSET ' + _limit * (_page - 1) : ''}`;
+
+            console.log({ sql })
             let sukiens = await executeQuery(sql);
             const sql_count = `SELECT COUNT(MA_SK) as total FROM SU_KIEN`;
             const data = await executeQuery(sql_count);

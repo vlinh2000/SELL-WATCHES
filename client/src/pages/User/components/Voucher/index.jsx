@@ -7,6 +7,7 @@ import moment from 'moment';
 import { user_uudaiApi } from 'api/user_uudaiApi';
 import { useDispatch } from 'react-redux';
 import { fetch_my_vouchers } from 'pages/User/userSlice';
+import toast from 'react-hot-toast';
 
 Voucher.propTypes = {
     mode: PropTypes.string,
@@ -14,6 +15,7 @@ Voucher.propTypes = {
     name: PropTypes.string,
     expire: PropTypes.string,
     isSaved: PropTypes.bool,
+    saveAvailable: PropTypes.bool,
 };
 Voucher.defaultProps = {
     mode: 'refer',
@@ -21,13 +23,15 @@ Voucher.defaultProps = {
     name: '',
     expire: '',
     isSaved: false,
+    saveAvailable: false
 };
 
 function Voucher(props) {
-    const { mode, id, name, expire, isSaved } = props;
+    const { mode, id, name, expire, isSaved, saveAvailable } = props;
     const dispatch = useDispatch();
     const handleSave = async () => {
         try {
+            if (!saveAvailable) return toast.error('Chỉ áp dụng đối với khách hàng đã từng đặt hàng trên web.')
             await user_uudaiApi.post({ MA_UU_DAI: id });
             dispatch(fetch_my_vouchers());
         } catch (error) {

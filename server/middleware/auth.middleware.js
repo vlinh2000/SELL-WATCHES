@@ -8,7 +8,6 @@ module.exports = {
         if (token) {
             verifyToken(token).then(data => {
                 req.user = data;
-                console.log({ data })
                 next();
             }).catch(err => {
                 console.log({ err })
