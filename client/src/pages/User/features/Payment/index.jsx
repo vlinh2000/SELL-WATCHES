@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { CodeOutlined, DeleteOutlined, EditOutlined, PlusOutlined, QuestionOutlined, SaveOutlined, SettingFilled } from '@ant-design/icons';
+import { CodeOutlined, ConsoleSqlOutlined, DeleteOutlined, EditOutlined, PlusOutlined, QuestionOutlined, SaveOutlined, SearchOutlined, SettingFilled } from '@ant-design/icons';
 import { Button, Col, Collapse, Drawer, Form, Input, Modal, Popconfirm, Radio, Row, Space, Table, Tag, Tooltip } from 'antd';
 import InputField from 'custom-fields/InputField';
 import SelectField from 'custom-fields/SelectField';
 import ButtonCustom from 'components/ButtonCustom';
 import './Payments.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import { switch_chooseAddressModal, switch_screenLogin, switch_voucherModal } from 'pages/User/userSlice';
+import { fetch_my_orders, fetch_my_vouchers, resetCart, switch_chooseAddressModal, switch_screenLogin, switch_voucherModal } from 'pages/User/userSlice';
 import * as yup from 'yup';
 import { numberWithCommas } from 'assets/admin';
 import { getTotalPrice } from 'assets/common';
@@ -17,6 +17,9 @@ import { diachighApi } from 'api/diachighApi';
 import { FROM_DESTRICT_ID } from 'constants/commonContants';
 import { Navigate, useNavigate } from 'react-router-dom';
 import VoucherModal from 'pages/User/components/VoucherModal';
+import toast from 'react-hot-toast';
+import { donhangApi } from 'api/donhangApi';
+import { handleMomoPayment } from 'assets/payment';
 
 Payments.propTypes = {
 
@@ -52,7 +55,7 @@ function Payments(props) {
     const [showUseVoucherForm, setShowUseVoucherForm] = React.useState(false);
     const [deliveryAddressList, setDeliveryAddressList] = React.useState([]);
     const [isReload, setIsReload] = React.useState(false);
-    const { cart, payments: { voucher } } = useSelector(state => state.userInfo);
+    const { cart, payments: { voucher }, pagination: { myOrders: pagination } } = useSelector(state => state.userInfo);
     const { isAuth, user } = useSelector(state => state.auth);
 
     const [options_Provinces, setOptions_Provinces] = React.useState([]);
@@ -62,6 +65,11 @@ function Payments(props) {
     const [reloadFeeShip, setReloadFeeShip] = React.useState(false);
     const [addressCode, setAddressCode] = React.useState({ provincesCode: null, districtCode: null })
     const [isVoucherValid, setIsVoucherValid] = React.useState(false)
+    const [isLoading, setIsLoading] = React.useState(false)
+    const [voucherValue, setVoucherValue] = React.useState(0)
+    const [totalPriceOrder, setTotalPriceOrder] = React.useState(() => getTotalPrice(cart, 'GIA_BAN', 'SL_TRONG_GIO'));
+
+
     const navigate = useNavigate();
 
     const dispatch = useDispatch();
@@ -71,7 +79,7 @@ function Payments(props) {
         HO_TEN: user?.HO_TEN || '',
         SO_DIEN_THOAI: user?.SO_DIEN_THOAI || '',
         EMAIL: user?.EMAIL || '',
-        HINH_THUC_THANH_TOAN: 'normal',
+        HINH_THUC_THANH_TOAN: 'cod',
         DIA_CHI_GH: '',
         VOUCHER: ''
     }
@@ -176,7 +184,9 @@ function Payments(props) {
                     width: 30
                 }
                 const { data: { data } } = await axios.get(process.env.REACT_APP_GHN_CALCULATE_FEE, { params, headers: { token: process.env.REACT_APP_GHN_TOKEN } });
-                setFeeShip((deliveryAddressList.length < 1 && isAuth) ? 0 : data.total);
+                const fee = Math.ceil(data.total / 1000) * 1000;
+                console.log({ fee })
+                setFeeShip((deliveryAddressList.length < 1 && isAuth) ? 0 : fee);
             } catch (error) {
                 console.log({ error })
             }
@@ -184,15 +194,77 @@ function Payments(props) {
         cart.length < 1 ? navigate('/', { replace: true }) : fetchFeeShip();
     }, [deliveryAddressList, reloadFeeShip, cart])
 
+    React.useEffect(() => {
+        console.log({ feeShip })
+    }, [feeShip])
 
-    const handleOrder = (values) => {
-        console.log({ values, cart, feeShip });
+
+    const handleOrder = async (values) => {
+        try {
+            setIsLoading(true);
+            const data = {
+                USER_ID: user?.USER_ID,
+                DIA_CHI_GH: values.DIA_CHI_GH.replace(/[(0-9)]/g, ''),
+                HINH_THUC_THANH_TOAN: values.HINH_THUC_THANH_TOAN,
+                GHI_CHU: values.GHI_CHU, HO_TEN_NGUOI_DAT: values.HO_TEN,
+                SDT_NGUOI_DAT: values.SO_DIEN_THOAI, EMAIL_NGUOI_DAT: values.EMAIL,
+                MA_UU_DAI: voucher?.MA_UU_DAI,
+                GIAM_GIA: voucherValue, TONG_TIEN: voucher?.MPVC ? totalPriceOrder : totalPriceOrder - feeShip,
+                DA_THANH_TOAN: 0,
+                PHI_SHIP: feeShip,
+                SAN_PHAM: JSON.stringify(cart?.map((sp) => ({ MA_SP: sp.MA_SP, SO_LUONG: sp.SL_TRONG_GIO, DON_GIA: sp.GIA_BAN, GIA: sp.GIA_BAN * sp.SL_TRONG_GIO, GIA_GOC: sp.GIA_GOC })))
+            }
+
+            switch (values.HINH_THUC_THANH_TOAN) {
+                // case 'zalopay_wallet': 
+                case 'momo_wallet': {
+                    // data.items = cart?.map((sp) => ({ id: sp.MA_SP, name: sp.TEN_SP, category: sp.TEN_LOAI_SP, imageUrl: sp.HINH_ANH, quantity: sp.SL_TRONG_GIO, price: sp.GIA_BAN, totalPrice: sp.GIA_BAN * sp.SL_TRONG_GIO, currency: 'VND' }))
+                    const params = { wallet: 'momo_wallet', data: JSON.stringify(data) };
+                    const { result } = await donhangApi.createPayment(params);
+                    window.location.href = result.payUrl
+                    break;
+                }
+                default:
+                    const { message } = await donhangApi.post(data);
+                    setIsLoading(false);
+                    toast.success(message);
+                    dispatch(fetch_my_orders({ action: 'get_my_orders', _limit: pagination._limit, _page: pagination._page }));
+                    dispatch(fetch_my_vouchers());
+                    if (isAuth) {
+                        navigate('/profile', { replace: true, state: { historyOrder: true } })
+                    } else {
+                        navigate('/', { replace: true });
+                    }
+            }
+
+        } catch (error) {
+            setIsLoading(false);
+            // toast.error(error.response.data.message);
+            console.log({ error })
+        }
     }
 
-    const handleUseVoucher = (values) => {
-        // console.log({ values, cart, feeShip });
-        setIsVoucherValid(true)
-    }
+    React.useEffect(() => {
+        if (!voucher) return;
+        // apply voucher
+        const totalPriceWithShip = getTotalPrice(cart, 'GIA_BAN', 'SL_TRONG_GIO') + feeShip;
+        if (voucher.MPVC) {
+            setVoucherValue(feeShip);
+        } else {
+            if (voucher.DON_VI_GIAM === '%') {
+                const value = totalPriceWithShip * (voucher.GIA_TRI / 100);
+                setVoucherValue(value);
+            } else {
+                setVoucherValue(voucher.GIA_TRI);
+            }
+        }
+
+        setIsVoucherValid(true);
+    }, [voucher, feeShip])
+
+    React.useEffect(() => {
+        setTotalPriceOrder(getTotalPrice(cart, 'GIA_BAN', 'SL_TRONG_GIO') + feeShip - voucherValue);
+    }, [feeShip, voucherValue])
 
     return (
         <div className='wrapper-content'>
@@ -217,7 +289,7 @@ function Payments(props) {
                     initialValues={initialValues}
                     onFinish={handleOrder}
                     layout='vertical'>
-                    <div className='note'>
+                    {/* <div className='note'>
                         <CodeOutlined />  Có mã ưu đãi? <a onClick={(e) => {
                             e.preventDefault();
                             setShowUseVoucherForm(prev => !prev);
@@ -235,10 +307,10 @@ function Payments(props) {
                                 </Row>
                             </Collapse.Panel>
                         </Collapse>
-                    </div>
+                    </div> */}
                     <div className="main-content">
                         <Row gutter={[30, 0]}>
-                            <Col xs={24} sm={24} md={10} lg={13}>
+                            <Col xs={24} sm={24} md={10} lg={12}>
                                 <div className="left-side">
                                     <h1>Thông tin thanh toán</h1>
 
@@ -291,9 +363,8 @@ function Payments(props) {
                                 </div>
                             </Col>
 
-                            <Col xs={24} sm={24} md={14} lg={11}>
+                            <Col xs={24} sm={24} md={14} lg={12}>
                                 <div className="right-side">
-
                                     <h1>Đơn hàng của bạn</h1>
                                     <div className='title-custom'>
                                         <span>Sản phẩm</span>
@@ -303,9 +374,9 @@ function Payments(props) {
                                         {
                                             cart?.map((product, idx) =>
                                                 <div key={idx} className='category-label'>
-                                                    <span className='category-label-key'>
+                                                    <span className='category-label-key' style={{ whiteSpace: 'nowrap' }}>
                                                         <span className='name'>{product?.TEN_SP}</span>&nbsp;
-                                                        <div><strong >x {product?.SL_TRONG_GIO}</strong></div>
+                                                        <strong >x {product?.SL_TRONG_GIO}</strong>
                                                     </span>
                                                     <strong className='category-label-value'>{numberWithCommas(product.SL_TRONG_GIO * product.GIA_BAN)} ₫</strong>
                                                 </div>
@@ -319,12 +390,19 @@ function Payments(props) {
                                             <span className='category-label-key'>Phí vận chuyển </span><span className='category-label-value'>{feeShip ? numberWithCommas(feeShip) + ' ₫' : <NotFoundAddress />}</span>
                                         </div>
                                         <div className='category-label'>
-                                            <span className='category-label-key'>Mã ưu đãi </span><span className='category-label-value'>{isVoucherValid ? voucher.MA_UU_DAI : 'không áp dụng'} </span>
+                                            <span className='category-label-key'>Mã ưu đãi <a onClick={() => dispatch(switch_voucherModal(true))}><Tag color='#55acee'><SearchOutlined /></Tag></a>  </span><span className='category-label-value'>{isVoucherValid ? `${voucher.MA_UU_DAI} (${voucher.MPVC ? 'Miễn phí vận chuyển' : `Giảm ${numberWithCommas(voucher.GIA_TRI)} ${voucher.DON_VI_GIAM}`}) ` : 'không áp dụng'} </span>
                                         </div>
                                         <div className='category-label'>
-                                            <span className='category-label-key'>Tổng cộng </span><strong className='category-label-value'>{numberWithCommas(getTotalPrice(cart, 'GIA_BAN', 'SL_TRONG_GIO') + feeShip)} ₫</strong>
+                                            <span className='category-label-key'>Tổng tiền </span><span className='category-label-value'>{numberWithCommas(getTotalPrice(cart, 'GIA_BAN', 'SL_TRONG_GIO') + feeShip)} ₫</span>
+                                        </div>
+                                        <div className='category-label'>
+                                            <span className='category-label-key'>Giảm giá </span><span className='category-label-value'> {voucherValue ? '- ' + numberWithCommas(voucherValue) : 0} ₫</span>
+                                        </div>
+                                        <div className='category-label'>
+                                            <span className='category-label-key'>Tổng cộng </span><strong style={{ fontSize: 20 }} className='category-label-value'>{numberWithCommas(totalPriceOrder)} ₫</strong>
                                         </div>
                                         <br />
+
                                         <div>
                                             <div style={{
                                                 fontSize: 14,
@@ -334,13 +412,13 @@ function Payments(props) {
                                             <Form.Item name="HINH_THUC_THANH_TOAN">
                                                 <Radio.Group>
                                                     <Space direction="vertical" >
-                                                        <Radio checked value='normal'>Thanh toán khi nhận hàng</Radio>
-                                                        <Radio value='zalopay'>Thanh toán ZaloPay</Radio>
+                                                        <Radio checked value='cod'>Thanh toán khi nhận hàng</Radio>
+                                                        <Radio value='zalopay_wallet'>Thanh toán ZaloPay</Radio>
+                                                        <Radio value='momo_wallet'>Thanh toán Momo</Radio>
                                                     </Space>
                                                 </Radio.Group>
                                             </Form.Item>
                                         </div>
-                                        <br />
                                         {
                                             isAuth &&
                                             <div>
@@ -358,7 +436,6 @@ function Payments(props) {
                                                         </a></strong>
                                                 </div>
                                                 <ChooseAddressModal onReload={handleReloadDeliveryAddress} addressList={deliveryAddressList} />
-
                                                 {
                                                     deliveryAddressList.length < 1 &&
                                                     <p>Vui lòng chọn địa chỉ giao hàng</p>
@@ -367,7 +444,6 @@ function Payments(props) {
                                                     <Radio.Group>
                                                         <Space direction="vertical" >
                                                             {
-
                                                                 deliveryAddressList?.map((address, idx) =>
                                                                     <Radio key={idx} value={address.DIA_CHI}>{address.DIA_CHI?.replace(/[(0-9)]/g, '')}</Radio >
                                                                 )
@@ -378,9 +454,8 @@ function Payments(props) {
                                             </div>
 
                                         }
-                                        <br />
                                         {/* </Form>  */}
-                                        <ButtonCustom type='submit' style={{ width: '100%', justifyContent: 'center', textTransform: 'uppercase' }} text="Đặt hàng" />
+                                        <ButtonCustom isLoading={isLoading} type='submit' style={{ width: '100%', justifyContent: 'center', textTransform: 'uppercase' }} text="Đặt hàng" />
                                         {
                                             !isAuth && <InputField name='DIA_CHI_GH' type='hidden' />
                                         }

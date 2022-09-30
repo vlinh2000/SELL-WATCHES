@@ -64,7 +64,7 @@ function Order(props) {
         },
         {
             title: 'Họ tên người đặt',
-            dataIndex: 'HO_TEN',
+            dataIndex: 'HO_TEN_NGUOI_DAT',
         },
         {
             title: 'Thời gian đặt hàng',

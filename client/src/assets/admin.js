@@ -110,9 +110,14 @@ function getBreadcrumbFromSecond(path) {
             key = "12121";
             break;
         }
+        // case '/admin/rules/edit_rule_employee': {
+        //     paths = ['Quản lý quyền', 'Cập nhật quyền nhân viên'];
+        //     key = "12122";
+        //     break;
+        // }
         case '/admin/rules/view': {
             paths = ['Quản lý quyền', 'Danh sách quyền'];
-            key = "12122";
+            key = "12123";
             break;
         }
         case '/admin/events/edit': {
@@ -123,6 +128,11 @@ function getBreadcrumbFromSecond(path) {
         case '/admin/events/view': {
             paths = ['Quản lý sự kiện', 'Danh sách sự kiện'];
             key = "13132";
+            break;
+        }
+        case '/admin/revenues/view': {
+            paths = ['Quản lý doanh thu', 'Thống kê doanh thu'];
+            key = "14141";
             break;
         }
         case '/admin/dashboard': {

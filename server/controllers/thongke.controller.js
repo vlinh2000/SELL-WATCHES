@@ -50,15 +50,36 @@ module.exports = {
 
             res.json({
                 result: {
-                    TONG_DH: result.TONG_DH[0].total,
-                    TONG_DOANH_THU: result.TONG_DOANH_THU[0].total,
-                    TONG_USER: result.TONG_USER[0].total,
-                    DH_TINH_TU_NGAY: result.DH_TINH_TU_NGAY[0].TG_DAT_HANG,
-                    SL_USER_HOM_NAY: result.SL_USER_HOM_NAY[0].total,
-                    TONG_DOANH_THU_HOM_NAY: result.TONG_DOANH_THU_HOM_NAY[0].total,
+                    TONG_DH: result.TONG_DH[0]?.total,
+                    TONG_DOANH_THU: result.TONG_DOANH_THU[0]?.total,
+                    TONG_USER: result.TONG_USER[0]?.total,
+                    DH_TINH_TU_NGAY: result.DH_TINH_TU_NGAY[0]?.TG_DAT_HANG,
+                    SL_USER_HOM_NAY: result.SL_USER_HOM_NAY[0]?.total,
+                    TONG_DOANH_THU_HOM_NAY: result.TONG_DOANH_THU_HOM_NAY[0]?.total,
                     TOP_SP_BAN_CHAY: result.TOP_SP_BAN_CHAY,
                     DON_HANG_MOI_NHAT: result.DON_HANG_MOI_NHAT
                 },
+                message: 'Thành công'
+            });
+        } catch (error) {
+            console.log({ error: error.message });
+            res.status(500).json({ message: "Đã xảy ra lỗi! Hãy thử lại sau." })
+        }
+    },
+    get_thongkes_my_orders: async (req, res) => {
+        try {
+            // total orders
+            const { USER_ID } = req.user.data;
+            let result = {};
+            const sql = `select COUNT(MA_DH) AS TONG_SO, TRANG_THAI FROM DON_HANG WHERE USER_ID='${USER_ID}' GROUP BY TRANG_THAI`
+            const data = await executeQuery(sql);
+            const dataNumAfterGroupBy = [0, 0, 0, 0];
+            data?.forEach(tk => {
+                dataNumAfterGroupBy[tk.TRANG_THAI] = tk.TONG_SO;
+            });
+
+            res.json({
+                result: { THONG_KE: dataNumAfterGroupBy },
                 message: 'Thành công'
             });
         } catch (error) {

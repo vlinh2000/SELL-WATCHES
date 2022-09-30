@@ -85,7 +85,7 @@ function ReceiptEdit(props) {
         const fetchAllSupplier = async () => {
             try {
                 const { result } = await nhacungcapApi.getAll();
-                const options = result.map((e) => ({ label: e.MA_NCC + ' - ' + e.TEN_NCC, value: e.MA_NCC }));
+                const options = result.map((e) => ({ label: e.TEN_NCC, value: e.MA_NCC }));
                 setOptions_Supplier(options);
             } catch (error) {
                 console.log({ error });
@@ -151,12 +151,12 @@ function ReceiptEdit(props) {
                 initialValues={initialValues}
                 layout='vertical'>
                 <Row gutter={[20, 0]} justify="space-between" align='middle'>
-                    <Col xs={24} sm={12} md={8} lg={8}>
+                    <Col xs={24} sm={12} md={9} lg={9}>
                         <InputField name='NV_ID' label='Mã nhân viên' disabled />
                         <InputField name='HO_TEN' label='Tên nhân viên' disabled />
                         <SelectField name='MA_NCC' label='Nhà cung cấp' rules={[yupSync]} options={options_Supplier} />
                     </Col>
-                    <Col xs={24} sm={12} md={13} lg={15}>
+                    <Col xs={24} sm={12} md={13} lg={13}>
                         <InputField name='GHI_CHU' label='Ghi chú' type='textarea' rows={9} />
                     </Col>
                 </Row>

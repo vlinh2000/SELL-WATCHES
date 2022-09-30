@@ -23,25 +23,25 @@ VoucherModal.defaultProps = {
 
 function VoucherModal(props) {
     const { addressList: defaultList, onReload } = props;
-    const { user } = useSelector(state => state.userInfo);
+    const { user, data: { myVouchers } } = useSelector(state => state.userInfo);
     const dispatch = useDispatch();
     const { isVisibleVoucherModal } = useSelector(state => state.userInfo)
     const [isLoading, setIsLoading] = React.useState(false);
     const [voucherList, setVoucherList] = React.useState([]);
     const [voucherSelected, setVoucherSelected] = React.useState('');
 
-    React.useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const { result } = await uudaiApi.getAll();
-                setVoucherList(result);
-            } catch (error) {
-                console.log({ error })
-            }
-        }
+    // React.useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const { result } = await uudaiApi.getAll({});
+    //             setVoucherList(result);
+    //         } catch (error) {
+    //             console.log({ error })
+    //         }
+    //     }
 
-        fetchData();
-    }, [user])
+    //     fetchData();
+    // }, [user])
 
     const handleChoose = () => {
         dispatch(selectVoucher(voucherSelected));
@@ -58,10 +58,10 @@ function VoucherModal(props) {
                 onOk={handleChoose}
                 visible={isVisibleVoucherModal}
                 onCancel={() => dispatch(switch_voucherModal(false))}>
-                <Radio.Group onChange={({ target }) => setVoucherSelected(voucherList[target.value])}>
+                <Radio.Group onChange={({ target }) => setVoucherSelected(myVouchers[target.value])}>
                     <Space style={{ width: 400 }} direction="vertical">
                         {
-                            voucherList?.map((voucher, idx) =>
+                            myVouchers?.map((voucher, idx) =>
                                 <Radio key={idx} value={idx}><Voucher name={voucher.TEN_UU_DAI} id={voucher.MA_UU_DAI} expire={voucher.HSD} /></Radio>
                             )
                         }

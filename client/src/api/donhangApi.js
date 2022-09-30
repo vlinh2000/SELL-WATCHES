@@ -51,5 +51,9 @@ export const donhangApi = {
     delete: (params) => {
         const url = `/donhangs/${params}`
         return axiosClient.delete(url);
-    }
+    },
+    createPayment: (params) => {
+        const url = `/donhangs/payment`
+        return axiosClient.get(url, { params });
+    },
 }

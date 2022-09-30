@@ -4,7 +4,7 @@ import { toggleSideBar } from 'assets/admin';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { fetch_brands, fetch_employees, fetch_events, fetch_orders, fetch_orders_pending, fetch_positions, fetch_products, fetch_productTypes, fetch_receipts, fetch_statistical, fetch_suppliers, fetch_users, fetch_vouchers } from './adminSlice';
+import { fetch_brands, fetch_employees, fetch_events, fetch_myRoles, fetch_orders, fetch_orders_pending, fetch_positions, fetch_products, fetch_productTypes, fetch_receipts, fetch_rules, fetch_statistical, fetch_suppliers, fetch_users, fetch_vouchers } from './adminSlice';
 import BreadcrumbCustomv2 from './components/BreadcrumbCustomv2';
 import Header from './components/Header';
 import SideBar from './components/SideBar';
@@ -25,6 +25,10 @@ import ProductType from './features/ProductType';
 import ProductTypeEdit from './features/ProductType/sub-pages';
 import Receipt from './features/Receipt';
 import ReceiptEdit from './features/Receipt/sub-pages';
+import RevenueReport from './features/Report/RevenueReport';
+import Rule from './features/Rule';
+import RuleEdit from './features/Rule/RuleEdit';
+import RuleEmployeeEdit from './features/Rule/RuleEmployeeEdit';
 import Supplier from './features/Supplier';
 import SupplierEdit from './features/Supplier/sub-pages';
 import User from './features/User';
@@ -37,9 +41,13 @@ AdminPage.propTypes = {
 
 function AdminPage(props) {
 
-    const {
-        pagination } = useSelector(state => state.adminInfo);
+    const { pagination } = useSelector(state => state.adminInfo);
+    const { user } = useSelector(state => state.auth);
     const dispatch = useDispatch();
+
+    React.useEffect(() => {
+        user?.NV_ID && dispatch(fetch_myRoles());
+    }, [user])
 
     React.useEffect(() => {
         dispatch(fetch_positions({ _limit: pagination.positions._limit, _page: pagination.positions._page }));
@@ -62,8 +70,8 @@ function AdminPage(props) {
     }, [pagination.suppliers])
 
     React.useEffect(() => {
-        dispatch(fetch_suppliers({ _limit: pagination.suppliers._limit, _page: pagination.suppliers._page }));
-    }, [pagination.suppliers])
+        dispatch(fetch_rules({ _limit: pagination.rules._limit, _page: pagination.rules._page }));
+    }, [pagination.rules])
 
     React.useEffect(() => {
         dispatch(fetch_employees({ _limit: pagination.employees._limit, _page: pagination.employees._page }));
@@ -155,6 +163,14 @@ function AdminPage(props) {
                             <Route path='/vouchers'>
                                 <Route path='view' element={<Voucher />}></Route>
                                 <Route path='edit' element={<VoucherEdit />}></Route>
+                            </Route>
+                            <Route path='/rules'>
+                                <Route path='view' element={<Rule />}></Route>
+                                <Route path='edit' element={<RuleEdit />}></Route>
+                                {/* <Route path='edit_rule_employee' element={<RuleEmployeeEdit />}></Route> */}
+                            </Route>
+                            <Route path='/revenues'>
+                                <Route path='view' element={<RevenueReport />}></Route>
                             </Route>
                         </Routes>
                     </div>

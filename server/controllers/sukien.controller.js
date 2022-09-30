@@ -9,7 +9,7 @@ module.exports = {
             const sql = `SELECT * 
                         FROM SU_KIEN
                         WHERE 1=1
-                        ${action === 'nearest' ? ` AND TG_KET_THUC >= '${d.toJSON().slice(0, 10)} ${d.toJSON().slice(11, 19)}' ` : ''}
+                        ${action === 'nearest' ? ` AND TG_KET_THUC >= '${d.toJSON().slice(0, 10)} ${d.toLocaleTimeString('en-GB')}' ` : ''}
                         ORDER BY ${action === 'nearest' ? 'TG_BAT_DAU ASC' : 'NGAY_TAO DESC'} ${(_page && _limit) ? ' LIMIT ' + _limit + ' OFFSET ' + _limit * (_page - 1) : ''}`;
 
             console.log({ sql })

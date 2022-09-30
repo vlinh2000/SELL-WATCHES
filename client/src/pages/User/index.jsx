@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Home from './features/Home';
 import ProductDetail from './features/ProductDetail';
 import Cart from './features/Cart';
@@ -18,6 +18,8 @@ import { getMe, getNewToken } from 'app/authSlice';
 import ProtectedRoute from 'components/ProtectedRoute';
 import { isAccountOfThisSite } from 'constants/commonContants';
 import { fetch_productTypes, fetch_favouriteList, fetch_my_vouchers, fetch_my_orders } from './userSlice';
+import toast from 'react-hot-toast';
+import { donhangApi } from 'api/donhangApi';
 
 UserPage.propTypes = {
 
@@ -26,9 +28,11 @@ UserPage.propTypes = {
 function UserPage(props) {
 
     const { token, refreshToken, isAuth, user } = useSelector(state => state.auth);
-    const { data: { productTypeList, myOrders }, pagination } = useSelector(state => state.userInfo);
+    const { data: { productTypeList, myOrders }, pagination: { myOrders: pagination } } = useSelector(state => state.userInfo);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+
     React.useEffect(() => {
         const handleGetInfo = async () => {
             if (!token || isAuth) return;
@@ -43,7 +47,6 @@ function UserPage(props) {
         handleGetInfo();
     }, [token])
 
-
     React.useEffect(() => {
         isAuth && dispatch(fetch_favouriteList());
         isAuth && dispatch(fetch_my_vouchers());
@@ -51,9 +54,40 @@ function UserPage(props) {
     }, [isAuth])
 
     React.useEffect(() => {
-        console.log({})
-        !Array.isArray(myOrders) && user?.USER_ID && dispatch(fetch_my_orders({ action: 'get_my_orders', _limit: pagination.myOrders._limit, _page: pagination.myOrders._page }));
-    }, [pagination.myOrders, user?.USER_ID, myOrders])
+        user?.USER_ID && dispatch(fetch_my_orders({ action: 'get_my_orders', _limit: pagination._limit, _page: pagination._page }));
+    }, [pagination._limit, pagination._page, user?.USER_ID])
+
+    const onCompleteOrder = async (data) => {
+        try {
+            await donhangApi.post(data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    React.useEffect(() => {
+        // if(!isAuth)
+        const redirect = searchParams.get('redirect');
+        const extraData = searchParams.get('extraData');
+        const resultCode = searchParams.get('resultCode');
+        const message = searchParams.get('message');
+        setSearchParams({});
+        if (resultCode && resultCode == 0) {
+            (async () => {
+                const data = { isCompleteOrder: true, data: extraData };
+                await onCompleteOrder(data);
+                dispatch(fetch_my_orders({ action: 'get_my_orders', _limit: pagination._limit, _page: pagination._page }));
+                toast.success('Đặt hàng thành công.');
+                navigate(redirect, { state: { historyOrder: true } });
+            })();
+        } else if (resultCode && resultCode !== 0) {
+            const msg = `Đặt hàng thất bại (${message})`;
+            const idTimeout = setTimeout(() => {
+                toast.error(msg);
+                clearTimeout(idTimeout);
+            }, 1000);
+        }
+    }, [searchParams])
 
     return (
         <>

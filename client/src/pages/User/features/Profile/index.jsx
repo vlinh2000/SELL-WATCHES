@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, Col, Collapse, Divider, Form, Pagination, Row, Tabs, Tooltip } from 'antd';
 import { AndroidOutlined, AppleOutlined, CameraOutlined, CarOutlined, HistoryOutlined, HourglassOutlined, LogoutOutlined, SettingOutlined, ShoppingOutlined, UserOutlined, WarningOutlined } from '@ant-design/icons';
@@ -8,7 +8,7 @@ import UploadField from 'custom-fields/UploadField';
 import './Profile.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import { getMe, getNewToken, logout } from 'app/authSlice';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { defaultAvatar, isAccountOfThisSite } from 'constants/commonContants';
 import { nguoidungApi } from 'api/nguoidungApi';
 import { nhanvienApi } from 'api/nhanvienApi';
@@ -17,6 +17,7 @@ import * as yup from 'yup';
 import { getStatusOrder, numberWithCommas } from 'assets/admin';
 import moment from 'moment';
 import HistoryOrder from 'pages/User/components/HistoryOrder';
+import { resetCart } from 'pages/User/userSlice';
 
 Profile.propTypes = {
 
@@ -42,10 +43,15 @@ const yupSync = {
 function Profile(props) {
 
     const { user } = useSelector(state => state.auth);
-    const { data: { myOrders } } = useSelector(state => state.userInfo);
+    const { data: { myOrders }, pagination: { myOrders: pagination } } = useSelector(state => state.userInfo);
     const [currentAvatar, setCurrentAvatar] = React.useState(() => user?.ANH_DAI_DIEN || defaultAvatar);
     const [loading, setLoading] = React.useState(false);
     const dispatch = useDispatch();
+    const { state } = useLocation();
+    const defaultActiveKey = useMemo(() => {
+        state?.historyOrder && dispatch(resetCart());
+        return state?.historyOrder ? '2' : '1'
+    }, [state])
 
     const initialValues = {
         ...user, USER_ID: user?.USER_ID || user?.NV_ID
@@ -81,7 +87,7 @@ function Profile(props) {
     return (
         <div className='wrapper-content'>
             <div className="profile">
-                <Tabs tabPosition='left' defaultActiveKey="1">
+                <Tabs tabPosition='left' defaultActiveKey={defaultActiveKey}>
                     <Tabs.TabPane
                         tab={
                             <span>
@@ -142,7 +148,7 @@ function Profile(props) {
                             tab={
                                 <span>
                                     <HistoryOutlined />
-                                    Lịch sử mua hàng ({myOrders?.length})
+                                    Lịch sử mua hàng ({pagination?._totalRecord})
                                 </span>
                             }
                             key="2"

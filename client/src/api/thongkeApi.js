@@ -14,5 +14,9 @@ export const thongkeApi = {
             }, 500)
         })
 
+    },
+    get_my_orders: (params) => {
+        const url = `/thongkes/my_orders`;
+        return axiosClient.get(url);
     }
 }

@@ -4,7 +4,19 @@ const { randomString } = require("../utils/global");
 module.exports = {
     get_quyens: async (req, res) => {
         try {
-            const { _limit, _page } = req.query;
+            const { _limit, _page, action } = req.query;
+
+            if (action === 'get_user_rules') {
+                let { NV_ID } = req.query;
+                const sql_all_user_rules = `SELECT MA_QUYEN FROM QUYEN_NHAN_VIEN WHERE NV_ID='${NV_ID || req.user?.data.NV_ID}'`;
+                const quyens = await executeQuery(sql_all_user_rules);
+                console.log({ sql_all_user_rules })
+                return res.json({
+                    result: quyens,
+                    message: 'Thành công'
+                });
+            }
+
             const sql = `SELECT * FROM QUYEN ORDER BY NGAY_TAO DESC ${(_page && _limit) ? ' LIMIT ' + _limit + ' OFFSET ' + _limit * (_page - 1) : ''}`;
             const quyens = await executeQuery(sql);
             const sql_count = `SELECT COUNT(MA_QUYEN) as total FROM QUYEN`;
@@ -37,6 +49,9 @@ module.exports = {
     post_quyens: async (req, res) => {
         try {
             const { TEN_QUYEN, MA_QUYEN } = req.body;
+
+            const isExist = await checkIsExist('QUYEN', 'MA_QUYEN', MA_QUYEN);
+            if (isExist) return res.status(400).json({ message: `Quyền [${MA_QUYEN}] đã tồn tại.` });
 
             const sql = `INSERT INTO QUYEN(MA_QUYEN,TEN_QUYEN) 
                                         VALUES ('${MA_QUYEN}','${TEN_QUYEN}')`;

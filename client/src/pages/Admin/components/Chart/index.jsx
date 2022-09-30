@@ -6,24 +6,21 @@ import {
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
     Title,
     Tooltip,
     Filler,
     Legend
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
-import SelectField from 'custom-fields/SelectField';
-import { Col, Divider, Form, Row, Space, DatePicker } from 'antd';
-import ButtonCustom from 'components/ButtonCustom';
-import InputField from 'custom-fields/InputField';
-import moment from 'moment';
-import { formatDate } from 'assets/admin';
+import { Line, Bar } from 'react-chartjs-2';
+
 
 Chart.propTypes = {
     onFilter: PropTypes.func,
     options: PropTypes.object,
     data: PropTypes.object,
     isLoading: PropTypes.bool,
+    type: PropTypes.string,
 };
 
 Chart.defaultProps = {
@@ -31,12 +28,13 @@ Chart.defaultProps = {
     options: {},
     data: {},
     isLoading: false,
+    type: 'line',
 };
-
 
 
 ChartJS.register(
     CategoryScale,
+    BarElement,
     LinearScale,
     PointElement,
     LineElement,
@@ -47,28 +45,11 @@ ChartJS.register(
 );
 
 export function Chart(props) {
-    const { onFilter, options, data, isLoading } = props;
-    const [date, setDate] = React.useState(() => ([moment().startOf('year'), moment()]))
-
-    React.useEffect(() => {
-        handleFilter();
-    }, [])
-
-    const handleFilter = () => {
-        if (!onFilter) return;
-        const dateFrom = date[0].format().slice(0, 10);
-        const dateTo = date[1].endOf('month').format().slice(0, 10);
-        console.log({ dateFrom, dateTo })
-        onFilter(dateFrom, dateTo);
-    }
+    const { options, data, isLoading, type } = props;
 
     return <>
-        <Space direction="vertical" size={12}>
-            <DatePicker.RangePicker picker="month" onChange={(values) => setDate(values)} defaultValue={[date[0], date[1]]} />
-            <ButtonCustom isLoading={isLoading} onClick={handleFilter} className='admin-custom-btn' text='Lọc'></ButtonCustom>
-        </Space>
-        <br />
-        <br />
-        <Line options={options} data={data} />;
+        {
+            type === 'bar' ? <Bar options={options} data={data} /> : <Line options={options} data={data} />
+        }
     </>
 }

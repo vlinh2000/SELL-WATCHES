@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
 require('dotenv').config();
 
+
+
 function randomString() {
     return generator.generate(options);
 }
@@ -78,4 +80,62 @@ function verifyToken(token) {
 
 }
 
-module.exports = { randomString, getNow, hashString, compareString, generateToken, generateRefreshToken, verifyToken }
+async function handleMomoPayment(data) {
+    //parameters
+    var partnerCode = "MOMO";
+    var accessKey = process.env.MOMO_ACCESS_KEY;
+    var secretkey = process.env.MOMO_SECRET_KEY;
+    var requestId = partnerCode + new Date().getTime();
+    var orderId = 'DH_' + randomString();
+    var orderInfo = "Thanh toán với Momo";
+    var redirectUrl = "http://localhost:3000?redirect=profile";
+    var ipnUrl = "http://localhost:8000/api/donhangs";
+    var amount = data.TONG_TIEN + data.PHI_SHIP - data.GIAM_GIA;
+    // var requestType = "captureWallet"
+    var requestType = "payWithATM"
+    // var requestType = "payWithATM"
+    var extraData = Buffer.from(JSON.stringify({ ...data, orderId })).toString('base64');
+    var rawSignature = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData + "&ipnUrl=" + ipnUrl + "&orderId=" + orderId + "&orderInfo=" + orderInfo + "&partnerCode=" + partnerCode + "&redirectUrl=" + redirectUrl + "&requestId=" + requestId + "&requestType=" + requestType
+    // var items = data.items;
+    // var userInfo = {
+    //     name: data.HO_TEN_NGUOI_DAT,
+    //     phoneNumber: data.SDT_NGUOI_DAT,
+    //     email: data.EMAIL_NGUOI_DAT
+    // }
+
+    const crypto = require('crypto');
+    var signature = crypto.createHmac('sha256', secretkey)
+        .update(rawSignature)
+        .digest('hex');
+
+    //json object send to MoMo endpoint
+    const requestBody = JSON.stringify({
+        partnerCode: partnerCode,
+        accessKey: accessKey,
+        requestId: requestId,
+        amount: amount,
+        orderId: orderId,
+        orderInfo: orderInfo,
+        redirectUrl: redirectUrl,
+        ipnUrl: ipnUrl,
+        extraData: extraData,
+        // items: items,
+        // userInfo: userInfo,
+        requestType: requestType,
+        signature: signature,
+        lang: 'en'
+    });
+    //Create the HTTPS objects
+    const axios = require('axios');
+    const axiosInstance = axios.create({
+        baseURL: 'https://test-payment.momo.vn',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(requestBody)
+        }
+    })
+    const response = await axiosInstance.post('/v2/gateway/api/create', requestBody)
+    return response.data;
+}
+
+module.exports = { randomString, getNow, hashString, compareString, generateToken, generateRefreshToken, verifyToken, handleMomoPayment }

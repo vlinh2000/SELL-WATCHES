@@ -76,15 +76,18 @@ function Product(props) {
                                 {/* <div className="old-price">20,217,000&nbsp;₫</div> */}
                                 <div className="price">{numberWithCommas(product.GIA_BAN)}&nbsp;₫</div>
                             </div>
-                            <div className="product__btn-add-to-cart">
-                                <Tooltip title={productInCartList?.includes(product.MA_SP) ? "Xem giỏ hàng" : "Thêm vào giỏ"} placement='top'>
-                                    {
-                                        productInCartList?.includes(product.MA_SP)
-                                            ? <SearchOutlined className='add-to-cart-icon' onClick={() => navigate("/cart")} />
-                                            : <ShoppingOutlined className='add-to-cart-icon' onClick={() => handleAddToCart(product)} />
-                                    }
-                                </Tooltip>
-                            </div>
+                            {
+                                product.SO_LUONG > 0 &&
+                                <div className="product__btn-add-to-cart">
+                                    <Tooltip title={productInCartList?.includes(product.MA_SP) ? "Xem giỏ hàng" : "Thêm vào giỏ"} placement='top'>
+                                        {
+                                            productInCartList?.includes(product.MA_SP)
+                                                ? <SearchOutlined className='add-to-cart-icon' onClick={() => navigate("/cart")} />
+                                                : <ShoppingOutlined className='add-to-cart-icon' onClick={() => handleAddToCart(product)} />
+                                        }
+                                    </Tooltip>
+                                </div>
+                            }
                             <div className="product__btn-like">
                                 {
                                     !favouriteList?.includes(product.MA_SP) ?

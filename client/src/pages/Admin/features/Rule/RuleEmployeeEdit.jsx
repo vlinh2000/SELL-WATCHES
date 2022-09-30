@@ -1,5 +1,5 @@
 
-import { Button, Form } from 'antd';
+import { Button, Checkbox, Col, Form, Row } from 'antd';
 import { danhmucApi } from 'api/uudaiApi';
 import { loaisanphamApi } from 'api/loaisanphamApi';
 import { quyenApi } from 'api/quyenApi';
@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 
-RuleEdit.propTypes = {
+RuleEmployeeEdit.propTypes = {
 
 };
 
@@ -27,7 +27,7 @@ const yupSync = {
     },
 };
 
-function RuleEdit(props) {
+function RuleEmployeeEdit(props) {
     const { mode, currentSelected } = useSelector(({ adminInfo }) => adminInfo.screenUpdateOn.rules);
     const { rules: pagination } = useSelector(({ adminInfo }) => adminInfo.pagination);
     const [isLoading, setIsLoading] = React.useState(false);
@@ -56,7 +56,7 @@ function RuleEdit(props) {
         } catch (error) {
             setIsLoading(false);
             console.log({ error });
-            toast.error(error.response.data.message);
+            toast.error(error);
         }
     }
 
@@ -74,7 +74,21 @@ function RuleEdit(props) {
 
 
     // }, [])
-
+    const optionsWithDisabled = [
+        {
+            label: 'Apple',
+            value: 'Apple',
+        },
+        {
+            label: 'Pear',
+            value: 'Pear',
+        },
+        {
+            label: 'Orange',
+            value: 'Orange',
+            disabled: false,
+        },
+    ];
     return (
         <div className='rule-edit box'>
             <Form
@@ -82,8 +96,19 @@ function RuleEdit(props) {
                 form={form}
                 initialValues={initialValues}
                 layout='vertical'>
-                <InputField name='MA_QUYEN' label='Mã quyền' rules={[yupSync]} />
-                <InputField name='TEN_QUYEN' label='Tên quyền' rules={[yupSync]} />
+                <Row gutter={[40, 0]}>
+                    <Col xs={24} sm={12}>
+                        <InputField name='HO_TEN' label='Họ tên' disabled rules={[yupSync]} />
+                        <SelectField name='MA_NV' label='Nhân viên' rules={[yupSync]} />
+                    </Col>
+                    <Col xs={24} sm={12}>
+                        <Form.Item name="MA_QUYEN" label="Danh sách quyền" >
+                            <Checkbox.Group
+                                options={optionsWithDisabled}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
                 {/* <SelectField name='MA_LOAI_SP' label='Loại sản phẩm' rules={[yupSync]} options={options_ProductType} /> */}
                 <br />
                 <Button htmlType='submit' className='admin-custom-btn bottom-btn' loading={isLoading}>Lưu</Button>
@@ -92,4 +117,4 @@ function RuleEdit(props) {
     );
 }
 
-export default RuleEdit;
+export default RuleEmployeeEdit;

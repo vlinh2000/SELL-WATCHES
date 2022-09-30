@@ -49,7 +49,7 @@ module.exports = {
             // have searchValue
             let searchCondition = '';
             if (searchValue) {
-                searchCondition = ` AND ( a.TEN_SP LIKE '%${searchValue}%' OR b.TEN_DANH_MUC LIKE '%${searchValue}%' OR c.TEN_THUONG_HIEU LIKE '%${searchValue}%') `
+                searchCondition = ` AND ( a.TEN_SP LIKE '%${searchValue}%' OR b.TEN_LOAI_SP LIKE '%${searchValue}%' OR c.TEN_THUONG_HIEU LIKE '%${searchValue}%') `
             }
 
             // get all products normal
@@ -171,7 +171,7 @@ module.exports = {
             if (!isExist) return res.status(400).json({ message: "Sản phẩm không tồn tại." });
 
             const data = {
-                MA_DANH_MUC: req.body.MA_DANH_MUC, MA_THUONG_HIEU: req.body.MA_THUONG_HIEU,
+                MA_LOAI_SP: req.body.MA_LOAI_SP, MA_THUONG_HIEU: req.body.MA_THUONG_HIEU,
                 TEN_SP: req.body.TEN_SP, GIA_GOC: req.body.GIA_GOC, GIA_BAN: req.body.GIA_BAN,
                 SO_LUONG: req.body.SO_LUONG, MO_TA: req.body.MO_TA, CHAT_LIEU_DAY: req.body.CHAT_LIEU_DAY,
                 CHAT_LIEU_MAT_KINH: req.body.CHAT_LIEU_MAT_KINH, PIN: req.body.PIN, MUC_CHONG_NUOC: req.body.MUC_CHONG_NUOC,

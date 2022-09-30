@@ -44,7 +44,7 @@ function OrderConfirm(props) {
 
     const handleConfirm = async (MA_DH) => {
         try {
-            const data = { TRANG_THAI: 1 }
+            const data = { action: 'confirm' }
             setLoading(true);
             const { message } = await donhangApi.update(MA_DH, data);
             await dispatch(fetch_orders_pending({ _limit: pagination._limit, _page: pagination._page, status: 0 }));
@@ -129,8 +129,11 @@ function OrderConfirm(props) {
                                                             <div className='category-label'>
                                                                 <span className='category-label-key'>Đơn vị vận chuyển </span><span className='category-label-value'>Giao hàng nhanh (GHN)</span>
                                                             </div>
-                                                            <div className='category-label'>
+                                                            {/* <div className='category-label'>
                                                                 <span className='category-label-key'>Mã ưu đãi </span><span className='category-label-value'>{order.MA_UU_DAI}</span>
+                                                            </div> */}
+                                                            <div className='category-label'>
+                                                                <span className='category-label-key'>Giảm giá </span><span className='category-label-value'>{numberWithCommas(order.GIAM_GIA)}&nbsp;₫</span>
                                                             </div>
                                                             <div className='category-label'>
                                                                 <span className='category-label-key'>Phí ship </span><span className='category-label-value'>{numberWithCommas(order.PHI_SHIP)}&nbsp;₫</span>
@@ -143,7 +146,7 @@ function OrderConfirm(props) {
                                                                 <span className='category-label-key'>Hình thức thanh toán </span><span className='category-label-value'>{order.HINH_THUC_THANH_TOAN}</span>
                                                             </div>
                                                             <div className='category-label'>
-                                                                <span className='category-label-key'>Trạng thái thanh toán </span><span className='category-label-value'>Chưa thanh toán</span>
+                                                                <span className='category-label-key'>Trạng thái thanh toán </span><span className='category-label-value'>{order.DA_THANH_TOAN == 1 ? 'Đã thanh toán' : 'Chưa thanh toán'}</span>
                                                             </div>
                                                             <div className='category-label'>
                                                                 <span className='category-label-key'>Ngày đặt hàng</span><span className='category-label-value'>{moment(order.NGAY_DAT_HANG).format('DD-MM-YYYY HH:mm:ss')}</span>
@@ -184,6 +187,7 @@ function OrderConfirm(props) {
                             <Pagination
                                 style={{ marginTop: '9rem' }}
                                 current={pagination._page}
+                                pageSize={1}
                                 total={pagination._totalPage}
                                 onChange={(page) => dispatch(savePagination({ screen: 'ordersConfirm', page }))} />
                         }

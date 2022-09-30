@@ -10,6 +10,7 @@ import { onFilter, onSearch, removeFromCart, switch_screenLogin, switch_suggesti
 import { numberWithCommas } from 'assets/admin';
 import { getTotalPrice } from 'assets/common';
 import { sanphamApi } from 'api/sanphamApi';
+import reactStringReplace from 'react-string-replace';
 
 Header.propTypes = {
 
@@ -203,8 +204,8 @@ function Header(props) {
                                                     to="" className='suggestions-wrapper__item__content'>
                                                     <img width={40} height={50} src={product.HINH_ANH} />
                                                     <div className='info'>
-                                                        <div>{product.TEN_SP}</div>
-                                                        <div><span className='category'>{product.TEN_DANH_MUC}</span><Divider type="vertical" /><strong className='price'>{numberWithCommas(product.GIA_BAN || 0)}&nbsp;₫</strong></div>
+                                                        <div>{reactStringReplace(product.TEN_SP, searchValue, (match, i) => <span style={{ color: 'red' }}>{match}</span>)}</div>
+                                                        <div><span className='category'>{reactStringReplace(product.TEN_LOAI_SP, searchValue, (match, i) => <span style={{ color: 'red' }}>{match}</span>)}</span><Divider type="vertical" /><strong className='price'>{numberWithCommas(product.GIA_BAN || 0)}&nbsp;₫</strong></div>
                                                     </div>
                                                 </Link>
                                             </li>

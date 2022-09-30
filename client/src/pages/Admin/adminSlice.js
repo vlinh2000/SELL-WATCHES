@@ -158,6 +158,18 @@ export const fetch_rules = createAsyncThunk("adminPage/fetch_rules", async (para
 
 })
 
+export const fetch_myRoles = createAsyncThunk("adminPage/fetch_myRoles", async (params, { rejectWithValue }) => {
+
+    try {
+        const { result, totalRecord } = await quyenApi.getAll({ action: 'get_user_rules' });
+        return { result, totalRecord };
+
+    } catch (error) {
+        return rejectWithValue(error.respone.data)
+    }
+
+})
+
 export const fetch_statistical = createAsyncThunk("adminPage/fetch_statistical", async (params, { rejectWithValue }) => {
 
     try {
@@ -201,7 +213,9 @@ const initialState = {
     },
     selectedKey: '1',
     loading: {},
-    data: {},
+    data: {
+        statistical: {}
+    },
     pagination: {
         positions: {
             _limit: 10,
@@ -252,7 +266,7 @@ const initialState = {
             _totalRecord: 0
         },
         products: {
-            _limit: 10,
+            _limit: 5,
             _page: 1,
             _totalPage: 1,
             _totalRecord: 0
@@ -481,6 +495,7 @@ const adminPage = createSlice({
             state.data.ordersConfirm = action.payload.result.map((e, idx) => ({ ...e, key: idx }));
 
             const totalRecord = action.payload.totalRecord;
+            state.data.statistical.DH_CHO_XU_LY = totalRecord;
             state.pagination.ordersConfirm._totalRecord = totalRecord;
             state.pagination.ordersConfirm._totalPage = Math.ceil(totalRecord / state.pagination.ordersConfirm._limit);
         },
@@ -503,6 +518,10 @@ const adminPage = createSlice({
         [fetch_rules.rejected]: (state, action) => {
             state.loading.rules = false;
             state.error.rules = action.error;
+        },
+        // my rules
+        [fetch_myRoles.fulfilled]: (state, action) => {
+            state.data.myRoles = action.payload.result.map((e, idx) => ({ ...e, key: idx }));
         },
         // statistical
         [fetch_statistical.pending]: (state, action) => {

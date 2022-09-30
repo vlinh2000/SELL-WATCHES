@@ -6,6 +6,7 @@ const donhangController = require('../controllers/donhang.controller');
 
 router.get('/', isAuth, donhangController.get_donhangs);
 router.get('/thongkes', donhangController.get_thongkes);
+router.get('/payment', donhangController.get_payUrl);
 router.get('/:donhangID', donhangController.get_donhang);
 router.post('/', donhangController.post_donhangs);
 router.patch('/:donhangID', isAuth, donhangController.patch_donhangs);

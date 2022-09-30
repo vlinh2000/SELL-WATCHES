@@ -17,23 +17,14 @@ HistoryOrder.propTypes = {
 
 function HistoryOrder(props) {
     const { myOrders } = props;
-    const { pagination: { myOrders: pagination } } = useSelector(state => state.userInfo);
+    const { pagination: { myOrders: pagination }, data: { statisticalMyOrders } } = useSelector(state => state.userInfo);
     const dispatch = useDispatch();
-    const [statisticalOrders, setStatisticalOrders] = React.useState([0, 0, 0, 0]);
-
-    React.useEffect(() => {
-        const groupByStatusList = [0, 0, 0, 0];
-        myOrders?.forEach(order => {
-            groupByStatusList[order.TRANG_THAI] += 1;
-        })
-        setStatisticalOrders(groupByStatusList);
-    }, [myOrders])
 
     const handleOrder = async (MA_DH, isReceived) => {
         try {
             const data = isReceived ? { action: 'received' } : { action: 'cancle' }
             const { message } = await donhangApi.update(MA_DH, data);
-            dispatch(fetch_my_orders());
+            dispatch(fetch_my_orders({ action: 'get_my_orders', _limit: pagination._limit, _page: pagination._page }));
             toast.success(message);
         } catch (error) {
             toast.error(error.response.data.message);
@@ -50,25 +41,25 @@ function HistoryOrder(props) {
                             <Col xs={24} sm={12} md={8} lg={6}>
                                 <div className='statistical'>
                                     <HourglassOutlined />
-                                    <div className='statistical-text'>Chờ xử lý ({statisticalOrders[0]})</div>
+                                    <div className='statistical-text'>Chờ xử lý ({statisticalMyOrders[0]})</div>
                                 </div>
                             </Col>
                             <Col xs={24} sm={12} md={8} lg={6}>
                                 <div className='statistical'>
                                     <CarOutlined />
-                                    <div className='statistical-text'>Đang vận chuyển ({statisticalOrders[1]})</div>
+                                    <div className='statistical-text'>Đang vận chuyển ({statisticalMyOrders[1]})</div>
                                 </div>
                             </Col>
                             <Col xs={24} sm={12} md={8} lg={6}>
                                 <div className='statistical'>
                                     <ShoppingOutlined />
-                                    <div className='statistical-text'>Đã giao ({statisticalOrders[2]})</div>
+                                    <div className='statistical-text'>Đã giao ({statisticalMyOrders[2]})</div>
                                 </div>
                             </Col>
                             <Col xs={24} sm={12} md={8} lg={6}>
                                 <div className='statistical'>
                                     <WarningOutlined />
-                                    <div className='statistical-text'>Đã hủy ({statisticalOrders[3]})</div>
+                                    <div className='statistical-text'>Đã hủy ({statisticalMyOrders[3]})</div>
                                 </div>
                             </Col>
                         </Row>
@@ -94,6 +85,9 @@ function HistoryOrder(props) {
                                                         <span className='category-label-key'>Mã ưu đãi </span><span className='category-label-value'>{order.MA_UU_DAI || 'Không áp dụng'}</span>
                                                     </div>
                                                     <div className='category-label'>
+                                                        <span className='category-label-key'>Phí vận chuyển </span><span className='category-label-value'>{numberWithCommas(order.PHI_SHIP)} ₫</span>
+                                                    </div>
+                                                    <div className='category-label'>
                                                         <span className='category-label-key'>Ngày đặt hàng</span><span className='category-label-value'>{moment(order.TG_DAT_HANG).format('DD-MM-YYYY')}</span>
                                                     </div>
                                                     <div className='category-label'>
@@ -106,7 +100,7 @@ function HistoryOrder(props) {
                                                         <span className='category-label-key'>Địa chỉ</span><span className='category-label-value'>{order.DIA_CHI}</span>
                                                     </div>
                                                     <div className='category-label'>
-                                                        <span className='category-label-key'>Tổng cộng </span><strong className='category-label-value' style={{ fontSize: 20 }}>{numberWithCommas(order.TONG_TIEN)} ₫</strong>
+                                                        <span className='category-label-key'>Tổng cộng </span><strong className='category-label-value' style={{ fontSize: 20 }}>{numberWithCommas(order.TONG_TIEN + order.PHI_SHIP)} ₫</strong>
                                                     </div>
                                                     <br />
                                                 </div>

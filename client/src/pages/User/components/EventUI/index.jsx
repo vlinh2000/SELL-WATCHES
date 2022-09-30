@@ -47,27 +47,26 @@ function EventUI(props) {
     React.useEffect(() => {
         if (!eventNearest) return;
         let second = 0;
-        if (moment().isBefore(eventNearest.TG_KET_THUC)) {
-            const dateStart = new Date(eventNearest.TG_BAT_DAU).toJSON().slice(0, 10) + ' ' + eventNearest.KHUNG_GIO_TU;
+        if (moment().isBefore(moment(eventNearest.TG_KET_THUC))) {
+            const dateStart = moment(eventNearest.TG_BAT_DAU).format('YYYY-MM-DD').toString() + ' ' + eventNearest.KHUNG_GIO_TU;
             // truoc su kien
-            console.log(moment().isBefore(moment(dateStart)), dateStart)
             if (moment().isBefore(moment(dateStart))) {
                 var duration = moment.duration(moment(dateStart).diff(moment()));
+                console.log({ start: moment(dateStart), now: moment(), start1: moment(eventNearest.TG_BAT_DAU) })
                 second = Math.trunc(duration._milliseconds / 1000);
 
             }
             // trong su kien
             else {
                 console.log("checked")
-                const d = new Date();
-                const today = d.toJSON().slice(0, 10);
+                const today = moment().format('YYYY-MM-DD').toString();
                 var duration_hours = null;
 
                 if (moment().isBefore(moment(today + ' ' + eventNearest.KHUNG_GIO_TU))) {
                     duration_hours = moment.duration(moment(today + ' ' + eventNearest.KHUNG_GIO_TU).diff(moment()));
                 }
                 else if (moment().isAfter(moment(today + ' ' + eventNearest.KHUNG_GIO_DEN))) {
-                    const tomorrow = new Date(d.setDate(d.getDate() + 1)).toJSON().slice(0, 10);
+                    const tomorrow = moment().add(1, 'days').format('YYYY-MM-DD').toString();
                     if (moment(tomorrow + ' ' + eventNearest.KHUNG_GIO_TU).isBefore(moment(eventNearest.TG_KET_THUC))) {
                         duration_hours = moment.duration(moment(tomorrow + ' ' + eventNearest.KHUNG_GIO_TU).diff(moment()));
                     } else return;

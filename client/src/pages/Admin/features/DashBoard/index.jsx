@@ -34,6 +34,7 @@ function Dashboard(props) {
         data: { statistical, ordersConfirm } } = useSelector(state => state.adminInfo);
 
     const [loading, setLoading] = React.useState(false);
+    const [date, setDate] = React.useState(() => ([moment().startOf('month'), moment().endOf('month')]))
 
     const [chartInfo, setChartInfo] = React.useState({
         labels: [],
@@ -48,23 +49,31 @@ function Dashboard(props) {
         ],
     });
 
-    const onFilterRevenueByMonth = async (dateFrom, dateTo) => {
-        try {
-            setLoading(true);
-            const { result } = await donhangApi.getThongKes({ dateFrom, dateTo });
-            const labels = [];
-            const data = [];
-            result.forEach(dh => {
-                labels.push(dh.THANG);
-                data.push(dh.TONG_TIEN);
-            })
-            setChartInfo(prev => ({ ...prev, labels, datasets: [{ ...prev.datasets[0], data }] }))
-            setLoading(false);
-        } catch (error) {
-            setLoading(false);
-            console.log({ error });
+    React.useEffect(() => {
+        const onFilterRevenue = async () => {
+            try {
+                setLoading(true);
+                const dateFrom = date[0].format().slice(0, 10);
+                const dateTo = date[1].format().slice(0, 10);
+                const { result } = await donhangApi.getThongKes({ groupBy: 'day', dateFrom, dateTo });
+                const labels = [];
+                const data = [];
+                result.forEach(dh => {
+                    labels.push(dh.TEN_THONG_KE);
+                    data.push(dh.TONG_TIEN);
+                })
+                setChartInfo(prev => ({ ...prev, labels, datasets: [{ ...prev.datasets[0], data }] }))
+                setLoading(false);
+            } catch (error) {
+                setLoading(false);
+                console.log({ error });
+            }
         }
-    }
+
+
+        onFilterRevenue();
+    }, [date])
+
 
     return (
         <div className='dashboard'>
@@ -112,7 +121,7 @@ function Dashboard(props) {
                         </div>
                         <div className="content">
                             <div className="content-title">Đơn chờ xử lý</div>
-                            <div className="content-num">{isLoading ? <Spin size='small' /> : ordersConfirm?.length}</div>
+                            <div className="content-num">{isLoading ? <Spin size='small' /> : statistical?.DH_CHO_XU_LY}</div>
                         </div>
                         <p className="small-info">
                             Danh sách đơn cần xử lý <Link className='view-btn' to="/admin/orders/confirm">View</Link>
@@ -135,7 +144,7 @@ function Dashboard(props) {
                                                 <List.Item.Meta
                                                     avatar={<Avatar src={sp.HINH_ANH} />}
                                                     title={sp.TEN_SP}
-                                                    description={sp.MO_TA}
+                                                    description={sp.MO_TA.substring(0, 120) + '...'}
                                                 />
                                                 <div style={{ fontSize: 13 }}>Đã bán: {sp.DA_BAN}</div>
                                             </List.Item>
@@ -170,9 +179,9 @@ function Dashboard(props) {
                 </Col>
             </Row>
             <div className="box">
-                <div className='sub-title'>Thống kê doanh thu</div>
+                <div className='sub-title'>Doanh thu tháng này ({date[0]?.format('MM-YYYY')}) <Link to="/admin/revenues/view">Xem chi tiết</Link></div>
                 <br />
-                <Chart isLoading={loading} onFilter={onFilterRevenueByMonth} options={options} data={chartInfo} />
+                <Chart isLoading={loading} options={options} data={chartInfo} />
             </div>
 
         </div>

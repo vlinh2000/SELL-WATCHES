@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { donhangApi } from 'api/donhangApi';
 import { loaisanphamApi } from 'api/loaisanphamApi';
+import { thongkeApi } from 'api/thongkeApi';
 import { user_uudaiApi } from 'api/user_uudaiApi';
 import { yeuthichApi } from 'api/yeuthichApi';
 
@@ -41,10 +42,23 @@ export const fetch_my_vouchers = createAsyncThunk("userPage/fetch_my_vouchers", 
 
 })
 
-export const fetch_my_orders = createAsyncThunk("userPage/fetch_my_orders", async (params, { rejectWithValue }) => {
+export const fetch_my_orders = createAsyncThunk("userPage/fetch_my_orders", async (params, { rejectWithValue, dispatch }) => {
 
     try {
         const { result, totalRecord } = await donhangApi.getAll(params);
+        dispatch(fetch_statistical_my_orders());
+        return { result, totalRecord };
+
+    } catch (error) {
+        return rejectWithValue(error.respone.data)
+    }
+
+})
+
+export const fetch_statistical_my_orders = createAsyncThunk("userPage/fetch_statistical_my_orders", async (params, { rejectWithValue }) => {
+
+    try {
+        const { result, totalRecord } = await thongkeApi.get_my_orders(params);
         return { result, totalRecord };
 
     } catch (error) {
@@ -61,7 +75,9 @@ const initialState = {
     isVisibleVoucherModal: false,
     error: {},
     loading: {},
-    data: {},
+    data: {
+        statisticalMyOrders: [0, 0, 0, 0]
+    },
     cart: [],
     payments: {},
     groupFilter: {},
@@ -112,6 +128,9 @@ const userPage = createSlice({
             const index = state.cart.findIndex((sp) => sp.MA_SP === id);
             if (index === -1) return;
             state.cart.splice(index, 1);
+        },
+        resetCart: (state, action) => {
+            state.cart = [];
         },
         changeQuantityInCart: (state, action) => {
             const { id, quantity } = action.payload
@@ -202,11 +221,24 @@ const userPage = createSlice({
             state.loading.myOrders = false;
             state.error.myOrders = action.error;
         },
+        // statistical orders
+        [fetch_statistical_my_orders.pending]: (state, action) => {
+            state.loading.statisticalMyOrders = true;
+        },
+        [fetch_statistical_my_orders.fulfilled]: (state, action) => {
+            state.loading.statisticalMyOrders = false;
+            state.data.statisticalMyOrders = action.payload.result.THONG_KE;
+
+        },
+        [fetch_statistical_my_orders.rejected]: (state, action) => {
+            state.loading.statisticalMyOrders = false;
+            state.error.statisticalMyOrders = action.error;
+        },
     }
 })
 
 const { actions, reducer } = userPage;
 export const { switch_screenLogin, addToCart,
-    removeFromCart, changeQuantityInCart, onFilter, onSort, onSearch, savePagination, switch_suggestionModal,
+    removeFromCart, resetCart, changeQuantityInCart, onFilter, onSort, onSearch, savePagination, switch_suggestionModal,
     switch_chooseAddressModal, switch_voucherModal, selectVoucher } = actions;
 export default reducer;

@@ -67,10 +67,11 @@ function ProductEdit(props) {
         HINH_DANG_MAT_SO: currentSelected?.HINH_DANG_MAT_SO || '',
         MAU_MAT_SO: currentSelected?.MAU_MAT_SO || '',
         KICH_THUOC_MAT_SO: currentSelected?.KICH_THUOC_MAT_SO || '',
-        ANH_SAN_PHAM: currentSelected?.HINH_ANH || [],
+        ANH_SAN_PHAM: currentSelected?.ANH_SAN_PHAM || [],
     }
 
     const handleSave = async (values) => {
+
         try {
             setIsLoading(true);
             let ANH_SAN_PHAM_NEW = [];

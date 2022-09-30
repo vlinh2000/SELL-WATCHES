@@ -41,7 +41,7 @@ function ProductDetail(props) {
     React.useEffect(() => {
         const checkFeedBackAvailable = async () => {
             try {
-                const { available } = await donhangApi.get({ action: 'check_had_order' });
+                const { available } = await donhangApi.getAll({ action: 'check_had_order', MA_SP: idProduct });
                 setFeedBackAvailable(available);
             } catch (error) {
                 console.log({ error })

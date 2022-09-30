@@ -1,5 +1,5 @@
 const { executeQuery, checkExist, checkIsExist, executeUpdateQuery } = require("../mysql");
-const { randomString, getNow } = require("../utils/global");
+const { randomString, getNow, handleMomoPayment } = require("../utils/global");
 
 module.exports = {
     get_donhangs: async (req, res) => {
@@ -9,9 +9,11 @@ module.exports = {
 
             if (action === 'check_had_order') {
                 const sql = `SELECT COUNT(a.MA_DH) as total
-                             FROM DON_HANG a, CHI_TIET_SAN_PHAM b 
+                             FROM DON_HANG a, CHI_TIET_DON_HANG b 
                              WHERE a.USER_ID='${user?.USER_ID}' AND a.MA_DH=b.MA_DH AND b.MA_SP='${MA_SP}'`;
                 let data = await executeQuery(sql);
+                console.log({ sql })
+                console.log({ data })
                 return res.json({
                     // result: data,
                     available: data[0].total > 0 ? true : false,
@@ -78,18 +80,84 @@ module.exports = {
             res.status(500).json({ message: "Đã xảy ra lỗi! Hãy thử lại sau." })
         }
     },
+
     get_thongkes: async (req, res) => {
         try {
-            const { dateFrom, dateTo } = req.query;
-            const sql = `SELECT  DATE_FORMAT(a.TG_DAT_HANG,'%Y-%m') as THANG, SUM(a.TONG_TIEN) as TONG_TIEN 
-                        FROM DON_HANG a
+            const { dateFrom, dateTo, groupBy, action } = req.query;
+
+            if (action === 'get_only_statistical') {
+                let result = [];
+                const sqls = [
+                    `SELECT COALESCE(SUM(a.TONG_TIEN),0) as DOANH_THU FROM DON_HANG a WHERE a.DA_THANH_TOAN = '1'`,
+                    `SELECT COALESCE(SUM(a.TONG_TIEN),0) as TIEN_VON FROM PHIEU_NHAP_KHO a`
+                ];
+
+                const processes = sqls.map((sql, idx) => {
+                    return new Promise(async (resolve, reject) => {
+                        try {
+                            const data = await executeQuery(sql);
+                            result[idx] = data[0].DOANH_THU || data[0].TIEN_VON;
+                            resolve(true)
+                        } catch (error) {
+                            console.log({ error })
+                            reject(false);
+                        }
+                    })
+                })
+                await Promise.all(processes);
+                const thongkes = {
+                    DOANH_THU: result[0],
+                    LOI_NHUAN: result[0] - result[1],
+                    TIEN_VON: result[1]
+                }
+                return res.json({
+                    result: thongkes,
+                    message: 'Thành công'
+                });
+            }
+
+
+            let groupByName = '';
+            let selectFieldName = ''
+            switch (groupBy) {
+                case 'day': {
+                    groupByName = `DATE_FORMAT(a.TG_DAT_HANG,'%Y-%m-%d')`;
+                    selectFieldName = `CONCAT('Ngày ',DATE_FORMAT(a.TG_DAT_HANG,'%d-%m-%Y'))`
+                    break;
+                }
+                case 'week': {
+                    groupByName = `CONCAT(YEAR(a.TG_DAT_HANG), '/', WEEK(a.TG_DAT_HANG))`;
+                    selectFieldName = `CONCAT('Tuần ', WEEK(a.TG_DAT_HANG),',',YEAR(a.TG_DAT_HANG) )`
+                    break;
+                }
+                case 'month': {
+                    groupByName = `YEAR(a.TG_DAT_HANG),MONTH(a.TG_DAT_HANG)`;
+                    selectFieldName = `CONCAT('Tháng ',MONTH(a.TG_DAT_HANG),',',YEAR(a.TG_DAT_HANG))`;
+                    break;
+                }
+                case 'quarter': {
+                    groupByName = `YEAR(a.TG_DAT_HANG), QUARTER(a.TG_DAT_HANG)`;
+                    selectFieldName = `CONCAT('Quý ',QUARTER(a.TG_DAT_HANG),',',YEAR(a.TG_DAT_HANG) )`
+                    break;
+                }
+                case 'year': {
+                    groupByName = `YEAR(a.TG_DAT_HANG)`;
+                    selectFieldName = `CONCAT('Năm ',YEAR(a.TG_DAT_HANG))`
+                    break;
+                }
+            }
+
+            const sql = `SELECT ${selectFieldName} as TEN_THONG_KE, SUM(b.GIA) as TONG_TIEN,SUM(b.GIA_GOC * b.SO_LUONG) as TIEN_VON
+                        FROM DON_HANG a,CHI_TIET_DON_HANG b
                         WHERE 
-                            a.TG_DAT_HANG between '${dateFrom}' AND '${dateTo}' 
-                            AND ( a.TRANG_THAI = 2 OR a.DA_THANH_TOAN = '1') 
-                        GROUP BY MONTH(a.TG_DAT_HANG)`;
-            const donhangs = await executeQuery(sql);
+                            a.MA_DH=b.MA_DH  
+                            AND a.TG_DAT_HANG between '${dateFrom + ' 00:00:00'}' AND '${dateTo + ' 23:59:59'}' 
+                            AND a.DA_THANH_TOAN = '1'
+                        GROUP BY ${groupByName}`;
+            const thongkes = await executeQuery(sql);
+            console.log({ sql })
             res.json({
-                result: donhangs,
+                result: thongkes,
                 message: 'Thành công'
             });
         } catch (error) {
@@ -99,21 +167,39 @@ module.exports = {
     },
     post_donhangs: async (req, res) => {
         try {
-            const { USER_ID, DIA_CHI_GH, GIAM_GIA, TONG_TIEN, DA_THANH_TOAN, HINH_THUC_THANH_TOAN, PHI_SHIP, GHI_CHU } = req.body;
-            const { MA_SP, SO_LUONG, DON_GIA } = req.body;
+            const { isCompleteOrder, data } = req.body;
+            let { USER_ID, DIA_CHI_GH, GIAM_GIA, TONG_TIEN, DA_THANH_TOAN, HINH_THUC_THANH_TOAN, PHI_SHIP, GHI_CHU, HO_TEN_NGUOI_DAT,
+                SDT_NGUOI_DAT, EMAIL_NGUOI_DAT, MA_UU_DAI, SAN_PHAM, orderId } = isCompleteOrder ? JSON.parse(Buffer.from(data, 'base64').toString('utf8')) : req.body;
+            SAN_PHAM = JSON.parse(SAN_PHAM);
+            DA_THANH_TOAN = isCompleteOrder ? 1 : DA_THANH_TOAN;
 
-            const MA_DH = 'DH_' + randomString();
-            const sql = `INSERT INTO DON_HANG(MA_DH,USER_ID, DIA_CHI_GH, GIAM_GIA, TONG_TIEN, DA_THANH_TOAN, HINH_THUC_THANH_TOAN, PHI_SHIP, GHI_CHU) 
-                                        VALUES ('${MA_DH}','${USER_ID}','${DIA_CHI_GH}','${GIAM_GIA}','${TONG_TIEN}','${DA_THANH_TOAN}','${HINH_THUC_THANH_TOAN}','${PHI_SHIP}','${GHI_CHU}')`;
+            const MA_DH = isCompleteOrder ? orderId : 'DH_' + randomString();
+            const sql = `INSERT INTO DON_HANG(MA_DH,${USER_ID ? 'USER_ID,' : ''} DIA_CHI, GIAM_GIA, TONG_TIEN, DA_THANH_TOAN, HINH_THUC_THANH_TOAN, PHI_SHIP, GHI_CHU,HO_TEN_NGUOI_DAT,
+                SDT_NGUOI_DAT,EMAIL_NGUOI_DAT,MA_UU_DAI) 
+                VALUES ('${MA_DH}',${USER_ID ? `'${USER_ID}',` : ''}'${DIA_CHI_GH}',${GIAM_GIA},${TONG_TIEN},'${DA_THANH_TOAN}','${HINH_THUC_THANH_TOAN}',${PHI_SHIP},'${GHI_CHU || ""}','${HO_TEN_NGUOI_DAT}','${SDT_NGUOI_DAT}','${EMAIL_NGUOI_DAT}','${MA_UU_DAI || ""}')`;
             await executeQuery(sql);
 
             // loop here
-            const sqlDetail = `INSERT INTO CHI_TIET_DON_HANG(MA_DH,MA_SP, SO_LUONG, DON_GIA) 
-                                                    VALUES ('${MA_DH}','${MA_SP}','${SO_LUONG}','${DON_GIA}')`;
-            //
-            await executeQuery(sql);
-            await executeQuery(sqlDetail);
-            res.json({ message: 'Thêm đơn hàng thành công.' });
+            const processes = SAN_PHAM?.map(sp => {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        const sqlDetail = `INSERT INTO CHI_TIET_DON_HANG(MA_DH,MA_SP, SO_LUONG, DON_GIA,GIA,GIA_GOC) VALUES ('${MA_DH}','${sp.MA_SP}',${sp.SO_LUONG},${sp.DON_GIA},${sp.GIA},${sp.GIA_GOC})`;
+                        await executeQuery(sqlDetail);
+                        resolve(true);
+                    } catch (error) {
+                        console.log({ error })
+                        reject(error);
+                    }
+                })
+            });
+
+            await Promise.all(processes);
+            console.log("ok")
+            const sql_delete = `DELETE FROM USER_UU_DAI WHERE USER_ID='${USER_ID}' AND MA_UU_DAI='${MA_UU_DAI}'`;
+            MA_UU_DAI && USER_ID && await executeQuery(sql_delete);
+            console.log(sql_delete)
+
+            res.json({ message: 'Đặt hàng thành công.' });
         } catch (error) {
             console.log({ error: error.message });
             res.status(500).json({ message: "Đã xảy ra lỗi! Hãy thử lại sau." })
@@ -131,15 +217,31 @@ module.exports = {
             const CAP_NHAT = getNow();
             let data = {};
             if (action === 'confirm' && NV_ID) {
-                data = { ...req.body, CAP_NHAT }
+                data = { TRANG_THAI: 1, CAP_NHAT, NV_ID }
             }
             else if (action === 'received' && USER_ID) {
                 data = { TRANG_THAI: 2, CAP_NHAT }
             }
             else if (action === 'cancle' && USER_ID) {
+                const sql_restore = `SELECT MA_SP,SO_LUONG FROM CHI_TIET_DON_HANG WHERE MA_DH='${donhangID}'`;
+                const listProductForRestore = await executeQuery(sql_restore);
+
+                const processes = listProductForRestore.map(sp => {
+                    return new Promise(async (resolve, reject) => {
+                        try {
+                            const sql_restore_quantity = `UPDATE SAN_PHAM SET SO_LUONG=SO_LUONG + ${sp.SO_LUONG} WHERE MA_SP='${sp.MA_SP}'`;
+                            await executeQuery(sql_restore_quantity);
+                            resolve(true);
+                        } catch (error) {
+                            reject(false);
+                        }
+                    })
+                })
+
+                await Promise.all(processes);
                 data = { TRANG_THAI: 3, CAP_NHAT }
             }
-
+            console.log({ data })
             const sql = `UPDATE DON_HANG SET ? WHERE MA_DH='${donhangID}'`;
             await executeUpdateQuery(sql, data);
 
@@ -161,6 +263,23 @@ module.exports = {
             res.json({ message: 'Xóa đơn hàng thành công.' });
         } catch (error) {
             console.log({ error: error.message });
+            res.status(500).json({ message: "Đã xảy ra lỗi! Hãy thử lại sau." })
+        }
+    }, get_payUrl: async (req, res) => {
+        try {
+            let { wallet, data } = req.query;
+            data = JSON.parse(data)
+            let result;
+            switch (wallet) {
+                case 'momo_wallet': {
+                    result = await handleMomoPayment(data);
+                    break;
+                }
+                default: ''
+            }
+            res.json({ result, message: 'Thành công' })
+        } catch (error) {
+            console.log({ error });
             res.status(500).json({ message: "Đã xảy ra lỗi! Hãy thử lại sau." })
         }
     },

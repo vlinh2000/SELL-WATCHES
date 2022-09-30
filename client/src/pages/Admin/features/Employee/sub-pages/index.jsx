@@ -1,8 +1,9 @@
 import { CameraOutlined } from '@ant-design/icons';
-import { Button, Col, Form, Row } from 'antd';
+import { Button, Checkbox, Col, Form, Row, Space } from 'antd';
 import { chucvuApi } from 'api/chucvuApi';
 import { nhacungcapApi } from 'api/nhacungcapApi';
 import { nhanvienApi } from 'api/nhanvienApi';
+import { quyenApi } from 'api/quyenApi';
 import axios from 'axios';
 import InputField from 'custom-fields/InputField';
 import SelectField from 'custom-fields/SelectField';
@@ -35,7 +36,7 @@ let schema = yup.object().shape({
     PROVINCES: yup.string().required('Tỉnh/Thành phố không được để trống.'),
     DISTRICT: yup.string().required('Quận/Huyện không được để trống.'),
     WARDS: yup.string().required('Phường/Xã không được để trống.'),
-    // QUYEN: yup.array().min(1, "Quyền không được để trống.")
+    QUYEN: yup.array().min(1, "Quyền không được để trống.")
 });
 
 const yupSync = {
@@ -52,6 +53,7 @@ function EmployeeEdit(props) {
     const [options_Provinces, setOptions_Provinces] = React.useState([]);
     const [options_district, setOptions_district] = React.useState([]);
     const [options_wards, setOptions_wards] = React.useState([]);
+    const [options_rules, setOptions_rules] = React.useState([]);
     const [currentAvatar, setCurrentAvatar] = React.useState(currentSelected?.ANH_DAI_DIEN || 'https://www.seekpng.com/png/detail/428-4287240_no-avatar-user-circle-icon-png.png');
 
 
@@ -86,6 +88,7 @@ function EmployeeEdit(props) {
             data.append('GIOI_TINH', values.GIOI_TINH);
             data.append('MAT_KHAU', values.MAT_KHAU);
             data.append('DIA_CHI', address);
+            data.append('QUYEN', JSON.stringify(values.QUYEN));
 
             setIsLoading(true);
             const { message } = mode === 'ADD' ? await nhanvienApi.post(data) : await nhanvienApi.update(currentSelected.NV_ID, data);
@@ -100,7 +103,7 @@ function EmployeeEdit(props) {
         } catch (error) {
             setIsLoading(false);
             console.log({ error });
-            toast.error(error);
+            toast.error(error.response.data.message);
         }
     }
 
@@ -164,6 +167,31 @@ function EmployeeEdit(props) {
 
     }, [addressCode.districtCode])
 
+    React.useEffect(() => {
+        const fetchAllRules = async () => {
+            try {
+                const { result } = await quyenApi.getAll();
+                setOptions_rules(result.map((e) => ({ label: `[${e.MA_QUYEN}] ${e.TEN_QUYEN}`, value: e.MA_QUYEN })))
+            } catch (error) {
+                console.log({ error });
+            }
+        }
+
+        fetchAllRules();
+    }, [])
+
+    React.useEffect(() => {
+        const fetchUserRules = async () => {
+            try {
+                const { result } = await quyenApi.getAll({ action: 'get_user_rules', NV_ID: currentSelected?.NV_ID });
+                form.setFieldValue('QUYEN', result?.map(q => q.MA_QUYEN));
+            } catch (error) {
+                console.log({ error });
+            }
+        }
+
+        currentSelected?.NV_ID && fetchUserRules();
+    }, [currentSelected?.NV_ID])
 
     return (
         <div className='employee-edit box'>
@@ -185,13 +213,14 @@ function EmployeeEdit(props) {
                         </div>
                         <InputField name='HO_TEN' label='Họ tên' rules={[yupSync]} />
                         <InputField name='SO_DIEN_THOAI' label='Số điện thoại' rules={[yupSync]} />
-                        <InputField name='EMAIL' label='Email' rules={[yupSync]} />
+                        <InputField name='EMAIL' label='Email' disabled={currentSelected?.NV_ID} rules={[yupSync]} />
                         <SelectField name='GIOI_TINH' label='Giới tính' rules={[yupSync]}
                             options={[{ value: 'Nam', labe: 'Nam' }, { value: 'Nữ', labe: 'Nữ' }, { value: 'Khác', labe: 'Khác' }]} />
-                    </Col>
-                    <Col xs={24} sm={12} md={12} lg={12}>
                         <InputField name='MAT_KHAU' label='Mật khẩu' rules={[yupSync]} />
                         <SelectField name='MA_CV' label='Chức vụ' options={options_Position} rules={[yupSync]} />
+                    </Col>
+                    <Col xs={24} sm={12} md={12} lg={12}>
+
                         <SelectField onChange={(_, options) => {
                             setAddressCode(prev => ({ ...prev, provincesCode: options.code, districtCode: null }))
                             form.setFieldValue('DISTRICT', '');
@@ -204,7 +233,15 @@ function EmployeeEdit(props) {
                         }} name='DISTRICT' label='Quận/Huyện' rules={[yupSync]} options={options_district} />
 
                         <SelectField name='WARDS' label='Phường/Xã' rules={[yupSync]} options={options_wards} />
-                        {/* <SelectField mode='tags' name='QUYEN' label='Quyền' rules={[yupSync]} options={options_wards} /> */}
+                        <Form.Item name="QUYEN" label="Quyền" >
+                            <Checkbox.Group>
+                                <Space direction='vertical'>
+                                    {
+                                        options_rules?.map((rule) => <Checkbox key={rule.value} value={rule.value}>{rule.label}</Checkbox>)
+                                    }
+                                </Space>
+                            </Checkbox.Group>
+                        </Form.Item>
                     </Col>
                 </Row>
                 <br />

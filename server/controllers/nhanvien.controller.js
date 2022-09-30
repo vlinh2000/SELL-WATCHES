@@ -1,5 +1,5 @@
 const { executeQuery, checkExist, checkIsExist, executeUpdateQuery } = require("../mysql");
-const { randomString, getNow, generateToken, generateRefreshToken } = require("../utils/global");
+const { randomString, getNow, generateToken, generateRefreshToken, hashString } = require("../utils/global");
 
 module.exports = {
     get_nhanviens: async (req, res) => {
@@ -41,14 +41,30 @@ module.exports = {
     },
     post_nhanviens: async (req, res) => {
         try {
-            const { HO_TEN, SO_DIEN_THOAI, EMAIL, ANH_DAI_DIEN, DIA_CHI, GIOI_TINH, MAT_KHAU, MA_CV } = req.body;
-
+            const { HO_TEN, SO_DIEN_THOAI, EMAIL, ANH_DAI_DIEN, DIA_CHI, GIOI_TINH, MA_CV } = req.body;
+            let { QUYEN, MAT_KHAU } = req.body;
+            QUYEN = JSON.parse(QUYEN);
             const avatarUrl = req.file?.path || ANH_DAI_DIEN;
+            MAT_KHAU = await hashString(MAT_KHAU);
 
             const NV_ID = 'NV_' + randomString();
             const sql = `INSERT INTO NHAN_VIEN(NV_ID,MA_CV,HO_TEN,SO_DIEN_THOAI,EMAIL,ANH_DAI_DIEN,DIA_CHI,GIOI_TINH,MAT_KHAU) 
                                         VALUES ('${NV_ID}','${MA_CV}','${HO_TEN}','${SO_DIEN_THOAI}','${EMAIL}','${avatarUrl || ""}','${DIA_CHI}','${GIOI_TINH}','${MAT_KHAU}')`;
             await executeQuery(sql);
+
+            const processes = QUYEN?.map((ma_quyen) => {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        const sql_newRule = `INSERT INTO QUYEN_NHAN_VIEN(MA_QUYEN,NV_ID) VALUES ('${ma_quyen}','${NV_ID}')`
+                        await executeQuery(sql_newRule);
+                        resolve(true);
+                    } catch (error) {
+                        reject(error);
+                    }
+                })
+            })
+
+            await Promise.all(processes);
             res.json({ message: 'Thêm nhân viên thành công.' });
         } catch (error) {
             console.log({ error: error.message });
@@ -58,20 +74,39 @@ module.exports = {
     patch_nhanviens: async (req, res) => {
         try {
             const { nhanvienID } = req.params;
-            // const { USER_ID: authorId } = req.user.data;
+            const { HO_TEN, SO_DIEN_THOAI, EMAIL, ANH_DAI_DIEN, DIA_CHI, GIOI_TINH, MA_CV } = req.body;
+            let { QUYEN, MAT_KHAU } = req.body;
+            QUYEN = JSON.parse(QUYEN);
+            MAT_KHAU = MAT_KHAU.includes('$') ? MAT_KHAU : await hashString(MAT_KHAU);
 
             const isExist = await checkIsExist('NHAN_VIEN', 'NV_ID', nhanvienID);
             if (!isExist) return res.status(400).json({ message: "Nhân viên không tồn tại." });
             // else if (authorId !== userID) return res.status(400).json({ message: "Chỉ có thể cập nhật thông tin cho bản thân." });
 
-            let data = { ...req.body, CAP_NHAT: getNow() };
-            console.log({ data })
+            let data = { HO_TEN, SO_DIEN_THOAI, EMAIL, ANH_DAI_DIEN, DIA_CHI, GIOI_TINH, MAT_KHAU: MAT_KHAU, MA_CV, CAP_NHAT: getNow() };
+
             const avatarUrl = req.file?.path;
             if (avatarUrl) data = { ...data, ANH_DAI_DIEN: avatarUrl }
 
             const sql = `UPDATE NHAN_VIEN SET ? WHERE NV_ID='${nhanvienID}'`;
             await executeUpdateQuery(sql, data);
 
+            const sql_resetRules = `DELETE FROM QUYEN_NHAN_VIEN WHERE NV_ID='${nhanvienID}'`
+            await executeQuery(sql_resetRules);
+
+            const processes = QUYEN?.map((ma_quyen) => {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        const sql_newRule = `INSERT INTO QUYEN_NHAN_VIEN(MA_QUYEN,NV_ID) VALUES ('${ma_quyen}','${nhanvienID}')`
+                        await executeQuery(sql_newRule);
+                        resolve(true);
+                    } catch (error) {
+                        reject(error);
+                    }
+                })
+            })
+
+            await Promise.all(processes);
             res.json({ message: 'Cập nhật nhân viên thành công.' });
         } catch (error) {
             console.log({ error: error.message });
