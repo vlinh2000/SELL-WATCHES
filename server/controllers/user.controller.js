@@ -1,5 +1,8 @@
+const { TokenExpiredError } = require("jsonwebtoken");
 const { executeQuery, checkExist, checkIsExist, executeUpdateQuery } = require("../mysql");
-const { randomString, getNow, hashString, compareString, generateToken, generateRefreshToken } = require("../utils/global");
+const { sendMail } = require("../services/mail/mail");
+const { TEMPLATE_FORGET_PASSWORD } = require("../services/mail/templates");
+const { randomString, getNow, hashString, compareString, generateToken, generateRefreshToken, verifyToken } = require("../utils/global");
 
 
 module.exports = {
@@ -103,7 +106,7 @@ module.exports = {
                 const sql = `SELECT * FROM NHAN_VIEN a, CHUC_VU b WHERE a.EMAIL='${EMAIL}' AND a.MA_CV = b.MA_CV`;
                 response = await executeQuery(sql);
             } else {
-                const sql = `SELECT * FROM USER WHERE EMAIL='${EMAIL}'`;
+                const sql = `SELECT * FROM USER WHERE LOAI_TAI_KHOAN = 'tao_moi' AND EMAIL='${EMAIL}'`;
                 response = await executeQuery(sql);
             }
             user = response[0];
@@ -178,6 +181,49 @@ module.exports = {
 
         } catch (error) {
             console.log({ error: error.message });
+            res.status(500).json({ message: "Đã xảy ra lỗi! Hãy thử lại sau." })
+        }
+    },
+    forget_password: async (req, res) => {
+        try {
+            const { EMAIL, SEND_MAIL_FLAG, TOKEN, MAT_KHAU } = req.body;
+            // send mail
+            if (SEND_MAIL_FLAG) {
+                const isExist = await checkIsExist('USER', `LOAI_TAI_KHOAN = 'tao_moi' AND EMAIL`, EMAIL);
+                if (!isExist) {
+                    const isExist_employee = await checkIsExist('NHAN_VIEN', 'EMAIL', EMAIL);
+                    if (!isExist_employee) return res.status(400).json({ message: "Tài khoản không tồn tại." });
+                    const sql = `SELECT * FROM NHAN_VIEN a, CHUC_VU b WHERE a.EMAIL='${EMAIL}' AND a.MA_CV = b.MA_CV`;
+                    response = await executeQuery(sql);
+                } else {
+                    const sql = `SELECT * FROM USER WHERE LOAI_TAI_KHOAN = 'tao_moi' AND EMAIL='${EMAIL}'`;
+                    response = await executeQuery(sql);
+                }
+                user = response[0];
+                if (user.BI_KHOA == '1') return res.status(400).json({ message: `Tài khoản [${EMAIL}] đã bị khóa.` });
+                const token = await generateToken(user, 60 * 5); // expire 5 minutes
+                const urlForResetPass = `http://localhost:3000?action=resetpass&token=${token}`;
+                // send mail
+                const response_sendMail = await sendMail(EMAIL, 'Khôi phục mật khẩu của bạn', TEMPLATE_FORGET_PASSWORD(urlForResetPass));
+                console.log({ response_sendMail, token });
+                return res.json({ message: 'Gửi mail thành công.' });
+            } else {
+                // save new pasword
+                const MAT_KHAU_HASHED = await hashString(MAT_KHAU);
+                const { data } = await verifyToken(TOKEN);
+                console.log({ data, EMAIL })
+                // if (data.EMAIL !== EMAIL) return res.status(400).json({ message: 'Hệ thống phát hiện hành vi cố tình phá hoại.' });
+                console.log({ data });
+                const sql = `UPDATE ${data.USER_ID ? 'USER' : 'NHAN_VIEN'} SET MAT_KHAU='${MAT_KHAU_HASHED}' WHERE ${data.USER_ID ? 'USER_ID' : 'NV_ID'}='${data.USER_ID || data.NV_ID}'`;
+                await executeQuery(sql);
+                return res.json({ message: 'Cập nhật mật khẩu mới thành công.', result: { EMAIL: data.EMAIL } });
+            }
+
+
+        } catch (error) {
+            if (error instanceof TokenExpiredError) {
+                return res.status(400).json({ message: "Link reset password đã hết hiệu lực." })
+            }
             res.status(500).json({ message: "Đã xảy ra lỗi! Hãy thử lại sau." })
         }
     },

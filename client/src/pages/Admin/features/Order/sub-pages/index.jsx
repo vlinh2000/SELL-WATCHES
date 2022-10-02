@@ -4,6 +4,7 @@ import { Col, Collapse, Form, Pagination, Row, Table, Tag } from 'antd';
 import { donhangApi } from 'api/donhangApi';
 import { getStatusOrder, numberWithCommas } from 'assets/admin';
 import ButtonCustom from 'components/ButtonCustom';
+import PickDateField from 'custom-fields/PickDateField';
 import moment from 'moment';
 import { fetch_orders, fetch_orders_pending, savePagination } from 'pages/Admin/adminSlice';
 import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
@@ -42,19 +43,20 @@ function OrderConfirm(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch()
 
-    const handleConfirm = async (MA_DH) => {
+    const handleConfirm = async (values, MA_DH) => {
         try {
-            const data = { action: 'confirm' }
+            if (moment().isAfter(values.TG_GIAO_HANG)) return toast.error("Thời gian giao hàng không hợp lệ.")
+            const data = { action: 'confirm', ...values }
             setLoading(true);
             const { message } = await donhangApi.update(MA_DH, data);
-            await dispatch(fetch_orders_pending({ _limit: pagination._limit, _page: pagination._page, status: 0 }));
+            await dispatch(fetch_orders_pending({ _limit: pagination._limit, _page: pagination._page, status: JSON.stringify('[0]') }));
             dispatch(fetch_orders({ _limit: pagination_order._limit, _page: pagination_order._page }));
             setLoading(false);
             toast.success(message);
         } catch (error) {
             setLoading(false);
             console.log({ error });
-            toast.error(error);
+            toast.error(error.response.data.message);
         }
     }
 
@@ -170,8 +172,17 @@ function OrderConfirm(props) {
                                                 </Table>
                                             </div>
                                             <div className='order-confirm__item__footer'>
-                                                <ButtonCustom isLoading={loading} className="btn-info-custom" onClick={() => handleConfirm(order.MA_DH)} text='Xác nhận đơn hàng' />
-                                                {/* <ButtonCustom className="btn-success-custom" text='Đã nhận được hàng ?' /> */}
+                                                <Form layout='vertical' onFinish={(values) => handleConfirm(values, order.MA_DH)}>
+                                                    <Row gutter={[40, 0]} align="middle">
+                                                        <Col xs={24} sm={6}>
+                                                            <PickDateField name='TG_GIAO_HANG' rules={[{ required: true, message: 'Vui lòng chọn ngày.' }]} label='Thời gian giao hàng dự kiến' />
+                                                        </Col>
+                                                        <Col xs={24} sm={12}>
+                                                            <ButtonCustom isLoading={loading} className="btn-info-custom" text='Xác nhận đơn hàng' type='submit' />
+                                                            {/* <ButtonCustom className="btn-success-custom" text='Đã nhận được hàng ?' /> */}
+                                                        </Col>
+                                                    </Row>
+                                                </Form>
                                             </div>
                                         </li>
                                         <br />

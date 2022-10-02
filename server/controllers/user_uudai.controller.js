@@ -7,6 +7,7 @@ module.exports = {
             const { _limit, _page } = req.query;
             const { USER_ID } = req.user.data;
             const sql = `SELECT * FROM USER_UU_DAI a, UU_DAI b WHERE a.MA_UU_DAI=b.MA_UU_DAI AND a.USER_ID='${USER_ID}'`;
+            console.log({ sql })
             const user_uudais = await executeQuery(sql);
             const sql_count = `SELECT COUNT(a.MA_UU_DAI) as total FROM USER_UU_DAI a, UU_DAI b WHERE a.MA_UU_DAI=b.MA_UU_DAI AND a.USER_ID='${USER_ID}'`;
             const data = await executeQuery(sql_count);

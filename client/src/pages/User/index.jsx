@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getMe, getNewToken } from 'app/authSlice';
 import ProtectedRoute from 'components/ProtectedRoute';
 import { isAccountOfThisSite } from 'constants/commonContants';
-import { fetch_productTypes, fetch_favouriteList, fetch_my_vouchers, fetch_my_orders } from './userSlice';
+import { fetch_productTypes, fetch_favouriteList, fetch_my_vouchers, fetch_my_orders, switch_screenLogin } from './userSlice';
 import toast from 'react-hot-toast';
 import { donhangApi } from 'api/donhangApi';
 
@@ -70,6 +70,7 @@ function UserPage(props) {
         const redirect = searchParams.get('redirect');
         const extraData = searchParams.get('extraData');
         const resultCode = searchParams.get('resultCode');
+        const action = searchParams.get('action');
         const message = searchParams.get('message');
         setSearchParams({});
         if (resultCode && resultCode == 0) {
@@ -87,6 +88,7 @@ function UserPage(props) {
                 clearTimeout(idTimeout);
             }, 1000);
         }
+
     }, [searchParams])
 
     return (

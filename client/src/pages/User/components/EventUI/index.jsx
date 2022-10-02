@@ -30,7 +30,6 @@ function EventUI(props) {
     }
 
 
-
     React.useEffect(() => {
         const fetchEventNearest = async () => {
             try {
@@ -121,7 +120,7 @@ function EventUI(props) {
                         <Row gutter={[10, 10]} >
                             {
                                 voucherList?.map((voucher, idx) =>
-                                    <Col key={idx} xs={24} sm={12} md={8}>
+                                    <Col key={idx} xs={24} sm={24} md={12} lg={8}>
                                         <Voucher saveAvailable={hadOrder} isSaved={myVouchersID?.includes(voucher.MA_UU_DAI)} name={voucher.TEN_UU_DAI} id={voucher.MA_UU_DAI} expire={new Date(voucher.HSD).toString()} mode='save' />
                                     </Col>
                                 )

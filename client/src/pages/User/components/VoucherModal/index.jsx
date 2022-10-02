@@ -52,17 +52,17 @@ function VoucherModal(props) {
         <div>
             {/* choose address modal */}
             <Modal
-                width={700}
+                width={500}
                 title="Danh sách mã giảm giá"
                 okText="OK"
                 onOk={handleChoose}
                 visible={isVisibleVoucherModal}
                 onCancel={() => dispatch(switch_voucherModal(false))}>
                 <Radio.Group onChange={({ target }) => setVoucherSelected(myVouchers[target.value])}>
-                    <Space style={{ width: 400 }} direction="vertical">
+                    <Space style={{ width: '100%' }} direction="vertical">
                         {
                             myVouchers?.map((voucher, idx) =>
-                                <Radio key={idx} value={idx}><Voucher name={voucher.TEN_UU_DAI} id={voucher.MA_UU_DAI} expire={voucher.HSD} /></Radio>
+                                <Radio disabled={voucher.SU_DUNG} key={idx} value={idx}><Voucher name={voucher.TEN_UU_DAI} used={voucher.SU_DUNG} id={voucher.MA_UU_DAI} expire={voucher.HSD} /></Radio>
                             )
                         }
                     </Space>

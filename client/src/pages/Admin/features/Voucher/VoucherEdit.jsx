@@ -70,7 +70,7 @@ function VoucherEdit(props) {
                 TEN_UU_DAI: values.TEN_UU_DAI,
                 SO_LUONG_BAN_DAU: values.SO_LUONG_BAN_DAU,
                 SO_LUONG_CON_LAI: values.SO_LUONG_CON_LAI,
-                HSD: values.HSD._d,
+                HSD: values.HSD.utc(true),
                 MPVC: values.MPVC,
                 GIA_TRI: values.GIA_TRI === -1 ? values.GIA_TRI_SO : values.GIA_TRI,
                 DON_VI_GIAM: values.DON_VI_GIAM

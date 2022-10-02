@@ -77,12 +77,13 @@ function WishList(props) {
                                             </td>
                                             <td className='action'>
                                                 {
-                                                    productInCart?.includes(product.MA_SP) ? <i>Sản phẩm đã có trong giỏ hàng</i> :
+                                                    productInCart?.includes(product.MA_SP) ? <i>Sản phẩm đã có trong giỏ hàng</i> : product.SO_LUONG > 0 ?
                                                         <ButtonCustom onClick={() => {
                                                             dispatch(addToCart({ product }));
                                                             toast.success("Đã thêm sản phẩm vào giỏ hàng");
                                                         }}
                                                             text="Thêm vào giỏ"></ButtonCustom>
+                                                        : ''
                                                 }
                                             </td>
                                         </tr>

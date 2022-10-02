@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import './InputField.scss';
 import { Form, Input, InputNumber } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
+import { array } from 'yup/lib/locale';
 
 InputField.propTypes = {
     name: PropTypes.string,
@@ -17,6 +18,7 @@ InputField.propTypes = {
     rules: PropTypes.array,
     onChange: PropTypes.func,
     min: PropTypes.number,
+    dependencies: array,
 };
 
 InputField.defaultProps = {
@@ -32,11 +34,12 @@ InputField.defaultProps = {
     rules: [],
     onChange: null,
     min: 1,
+    dependencies: [],
 };
 
 function InputField(props) {
 
-    const { name, disabled, placeHolder, label, type, rows, required, rules, readOnly, onChange, shouldUpdate, min } = props;
+    const { name, disabled, placeHolder, label, type, rows, required, rules, readOnly, onChange, shouldUpdate, min, dependencies } = props;
 
     const handleChange = ({ target }) => {
         if (!onChange) return;
@@ -45,6 +48,7 @@ function InputField(props) {
 
     return (
         <Form.Item
+            dependencies={dependencies}
             shouldUpdate={shouldUpdate}
             className='input-field'
             required={required}

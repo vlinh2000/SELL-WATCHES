@@ -1,4 +1,5 @@
-import { Button, Drawer, Form } from 'antd';
+import { Alert, Button, Divider, Drawer, Form, Tag } from 'antd';
+import { authApi } from 'api/authApi';
 import { nguoidungApi } from 'api/nguoidungApi';
 import { getMe, login, login_socialMedia, saveAuthInfo } from 'app/authSlice';
 import axios from 'axios';
@@ -9,6 +10,7 @@ import { switch_screenLogin } from 'pages/User/userSlice';
 import React from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
 import { FacebookLoginButton, GithubLoginButton, GoogleLoginButton } from 'react-social-login-buttons';
 import { LoginSocialFacebook, LoginSocialGithub, LoginSocialGoogle } from 'reactjs-social-login';
 import * as yup from 'yup';
@@ -30,6 +32,7 @@ let schema = yup.object().shape({
         .string().required('Email không được để trống.').email("Email không hợp lệ."),
     GIOI_TINH: yup.string().required('Giới tính không được để trống.'),
     MAT_KHAU: yup.string().required('Mật khẩu không được để trống.'),
+    MAT_KHAU_XAC_NHAN: yup.string().required('Mật khẩu xác nhận được để trống.'),
     PROVINCES: yup.string().required('Tỉnh/Thành phố không được để trống.'),
     DISTRICT: yup.string().required('Quận/Huyện không được để trống.'),
     WARDS: yup.string().required('Phường/Xã không được để trống.'),
@@ -45,7 +48,7 @@ const REDIRECT_URI = window.location.href;
 
 function Auth(props) {
 
-    const [isLoginMode, setIsLoginMode] = React.useState(true)
+    const [screenMode, setScreenMode] = React.useState('login')
     const { isVisibleScreenLogin } = useSelector(state => state.userInfo);
     const { isLoading, errorMsg } = useSelector(state => state.auth);
     const [loading, setLoading] = React.useState(false);
@@ -55,6 +58,14 @@ function Auth(props) {
     const [addressCode, setAddressCode] = React.useState({ provincesCode: null, districtCode: null })
     const [formLogin] = Form.useForm();
     const [formRegister] = Form.useForm();
+    const [formForgetPassword] = Form.useForm();
+    const [formResetPassword] = Form.useForm();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [resetPassInfo, setResetPassInfo] = React.useState();
+
+
+
+    const [stepToResetPass, setStepToResetPass] = React.useState(0);
     const dispatch = useDispatch()
 
     const onLogin = async (values) => {
@@ -172,30 +183,67 @@ function Auth(props) {
         toast.error("Có lỗi xảy ra vui lòng thử lại sau ít phút.")
     }
 
+    const handleForgetPassword = async (values, isSendMail) => {
+        try {
+            setLoading(true);
+            const data = isSendMail ? { SEND_MAIL_FLAG: isSendMail, EMAIL: values.EMAIL } : { SEND_MAIL_FLAG: isSendMail, TOKEN: resetPassInfo.TOKEN, MAT_KHAU: values.MAT_KHAU };
+            const { message, result } = await nguoidungApi.forgetPassword(data);
+            toast.success(message);
+            if (isSendMail) {
+                setStepToResetPass(1)
+            } else {
+                formLogin.resetFields();
+                await dispatch(login({ EMAIL: result.EMAIL, MAT_KHAU: values.MAT_KHAU }));
+                setScreenMode('login');
+                setStepToResetPass(0);
+                setResetPassInfo(null)
+            }
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+            console.log({ error });
+            toast.error(error.response.data.message);
+        }
+    }
+
+    React.useEffect(() => {
+        // console.log(searchParams.get('token'))
+        const action = searchParams.get('action');
+        const token = searchParams.get('token');
+        // WHEN RESET PASSWORD
+        if (action === 'resetpass') {
+            dispatch(switch_screenLogin(true));
+            setScreenMode('forgetPassword');
+            setStepToResetPass(2);
+            setResetPassInfo({ TOKEN: token })
+        }
+
+    }, [searchParams])
+
     return (
         <div className='auth-wrapper'>
             {
                 <Drawer
                     onClose={() => dispatch(switch_screenLogin(false))}
                     visible={isVisibleScreenLogin}
-                    title={isLoginMode ? 'Đăng nhập' : 'Đăng ký'}
+                    title={screenMode === 'login' ? 'Đăng nhập' : screenMode === 'register' ? 'Đăng ký' : 'Quên mật khẩu'}
                     placement="right" >
                     {/* login */}
                     {
-                        isLoginMode ?
+                        screenMode === 'login' ?
                             <Form
                                 form={formLogin}
                                 layout='vertical'
                                 onFinish={(values) => onLogin(values)}>
                                 <InputField name='EMAIL' label='Email' rules={[yupSync]} />
                                 <InputField name='MAT_KHAU' label='Mật khẩu' type='password' rules={[yupSync]} />
-                                <a>Quên mật khẩu?</a>
+                                <a onClick={() => setScreenMode('forgetPassword')}>Quên mật khẩu?</a>
                                 <ButtonCustom
                                     isLoading={isLoading.login || isLoading.getMe}
                                     type='submit'
                                     style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }}
                                     text="Đăng nhập" />
-                                <Button block style={{ marginTop: '1rem' }} onClick={() => setIsLoginMode(false)}>Đăng ký tài khoản mới</Button>
+                                <Button block style={{ marginTop: '1rem' }} onClick={() => setScreenMode('register')}>Đăng ký tài khoản mới</Button>
                                 <br />
                                 <br />
                                 <div className="group-login-social-media">
@@ -214,49 +262,92 @@ function Auth(props) {
                                         onReject={onLoginError}>
                                         <GoogleLoginButton className='btn-social-media' />
                                     </LoginSocialGoogle>
-
-                                    {/* <LoginSocialGithub
-                                        redirect_uri='http://localhost:3000/'
-                                        client_id={process.env.REACT_APP_GITHUB_CLIENT_ID || ''}
-                                        client_secret={process.env.REACT_APP_GITHUB_CLIENT_SECRET || ''}
-                                        onResolve={(values) => console.log({ values })}
-                                        allow_signup={true}
-                                        onReject={onLoginError}
-                                    >
-                                        <GithubLoginButton className='btn-social-media' /> */}
-                                    {/* </LoginSocialGithub> */}
-
                                 </div>
                             </Form> :
-                            <Form
-                                initialValues={initialValues}
-                                form={formRegister}
-                                layout='vertical'
-                                onFinish={(values) => onRegister(values)}>
-                                <InputField name='HO_TEN' label='Họ tên' rules={[yupSync]} />
-                                <InputField name='EMAIL' label='Email' rules={[yupSync]} />
-                                <InputField name='MAT_KHAU' label='Mật khẩu' type='password' rules={[yupSync]} />
-                                <InputField name='SO_DIEN_THOAI' label='Số điện thoại' rules={[yupSync]} />
+                            screenMode === 'register' ?
+                                <Form
+                                    initialValues={initialValues}
+                                    form={formRegister}
+                                    layout='vertical'
+                                    onFinish={(values) => onRegister(values)}>
+                                    <InputField name='HO_TEN' label='Họ tên' rules={[yupSync]} />
+                                    <InputField name='EMAIL' label='Email' rules={[yupSync]} />
+                                    <InputField name='MAT_KHAU' label='Mật khẩu' type='password' rules={[yupSync]} />
+                                    <InputField name='SO_DIEN_THOAI' label='Số điện thoại' rules={[yupSync]} />
 
-                                <SelectField name='GIOI_TINH' label='Giới tính' rules={[yupSync]}
-                                    options={[{ value: 'Nam', label: 'Nam' }, { value: 'Nữ', label: 'Nữ' }, { value: 'Khác', label: 'Khác' }]} />
+                                    <SelectField name='GIOI_TINH' label='Giới tính' rules={[yupSync]}
+                                        options={[{ value: 'Nam', label: 'Nam' }, { value: 'Nữ', label: 'Nữ' }, { value: 'Khác', label: 'Khác' }]} />
 
-                                <SelectField onChange={(_, options) => {
-                                    setAddressCode(prev => ({ ...prev, provincesCode: options.code, districtCode: null }))
-                                    formRegister.setFieldValue('DISTRICT', '');
-                                    formRegister.setFieldValue('WARDS', '');
-                                }} name='PROVINCES' label='Tỉnh/Thành phố' rules={[yupSync]} options={options_Provinces} />
+                                    <SelectField onChange={(_, options) => {
+                                        setAddressCode(prev => ({ ...prev, provincesCode: options.code, districtCode: null }))
+                                        formRegister.setFieldValue('DISTRICT', '');
+                                        formRegister.setFieldValue('WARDS', '');
+                                    }} name='PROVINCES' label='Tỉnh/Thành phố' rules={[yupSync]} options={options_Provinces} />
 
-                                <SelectField onChange={(_, options) => {
-                                    setAddressCode(prev => ({ ...prev, districtCode: options.code, wardsCode: null }))
-                                    formRegister.setFieldValue('WARDS', '');
-                                }} name='DISTRICT' label='Quận/Huyện' rules={[yupSync]} options={options_district} />
+                                    <SelectField onChange={(_, options) => {
+                                        setAddressCode(prev => ({ ...prev, districtCode: options.code, wardsCode: null }))
+                                        formRegister.setFieldValue('WARDS', '');
+                                    }} name='DISTRICT' label='Quận/Huyện' rules={[yupSync]} options={options_district} />
 
-                                <SelectField name='WARDS' label='Phường/Xã' rules={[yupSync]} options={options_wards} />
-                                <br />
-                                <ButtonCustom isLoading={loading} htmlType='submit' style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} text="Đăng ký" />
-                                <Button block style={{ marginTop: '1rem' }} onClick={() => setIsLoginMode(true)}>Đã có tài khoản?</Button>
-                            </Form>
+                                    <SelectField name='WARDS' label='Phường/Xã' rules={[yupSync]} options={options_wards} />
+                                    <br />
+                                    <ButtonCustom isLoading={loading} htmlType='submit' style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} text="Đăng ký" />
+                                    <Button block style={{ marginTop: '1rem' }} onClick={() => setScreenMode('login')}>Đã có tài khoản?</Button>
+                                </Form>
+                                :
+                                <>
+                                    {
+                                        stepToResetPass === 0 ?
+                                            <Form
+                                                initialValues={{ EMAIL: '' }}
+                                                form={formForgetPassword}
+                                                layout='vertical'
+                                                onFinish={(values) => handleForgetPassword(values, true)}>
+                                                <InputField name='EMAIL' label='Email khôi phục' rules={[yupSync]} />
+                                                <br />
+                                                <ButtonCustom isLoading={loading} htmlType='submit' style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} text="Lấy lại mật mẩu" />
+                                            </Form>
+                                            :
+                                            stepToResetPass === 1 ?
+                                                <Alert
+                                                    description={<span>Chúng tôi đã gửi đường dẫn để tạo lại mật khẩu mới vào email <strong>{formLogin.getFieldValue('EMAIL')}</strong>. Hãy kiểm tra email của bạn và tạo mới mật khẩu an toàn hơn nhé.</span>}
+                                                    showIcon type='success'
+                                                    message="Thông báo !"></Alert>
+                                                :
+                                                <Form
+                                                    form={formResetPassword}
+                                                    layout='vertical'
+                                                    onFinish={(values) => handleForgetPassword(values, false)}>
+                                                    <InputField name='MAT_KHAU' label='Mật khẩu mới'
+                                                        type='password'
+                                                        rules={[yupSync]} />
+                                                    <InputField
+                                                        dependencies={['MAT_KHAU']}
+                                                        name='MAT_KHAU_XAC_NHAN' label='Xác nhận mật khẩu'
+                                                        type='password'
+                                                        rules={[
+                                                            yupSync,
+                                                            ({ getFieldValue }) => ({
+                                                                validator(_, value) {
+                                                                    if (!value || getFieldValue('MAT_KHAU') === value) {
+                                                                        return Promise.resolve();
+                                                                    }
+
+                                                                    return Promise.reject(new Error('Mật khẩu xác nhận không trùng khớp.'));
+                                                                },
+                                                            }),
+                                                        ]} />
+                                                    <br />
+                                                    <ButtonCustom isLoading={loading} htmlType='submit' style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} text="Lấy lại mật mẩu" />
+                                                </Form>
+                                    }
+                                    <br />
+                                    <Button onClick={() => {
+                                        setScreenMode('login');
+                                        setStepToResetPass(0);
+                                        formLogin.resetFields();
+                                    }}>Quay lại</Button>
+                                </>
                     }
                 </Drawer>
             }

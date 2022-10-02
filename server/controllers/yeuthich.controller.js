@@ -4,7 +4,7 @@ const { randomString } = require("../utils/global");
 module.exports = {
     get_yeuthichs: async (req, res) => {
         try {
-            const sql = `SELECT a.MA_YEU_THICH,a.MA_SP,b.TEN_SP,b.GIA_BAN,b.SO_LUONG,c.HINH_ANH 
+            const sql = `SELECT a.MA_YEU_THICH,a.MA_SP,b.TEN_SP,b.GIA_BAN,b.GIA_GOC,b.SO_LUONG,c.HINH_ANH 
                         FROM YEU_THICH a, SAN_PHAM b,ANH_SAN_PHAM c 
                         WHERE a.USER_ID='${req.user.data.USER_ID}' 
                             AND a.MA_SP=b.MA_SP 

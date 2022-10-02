@@ -7,7 +7,7 @@ import SelectField from 'custom-fields/SelectField';
 import ButtonCustom from 'components/ButtonCustom';
 import './Payments.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetch_my_orders, fetch_my_vouchers, resetCart, switch_chooseAddressModal, switch_screenLogin, switch_voucherModal } from 'pages/User/userSlice';
+import { fetch_my_orders, fetch_my_vouchers, resetCart, selectVoucher, switch_chooseAddressModal, switch_screenLogin, switch_voucherModal } from 'pages/User/userSlice';
 import * as yup from 'yup';
 import { numberWithCommas } from 'assets/admin';
 import { getTotalPrice } from 'assets/common';
@@ -230,6 +230,7 @@ function Payments(props) {
                     toast.success(message);
                     dispatch(fetch_my_orders({ action: 'get_my_orders', _limit: pagination._limit, _page: pagination._page }));
                     dispatch(fetch_my_vouchers());
+                    dispatch(selectVoucher(null))
                     if (isAuth) {
                         navigate('/profile', { replace: true, state: { historyOrder: true } })
                     } else {
@@ -413,7 +414,7 @@ function Payments(props) {
                                                 <Radio.Group>
                                                     <Space direction="vertical" >
                                                         <Radio checked value='cod'>Thanh toán khi nhận hàng</Radio>
-                                                        <Radio value='zalopay_wallet'>Thanh toán ZaloPay</Radio>
+                                                        {/* <Radio value='zalopay_wallet'>Thanh toán ZaloPay</Radio> */}
                                                         <Radio value='momo_wallet'>Thanh toán Momo</Radio>
                                                     </Space>
                                                 </Radio.Group>

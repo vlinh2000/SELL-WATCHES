@@ -20,7 +20,7 @@ module.exports = {
             const processes = sukiens.map((sk, idx) => {
                 return new Promise(async (resolve, reject) => {
                     try {
-                        const sql = `SELECT MA_UU_DAI FROM SU_KIEN_UU_DAI WHERE MA_SK='${sk.MA_SK}'`
+                        const sql = `SELECT MA_UU_DAI FROM SU_KIEN_UU_DAI WHERE MA_SK='${sk.MA_SK}' `
                         const mauudais = await executeQuery(sql);
                         sukiens[idx].VOUCHERS = mauudais;
                         resolve(true);
@@ -31,7 +31,7 @@ module.exports = {
                 })
             });
 
-            await Promise.all(processes);
+            action !== 'nearest' && await Promise.all(processes);
 
             res.json({
                 result: sukiens,

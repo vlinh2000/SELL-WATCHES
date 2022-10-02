@@ -69,4 +69,8 @@ export const nguoidungApi = {
             }
         });
     },
+    forgetPassword: (data) => {
+        const url = `/nguoidungs/forget_password`;
+        return axiosClient.post(url, data);
+    }
 }

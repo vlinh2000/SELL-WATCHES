@@ -157,6 +157,10 @@ function getStatusOrderClassName(num) {
     return num == 0 ? 'status-pending' : num == 1 ? 'status-shipping' : num === 2 ? 'status-success' : 'status-fail';
 }
 
+function getStatusOrderColor(num) {
+    return num == 0 ? 'warning' : num == 1 ? '#55acee' : num === 2 ? '#87d068' : '#cd201f';
+}
+
 function formatDate(date, formart = "YYYY-MM-DD") {
     let dateFormatted;
     switch (date) {
@@ -170,4 +174,4 @@ const toggleSideBar = () => {
     document.querySelector('.admin-page').classList.toggle('toggle-bg');
 }
 
-export { getBreadcrumbFromSecond, numberWithCommas, getStatusOrder, getStatusOrderClassName, formatDate, toggleSideBar };
+export { getBreadcrumbFromSecond, numberWithCommas, getStatusOrder, getStatusOrderClassName, getStatusOrderColor, formatDate, toggleSideBar };

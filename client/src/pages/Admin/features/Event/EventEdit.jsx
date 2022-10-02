@@ -73,7 +73,7 @@ function EventEdit(props) {
         } catch (error) {
             setIsLoading(false);
             console.log({ error });
-            toast.error(error);
+            toast.error(error.response.data.message);
         }
     }
     const plainOptions = ['Apple', 'Pear', 'Orange'];

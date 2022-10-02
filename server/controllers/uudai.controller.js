@@ -41,7 +41,6 @@ module.exports = {
             const MA_UU_DAI = 'UD_' + randomString();
             const sql = `INSERT INTO UU_DAI(MA_UU_DAI,TEN_UU_DAI,SO_LUONG_BAN_DAU,SO_LUONG_CON_LAI,HSD,GIA_TRI,MPVC,DON_VI_GIAM) 
                                         VALUES ('${MA_UU_DAI}','${TEN_UU_DAI}',${SO_LUONG_BAN_DAU},${SO_LUONG_CON_LAI},'${HSD}',${GIA_TRI || 0},${MPVC},'${DON_VI_GIAM || ""}')`;
-            console.log({ sql })
             await executeQuery(sql);
             res.json({ message: 'Thêm voucher thành công.' });
         } catch (error) {
@@ -59,6 +58,7 @@ module.exports = {
 
             const data = { TEN_UU_DAI, SO_LUONG_BAN_DAU, SO_LUONG_CON_LAI, HSD, MPVC, GIA_TRI, DON_VI_GIAM }
             const sql = `UPDATE UU_DAI SET ? WHERE MA_UU_DAI='${uudaiID}'`;
+            console.log({ sql, data })
             await executeUpdateQuery(sql, data);
 
             res.json({ message: 'Cập nhật ưu đãi thành công.' });

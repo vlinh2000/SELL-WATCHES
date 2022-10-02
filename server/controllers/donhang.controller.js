@@ -4,7 +4,9 @@ const { randomString, getNow, handleMomoPayment } = require("../utils/global");
 module.exports = {
     get_donhangs: async (req, res) => {
         try {
-            const { _limit, _page, status, action, MA_SP } = req.query;
+            const { _limit, _page, action, MA_SP } = req.query;
+            let { status } = req.query;
+            console.log({ status })
             const user = req.user?.data;
 
             if (action === 'check_had_order') {
@@ -21,21 +23,21 @@ module.exports = {
                 });
             }
 
-            const sql = `SELECT a.MA_DH,a.HO_TEN_NGUOI_DAT,a.SDT_NGUOI_DAT,a.NV_ID,a.DON_VI_VAN_CHUYEN, b.HO_TEN, a.USER_ID, a.TG_DAT_HANG, a.TG_GIAO_HANG, a.DIA_CHI, a.GIAM_GIA, a.TONG_TIEN, a.TRANG_THAI, a.DA_THANH_TOAN, a.HINH_THUC_THANH_TOAN, a.PHI_SHIP, a.GHI_CHU, a.NGAY_TAO  
+            const sql = `SELECT a.MA_DH,a.HO_TEN_NGUOI_DAT,a.EMAIL_NGUOI_DAT,a.SDT_NGUOI_DAT,a.NV_ID,a.DON_VI_VAN_CHUYEN, b.HO_TEN, a.USER_ID, a.TG_DAT_HANG, a.TG_GIAO_HANG, a.DIA_CHI, a.GIAM_GIA, a.TONG_TIEN, a.TRANG_THAI, a.DA_THANH_TOAN, a.HINH_THUC_THANH_TOAN, a.PHI_SHIP, a.GHI_CHU, a.NGAY_TAO  
                         FROM DON_HANG a
                         LEFT JOIN NHAN_VIEN b ON a.NV_ID = b.NV_ID 
                         WHERE 1=1
                         ${action === 'get_my_orders' ? ` AND a.USER_ID ='${user.USER_ID}'` : ''} 
-                        ${status ? 'AND a.TRANG_THAI=' + status : ''} 
+                        ${status ? 'AND a.TRANG_THAI IN ' + JSON.parse(status)?.replace('[', '(')?.replace(']', ')') : ''} 
                         ORDER BY a.NGAY_TAO DESC ${(_page && _limit) ? ' LIMIT ' + _limit + ' OFFSET ' + _limit * (_page - 1) : ''}`;
+            console.log({ sql })
             let donhangs = await executeQuery(sql);
-
             const sql_count = `SELECT COUNT(a.MA_DH) as total 
                         FROM DON_HANG a
                         LEFT JOIN NHAN_VIEN b ON a.NV_ID = b.NV_ID 
                         WHERE 1=1
                         ${action === 'get_my_orders' ? ` AND a.USER_ID ='${user.USER_ID}'` : ''} 
-                        ${status ? 'AND a.TRANG_THAI=' + status : ''} `;
+                        ${status ? 'AND a.TRANG_THAI IN ' + JSON.parse(status)?.replace('[', '(')?.replace(']', ')') : ''} `;
             const data = await executeQuery(sql_count);
 
             // get detail (CHI_TIET_DON_HANG)
@@ -184,6 +186,7 @@ module.exports = {
                 return new Promise(async (resolve, reject) => {
                     try {
                         const sqlDetail = `INSERT INTO CHI_TIET_DON_HANG(MA_DH,MA_SP, SO_LUONG, DON_GIA,GIA,GIA_GOC) VALUES ('${MA_DH}','${sp.MA_SP}',${sp.SO_LUONG},${sp.DON_GIA},${sp.GIA},${sp.GIA_GOC})`;
+                        console.log({ sqlDetail })
                         await executeQuery(sqlDetail);
                         resolve(true);
                     } catch (error) {
@@ -195,7 +198,7 @@ module.exports = {
 
             await Promise.all(processes);
             console.log("ok")
-            const sql_delete = `DELETE FROM USER_UU_DAI WHERE USER_ID='${USER_ID}' AND MA_UU_DAI='${MA_UU_DAI}'`;
+            const sql_delete = `UPDATE USER_UU_DAI SET SU_DUNG=1 WHERE USER_ID='${USER_ID}' AND MA_UU_DAI='${MA_UU_DAI}'`;
             MA_UU_DAI && USER_ID && await executeQuery(sql_delete);
             console.log(sql_delete)
 
@@ -209,20 +212,20 @@ module.exports = {
         try {
             const { donhangID } = req.params;
             const { USER_ID, NV_ID } = req.user.data;
-            const { DA_THANH_TOAN, TRANG_THAI, action } = req.body;
-
+            const { DA_THANH_TOAN, TRANG_THAI, action, TG_GIAO_HANG } = req.body;
+            console.log(req.body)
             const isExist = await checkIsExist('DON_HANG', 'MA_DH', donhangID);
             if (!isExist) return res.status(400).json({ message: "Đơn hàng không tồn tại." });
 
             const CAP_NHAT = getNow();
             let data = {};
             if (action === 'confirm' && NV_ID) {
-                data = { TRANG_THAI: 1, CAP_NHAT, NV_ID }
+                data = { TRANG_THAI: 1, CAP_NHAT, NV_ID, TG_GIAO_HANG }
             }
-            else if (action === 'received' && USER_ID) {
-                data = { TRANG_THAI: 2, CAP_NHAT }
+            else if (action === 'received') {
+                data = { TRANG_THAI: 2, CAP_NHAT, DA_THANH_TOAN: 1 }
             }
-            else if (action === 'cancle' && USER_ID) {
+            else if (action === 'cancle') {
                 const sql_restore = `SELECT MA_SP,SO_LUONG FROM CHI_TIET_DON_HANG WHERE MA_DH='${donhangID}'`;
                 const listProductForRestore = await executeQuery(sql_restore);
 

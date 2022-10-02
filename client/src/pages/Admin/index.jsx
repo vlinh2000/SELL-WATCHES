@@ -86,7 +86,7 @@ function AdminPage(props) {
     }, [pagination.products])
 
     React.useEffect(() => {
-        dispatch(fetch_orders({ _limit: pagination.orders._limit, _page: pagination.orders._page }));
+        dispatch(fetch_orders({ _limit: pagination.orders._limit, _page: pagination.orders._page, status: JSON.stringify('[1,2,3]') }));
     }, [pagination.orders])
 
     React.useEffect(() => {
@@ -102,7 +102,7 @@ function AdminPage(props) {
     }, [])
 
     React.useEffect(() => {
-        dispatch(fetch_orders_pending({ _limit: pagination.ordersConfirm._limit, _page: pagination.ordersConfirm._page, status: 0 }));
+        dispatch(fetch_orders_pending({ _limit: pagination.ordersConfirm._limit, _page: pagination.ordersConfirm._page, status: JSON.stringify('[0]') }));
     }, [pagination.ordersConfirm])
 
     return (

@@ -16,6 +16,7 @@ Voucher.propTypes = {
     expire: PropTypes.string,
     isSaved: PropTypes.bool,
     saveAvailable: PropTypes.bool,
+    used: PropTypes.bool,
 };
 Voucher.defaultProps = {
     mode: 'refer',
@@ -23,11 +24,12 @@ Voucher.defaultProps = {
     name: '',
     expire: '',
     isSaved: false,
-    saveAvailable: false
+    saveAvailable: false,
+    used: false,
 };
 
 function Voucher(props) {
-    const { mode, id, name, expire, isSaved, saveAvailable } = props;
+    const { mode, id, name, expire, isSaved, saveAvailable, used } = props;
     const dispatch = useDispatch();
     const handleSave = async () => {
         try {
@@ -45,9 +47,9 @@ function Voucher(props) {
                 <TagsOutlined />
             </div>
             <div className="voucher-body">
-                <div className='name'>{name}</div>
+                <div className='name'>{name} {used ? <small>(đã dùng)</small> : ''}</div>
                 <div className='code'>Mã: {id}</div>
-                <div className='description'>HSD: {expire && moment(expire).format('DD-MM-YYYY')}</div>
+                <div className='description'>HSD: {expire && moment(expire).format('DD-MM-YYYY HH:mm:ss')}</div>
             </div>
             {
                 mode !== 'refer' &&
