@@ -88,7 +88,6 @@ function UserPage(props) {
                 clearTimeout(idTimeout);
             }, 1000);
         }
-
     }, [searchParams])
 
     return (

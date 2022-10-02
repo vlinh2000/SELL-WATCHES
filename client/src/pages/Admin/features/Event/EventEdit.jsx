@@ -76,7 +76,6 @@ function EventEdit(props) {
             toast.error(error.response.data.message);
         }
     }
-    const plainOptions = ['Apple', 'Pear', 'Orange'];
 
     React.useEffect(() => {
         const fetchData = async () => {
