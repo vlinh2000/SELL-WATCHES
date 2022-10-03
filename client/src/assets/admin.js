@@ -75,9 +75,14 @@ function getBreadcrumbFromSecond(path) {
             key = "771";
             break;
         }
+        case '/admin/vouchers/give': {
+            paths = ['Quản lý ưu đãi', 'Tặng mã ưu đãi'];
+            key = "772";
+            break;
+        }
         case '/admin/vouchers/view': {
             paths = ['Quản lý ưu đãi', 'Danh sách ưu đãi'];
-            key = "772";
+            key = "773";
             break;
         }
         case '/admin/brands/edit': {

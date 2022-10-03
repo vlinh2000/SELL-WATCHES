@@ -34,6 +34,7 @@ import SupplierEdit from './features/Supplier/sub-pages';
 import User from './features/User';
 import Voucher from './features/Voucher';
 import VoucherEdit from './features/Voucher/VoucherEdit';
+import VoucherGive from './features/Voucher/VoucherGive';
 
 AdminPage.propTypes = {
 
@@ -162,12 +163,12 @@ function AdminPage(props) {
                             </Route>
                             <Route path='/vouchers'>
                                 <Route path='view' element={<Voucher />}></Route>
+                                <Route path='give' element={<VoucherGive />}></Route>
                                 <Route path='edit' element={<VoucherEdit />}></Route>
                             </Route>
                             <Route path='/rules'>
                                 <Route path='view' element={<Rule />}></Route>
                                 <Route path='edit' element={<RuleEdit />}></Route>
-                                {/* <Route path='edit_rule_employee' element={<RuleEmployeeEdit />}></Route> */}
                             </Route>
                             <Route path='/revenues'>
                                 <Route path='view' element={<RevenueReport />}></Route>

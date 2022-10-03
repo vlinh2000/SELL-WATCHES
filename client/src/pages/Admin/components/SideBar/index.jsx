@@ -63,7 +63,8 @@ function SideBar(props) {
         ]),
         'ROLE_QLUD': getItem('Quản lý ưu đãi', '7', <ClusterOutlined />, [
             getItem('Cập nhật ưu đãi', '771', <Link to="/admin/vouchers/edit"></Link>),
-            getItem('Danh sách ưu đãi', '772', <Link to="/admin/vouchers/view"></Link>),
+            getItem('Tặng mã ưu đãi', '772', <Link to="/admin/vouchers/give"></Link>),
+            getItem('Danh sách ưu đãi', '773', <Link to="/admin/vouchers/view"></Link>),
         ]),
         'ROLE_QLTH': getItem('Quản lý thương hiệu', '8', <VideoCameraOutlined />, [
             getItem('Cập nhật thương hiệu', '881', <Link to="/admin/brands/edit"></Link>),
