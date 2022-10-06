@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { numberWithCommas } from 'assets/admin';
 import { getTotalPrice } from 'assets/common';
 import { changeQuantityInCart, removeFromCart } from 'pages/User/userSlice';
+import Title from 'components/Title';
 
 Cart.propTypes = {
 
@@ -22,9 +23,10 @@ function Cart(props) {
     const navigate = useNavigate();
     return (
         <div className='wrapper-content'>
+            <Title style={{ fontSize: 20 }}>Giỏ hàng</Title>
             <div className="cart">
                 <Row gutter={[30, 0]}>
-                    <Col xs={24} sm={24} md={24} lg={16}>
+                    <Col xs={24} sm={24} md={24} lg={24} xl={16}>
                         <table>
                             <thead>
                                 <tr>
@@ -84,7 +86,7 @@ function Cart(props) {
                         <br />
                         <br />
                     </Col>
-                    <Col xs={24} sm={24} md={24} lg={8}>
+                    <Col xs={24} sm={24} md={24} lg={24} xl={8}>
                         <div className='title-custom'>Tổng số lượng</div>
                         <div>
                             {/* <div className='category-label'>

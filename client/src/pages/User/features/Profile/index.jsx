@@ -18,6 +18,7 @@ import { getStatusOrder, numberWithCommas } from 'assets/admin';
 import moment from 'moment';
 import HistoryOrder from 'pages/User/components/HistoryOrder';
 import { resetCart } from 'pages/User/userSlice';
+import Title from 'components/Title';
 
 Profile.propTypes = {
 
@@ -86,6 +87,8 @@ function Profile(props) {
 
     return (
         <div className='wrapper-content'>
+            {/* <Title style={{ fontSize: 20 }}>Thông tin cá nhân</Title> */}
+
             <div className="profile">
                 <Tabs tabPosition='left' defaultActiveKey={defaultActiveKey}>
                     <Tabs.TabPane

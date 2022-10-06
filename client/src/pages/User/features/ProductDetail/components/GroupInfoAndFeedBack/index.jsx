@@ -106,7 +106,7 @@ function GroupInfoAndFeedBack(props) {
             <Tabs defaultActiveKey={defaultActiveKey} onChange={onChange}>
                 <Tabs.TabPane tab="Thông tin bổ sung & Chính sách bảo hành" key="1">
                     <Row justify='space-between'>
-                        <Col xs={24} sm={24} md={12} lg={11}>
+                        <Col xs={24} sm={24} md={24} lg={11}>
                             <ul className="group-info">
                                 <li className="group-info-item">
                                     <span className='info-name'>bộ máy & năng lượng</span>
@@ -120,10 +120,10 @@ function GroupInfoAndFeedBack(props) {
                                     <span className='info-name'>CHẤT LIỆU MẶT KÍNH</span>
                                     <span className='info-value'>{product.CHAT_LIEU_MAT_KINH}</span>
                                 </li>
-                                {/* <li className="group-info-item">
-                                    <span className='info-name'>GIỚI TÍNH</span>
-                                    <span className='info-value'>{product.PIN}</span>
-                                </li> */}
+                                <li className="group-info-item">
+                                    <span className='info-name'>LOẠI SẢN PHẨM</span>
+                                    <span className='info-value'>{product.TEN_LOAI_SP}</span>
+                                </li>
                                 <li className="group-info-item">
                                     <span className='info-name'>HÌNH DẠNG MẶT SỐ</span>
                                     <span className='info-value'>{product.HINH_DANG_MAT_SO}</span>
@@ -151,7 +151,7 @@ function GroupInfoAndFeedBack(props) {
 
                             </ul>
                         </Col>
-                        <Col xs={24} sm={24} md={12} lg={12}>
+                        <Col xs={24} sm={24} md={24} lg={12}>
                             <p className='category-name'>Chính sách bảo hành của riêng mỗi hãng:</p>
                             <ul className='list-info'>
 

@@ -14,7 +14,7 @@ function Footer(props) {
         <div className='footer'>
             <div className="footer__main">
                 <Row>
-                    <Col className="footer-col" xs={24} sm={24} md={12} lg={6}>
+                    <Col className="footer-col" xs={24} sm={24} md={12} lg={12} xl={6}>
                         <h1>Tổng đài</h1>
                         <ul>
                             <li>
@@ -35,7 +35,7 @@ function Footer(props) {
                         </ul>
                     </Col>
 
-                    <Col className="footer-col" xs={24} sm={24} md={12} lg={5}>
+                    <Col className="footer-col" xs={24} sm={24} md={12} lg={12} xl={5}>
                         <h1>Liên kết</h1>
                         <ul>
                             <li>
@@ -56,7 +56,7 @@ function Footer(props) {
                         </ul>
                     </Col>
 
-                    <Col className="footer-col" xs={24} sm={24} md={12} lg={6}>
+                    <Col className="footer-col" xs={24} sm={24} md={12} lg={12} xl={5}>
                         <h1>Hổ trợ</h1>
                         <ul>
                             <li>
@@ -77,7 +77,7 @@ function Footer(props) {
                         </ul>
                     </Col>
 
-                    <Col className="footer-col" xs={24} sm={24} md={12} lg={7}>
+                    <Col className="footer-col" xs={24} sm={24} md={12} lg={12} xl={7}>
                         <h1>Thông tin liên hệ</h1>
                         <ul>
                             <li>

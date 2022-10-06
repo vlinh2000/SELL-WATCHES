@@ -10,7 +10,7 @@ import ListProducts from '../Home/Components/ListProducts';
 import { sanphamApi } from 'api/sanphamApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { onFilter, onSearch, onSort, savePagination } from 'pages/User/userSlice';
-import { SearchOutlined } from '@ant-design/icons';
+import { BarsOutlined, CloseCircleOutlined, SearchOutlined } from '@ant-design/icons';
 
 ProductByCategory.propTypes = {
 
@@ -70,6 +70,7 @@ function ProductByCategory(props) {
                 setTotalProduct(totalRecord)
                 dispatch(savePagination({ screen: 'productByCategoryScreen', _page: pagination._page, _totalPage: Math.ceil(totalRecord / pagination._limit) }))
                 setLoading(false);
+                document.querySelector('.navbar-list').scrollIntoView({ behavior: 'smooth' });
             } catch (error) {
                 setLoading(false);
                 console.log({ error });
@@ -82,11 +83,20 @@ function ProductByCategory(props) {
     const favouriteList_ID = useMemo(() => favouriteList?.map(f => f.MA_SP), [favouriteList])
     const productInCartList_ID = useMemo(() => cart?.map(f => f.MA_SP), [cart])
 
+    const toggleSideBar = (isShow) => {
+        console.log("chayj")
+        document.querySelector('body').style.overflowY = isShow ? 'hidden' : 'auto';
+        document.querySelector('.side-bar-wrapper').style.transform = isShow ? 'translateX(0)' : 'translateX(-200%)';
+        document.querySelector('.side-bar-wrapper .close-btn').style.display = isShow ? 'block' : 'none';
+
+    }
 
     return (
         <div className='product-by-category'>
+            <BarsOutlined onClick={() => toggleSideBar(true)}
+                className='menu-btn' />
             <Row gutter={[40, 0]}>
-                <Col xs={24} sm={24} md={9} lg={7}>
+                <Col lg={8} xl={7} className="side-bar-wrapper">
                     <div className="side-bar-user">
                         <BreadcrumbCustom more='Danh mục' />
                         <div className="list-filter-item">
@@ -96,9 +106,11 @@ function ProductByCategory(props) {
                             <FilterItem title="Chất liệu dây" name='CHAT_LIEU_DAY' listItem={ropeMaterial} />
                             <FilterItem title="Hình dạng mặt số" name='HINH_DANG_MAT_SO' listItem={dialShape} />
                         </div>
+                        <CloseCircleOutlined onClick={() => toggleSideBar(false)}
+                            className='close-btn' />
                     </div>
                 </Col>
-                <Col xs={24} sm={24} md={15} lg={17}>
+                <Col xs={24} sm={24} md={24} lg={16} xl={17}>
                     <Form
                         initialValues={{ sortBy: 'NGAY_TAO-DESC' }}
                         onValuesChange={values => {
@@ -139,8 +151,6 @@ function ProductByCategory(props) {
                     }
                 </Col>
             </Row>
-
-
         </div>
     );
 }

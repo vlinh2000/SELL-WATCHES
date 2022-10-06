@@ -19,7 +19,6 @@ Header.propTypes = {
 
 function CartInfo(props) {
     const { productList } = props;
-    console.log({ productList })
     const dispatch = useDispatch();
     return (
         <div className='cart-info'>
@@ -54,7 +53,9 @@ function CartInfo(props) {
                 {/* <div>...</div> */}
                 <strong className='total-price-title'>Tổng tiền:</strong> <strong className='total-price-num'>{numberWithCommas(getTotalPrice(productList, 'GIA_BAN', 'SL_TRONG_GIO'))}&nbsp;₫</strong>
             </div>
-            <Link className='btnCustom' style={{ backgroundColor: '#c89979' }} to="/cart">Xem giỏ hàng</Link>
+            <Link className='btnCustom'
+                // style={{ backgroundColor: '#c89979' }}
+                to="/cart">Xem giỏ hàng</Link>
             <Link className='btnCustom' to="/payments">Thanh toán</Link>
         </div>
     );

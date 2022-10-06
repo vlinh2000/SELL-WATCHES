@@ -23,7 +23,7 @@ function Contact(props) {
 
                 <div className="shop-info">
                     <Row>
-                        <Col xs={24} sm={24} md={8} lg={8}>
+                        <Col xs={24} sm={24} md={12} lg={8}>
                             <div className="info-wrapper">
                                 <div className="icon">
                                     <EnvironmentFilled />
@@ -34,7 +34,7 @@ function Contact(props) {
                                 </div>
                             </div>
                         </Col>
-                        <Col xs={24} sm={24} md={8} lg={8}>
+                        <Col xs={24} sm={24} md={12} lg={8}>
                             <div className="info-wrapper">
                                 <div className="icon">
                                     <PhoneFilled />
@@ -47,7 +47,7 @@ function Contact(props) {
                                 </div>
                             </div>
                         </Col>
-                        <Col xs={24} sm={24} md={8} lg={8}>
+                        <Col xs={24} sm={24} md={12} lg={8}>
                             <div className="info-wrapper">
                                 <div className="icon">
                                     <MailOutlined />

@@ -2,10 +2,21 @@
     width: 80%;
     margin: 2rem auto;
     min-height: 60vh;
+    position: relative;
+
+    .menu-btn{
+        color: #000;
+        font-size: 20px;
+        margin: 5px;
+        padding: 5px 10px;
+        border: 1px solid #555;
+        border-radius: 5px;
+        display: none;
+    }
 
     .side-bar-user{
         padding-right: 10px;
-        width: 300px;
+        // width: 300px;
         height: 100vh;
         position: -webkit-sticky;
         position: sticky;
@@ -14,30 +25,77 @@
         z-index: 99999;
         overflow-y: auto;
         overflow-x: hidden;
+
+        .close-btn{
+            display: none;
+        }
     }
     
     .list-filter-item{
-        margin-top: 3rem;
+        margin-top: 2rem;
     }
     
 }
 
-
-@media only screen and (max-width: 800px) {
-  
-    .breadcrumb-custom{
-        a{
-            font-size: 11px!important;
-        }
-    }
-
-  }
-
-@media only screen and (max-width: 663px) {
+@media only screen and (max-width: 913px) {
   
     .list-filter-item{
         margin-top: 1rem!important;
     }
 
+    .product-by-category{
+        width: 100%;
+        padding: 10px 5px;
+        margin: 0;
+
+        .menu-btn{
+            display: inline-block;
+        }
+        
+        .side-bar-user{
+            width: 95%;
+            height: 75vh;
+            position: relative;
+            padding: 10px;
+            border-radius: 3px;
+            box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+
+            .close-btn{
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                color: #555;
+                font-size: 20px;
+                display: block;
+            }
+        }
+    }
+
+    
+
+    .side-bar-wrapper{
+        position: absolute;
+        transform: translateX(-200%);
+        z-index: 999;
+        width: 100%;
+        height: 100vh;
+        padding-top: 1rem;
+        padding-left:0 !important;
+        top: 0;
+        left: 0;
+        transform: translateX(0);
+        background-color: rgba(0,0,0,0.6);
+        transition: transform 200ms ease-in-out;
+
+        
+    }
+
   }
 
+  @media only screen and (min-width: 914px) {
+    .side-bar-wrapper{
+        position: static;
+        transform: translateX(0)!important;
+    }
+
+  }

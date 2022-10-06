@@ -23,9 +23,10 @@ module.exports = {
                 });
             }
 
-            const sql = `SELECT a.MA_DH,a.HO_TEN_NGUOI_DAT,a.EMAIL_NGUOI_DAT,a.SDT_NGUOI_DAT,a.NV_ID,a.DON_VI_VAN_CHUYEN, b.HO_TEN, a.USER_ID, a.TG_DAT_HANG, a.TG_GIAO_HANG, a.DIA_CHI, a.GIAM_GIA, a.TONG_TIEN, a.TRANG_THAI, a.DA_THANH_TOAN, a.HINH_THUC_THANH_TOAN, a.PHI_SHIP, a.GHI_CHU, a.NGAY_TAO  
+            const sql = `SELECT a.MA_DH,a.HO_TEN_NGUOI_DAT,a.EMAIL_NGUOI_DAT,a.SDT_NGUOI_DAT,a.NV_ID,a.DON_VI_VAN_CHUYEN, b.HO_TEN, a.USER_ID, a.TG_DAT_HANG, a.TG_GIAO_HANG, a.DIA_CHI, a.GIAM_GIA, a.TONG_TIEN, a.TRANG_THAI, a.DA_THANH_TOAN, a.HINH_THUC_THANH_TOAN, a.PHI_SHIP, a.GHI_CHU, a.NGAY_TAO,c.MA_UU_DAI,c.TEN_UU_DAI,c.MPVC 
                         FROM DON_HANG a
                         LEFT JOIN NHAN_VIEN b ON a.NV_ID = b.NV_ID 
+                        LEFT JOIN UU_DAI c ON a.MA_UU_DAI = c.MA_UU_DAI 
                         WHERE 1=1
                         ${action === 'get_my_orders' ? ` AND a.USER_ID ='${user.USER_ID}'` : ''} 
                         ${status ? 'AND a.TRANG_THAI IN ' + JSON.parse(status)?.replace('[', '(')?.replace(']', ')') : ''} 

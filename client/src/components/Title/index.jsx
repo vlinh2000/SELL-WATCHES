@@ -7,11 +7,11 @@ Title.propTypes = {
 };
 
 function Title(props) {
-    const { animation } = props;
+    const { animation, style } = props;
 
     return (
         <div data-aos={animation || ''} className='title'>
-            <h2>
+            <h2 style={style}>
                 {props.children}
             </h2>
         </div>

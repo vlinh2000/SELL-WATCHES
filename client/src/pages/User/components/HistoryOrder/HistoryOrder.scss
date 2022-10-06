@@ -2,12 +2,12 @@
     margin-bottom: 2.5rem;
     .statistical{
         text-align: center;
-        font-size: 18px;
+        font-size: 16px;
 
         .statistical-text{
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
-            text-transform: uppercase;
+            // text-transform: uppercase;
         }
     }
 
@@ -24,6 +24,7 @@
         font-size: 10px;
         font-weight: bold;
         border-radius: 5px;
+        white-space: nowrap;
     }
     .status-pending{
         padding: 5px 10px;
@@ -32,6 +33,7 @@
         font-size: 10px;
         font-weight: bold;
         border-radius: 5px;
+        white-space: nowrap;
     }
     .status-fail{
         padding: 5px 10px;
@@ -40,6 +42,7 @@
         font-size: 10px;
         font-weight: bold;
         border-radius: 5px;
+        white-space: nowrap;
     }
 
     .status-shipping{
@@ -49,6 +52,11 @@
         font-size: 10px;
         font-weight: bold;
         border-radius: 5px;
+        white-space: nowrap;
+    }
+
+    .ant-collapse-header-text{
+        font-size: 13px;
     }
 
     &__item{
@@ -102,6 +110,7 @@
                     
                     a{
                         color: #333;
+                        font-size: 13px;
                     }
 
                 }

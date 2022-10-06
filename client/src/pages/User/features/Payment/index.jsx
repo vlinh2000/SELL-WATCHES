@@ -311,13 +311,13 @@ function Payments(props) {
                     </div> */}
                     <div className="main-content">
                         <Row gutter={[30, 0]}>
-                            <Col xs={24} sm={24} md={10} lg={12}>
+                            <Col xs={24} sm={24} md={24} lg={10} xl={12}>
                                 <div className="left-side">
                                     <h1>Thông tin thanh toán</h1>
 
                                     <InputField name='HO_TEN' label='Họ tên' required rules={[yupSync]} />
                                     <InputField name='SO_DIEN_THOAI' label='Số điện thoại' required rules={[yupSync]} />
-                                    <InputField name='EMAIL' label='Địa chỉ email' required rules={[yupSync]} />
+                                    <InputField name='EMAIL' label='Email' required rules={[yupSync]} />
                                     {
                                         !isAuth &&
                                         <>
@@ -364,7 +364,7 @@ function Payments(props) {
                                 </div>
                             </Col>
 
-                            <Col xs={24} sm={24} md={14} lg={12}>
+                            <Col xs={24} sm={24} md={24} lg={14} xl={12}>
                                 <div className="right-side">
                                     <h1>Đơn hàng của bạn</h1>
                                     <div className='title-custom'>
@@ -377,9 +377,9 @@ function Payments(props) {
                                                 <div key={idx} className='category-label'>
                                                     <span className='category-label-key' style={{ whiteSpace: 'nowrap' }}>
                                                         <span className='name'>{product?.TEN_SP}</span>&nbsp;
-                                                        <strong >x {product?.SL_TRONG_GIO}</strong>
+                                                        <span > ~ x{product?.SL_TRONG_GIO}</span>
                                                     </span>
-                                                    <strong className='category-label-value'>{numberWithCommas(product.SL_TRONG_GIO * product.GIA_BAN)} ₫</strong>
+                                                    <span className='category-label-value'>{numberWithCommas(product.SL_TRONG_GIO * product.GIA_BAN)} ₫</span>
                                                 </div>
                                             )
                                         }
@@ -405,17 +405,13 @@ function Payments(props) {
                                         <br />
 
                                         <div>
-                                            <div style={{
-                                                fontSize: 14,
-                                                fontWeight: 500,
-                                                marginBottom: 10
-                                            }}>Phương thức thanh toán</div>
+                                            <div className='title-custom'>Phương thức thanh toán</div>
                                             <Form.Item name="HINH_THUC_THANH_TOAN">
                                                 <Radio.Group>
                                                     <Space direction="vertical" >
-                                                        <Radio checked value='cod'>Thanh toán khi nhận hàng</Radio>
+                                                        <Radio checked value='cod'>Thanh toán khi nhận hàng (COD)</Radio>
                                                         {/* <Radio value='zalopay_wallet'>Thanh toán ZaloPay</Radio> */}
-                                                        <Radio value='momo_wallet'>Thanh toán Momo</Radio>
+                                                        <Radio value='momo_wallet'>Thanh toán Momo (MOMO_WALLET)</Radio>
                                                     </Space>
                                                 </Radio.Group>
                                             </Form.Item>
@@ -423,13 +419,9 @@ function Payments(props) {
                                         {
                                             isAuth &&
                                             <div>
-                                                <div className='category-label' style={{ border: 0 }}>
+                                                <div className='category-label title-custom' style={{ border: 0 }}>
                                                     <span className='category-label-key'>
-                                                        <div style={{
-                                                            fontSize: 14,
-                                                            fontWeight: 500,
-                                                            marginBottom: 10
-                                                        }}>Địa chỉ giao hàng </div>
+                                                        <div >Địa chỉ giao hàng </div>
                                                     </span>
                                                     <strong className='category-label-value'>
                                                         <a onClick={() => dispatch(switch_chooseAddressModal(true))}>

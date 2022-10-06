@@ -10,6 +10,7 @@ import { numberWithCommas } from 'assets/admin';
 import { addToCart, fetch_favouriteList } from 'pages/User/userSlice';
 import toast from 'react-hot-toast';
 import { yeuthichApi } from 'api/yeuthichApi';
+import Title from 'components/Title';
 
 WishList.propTypes = {
 
@@ -38,11 +39,12 @@ function WishList(props) {
     }
     return (
         <div className='wrapper-content'>
+            <Title style={{ fontSize: 20 }}>Sản phẩm yêu thích</Title>
             <div className="wishlist">
                 {
                     favouriteList?.length < 1 ? <p>Bạn chưa thêm sản phẩm nào vào giỏ hàng.&nbsp;<Link to="/">Về trang chủ</Link></p>
                         :
-                        <table width="100%">
+                        <table >
                             <thead>
                                 <tr>
                                     <th></th>

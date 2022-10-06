@@ -127,6 +127,7 @@ async function handleMomoPayment(data) {
         lang: 'en'
     });
     //Create the HTTPS objects
+    console.log({ requestBody })
     const axios = require('axios');
     const axiosInstance = axios.create({
         baseURL: 'https://test-payment.momo.vn',

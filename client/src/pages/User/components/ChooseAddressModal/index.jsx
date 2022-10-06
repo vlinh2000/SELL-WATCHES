@@ -8,6 +8,7 @@ import { DeleteOutlined, EditOutlined, PlusSquareOutlined } from '@ant-design/ic
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { diachighApi } from 'api/diachighApi';
+import './ChooseAddressModal.scss';
 
 ChooseAddressModal.propTypes = {
     addressList: PropTypes.array,
@@ -203,7 +204,8 @@ function ChooseAddressModal(props) {
         <div>
             {/* choose address modal */}
             <Modal
-                width={700}
+                className='choose-address-modal'
+                width={900}
                 title="Cập nhật địa chỉ giao hàng"
                 visible={isVisibleChooseAddressModal}
                 onCancel={() => dispatch(switch_chooseAddressModal(false))}
