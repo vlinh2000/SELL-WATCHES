@@ -36,33 +36,29 @@ module.exports = {
                         ${(_page && _limit) ? ' LIMIT ' + _limit + ' OFFSET ' + _limit * (_page - 1) : ''}`;
             let danhgias = await executeQuery(sql);
 
-
-
-
             const sql_count = `SELECT COUNT(a.MA_DG) as total 
                                 FROM DANH_GIA a, USER b 
                                 WHERE
                                     a.USER_ID = b.USER_ID AND MA_SP='${MA_SP}'`;
             const data = await executeQuery(sql_count);
 
-            // save img to database
-            const getAllResponseOfFeedBack = danhgias.map((f, idx) => {
-                return new Promise(async (resolve, reject) => {
-                    try {
-                        const sql = `SELECT * FROM PHAN_HOI WHERE MA_DG='${f.MA_DG}'`;
-                        const phanhois = await executeQuery(sql);
-                        danhgias[idx].PHAN_HOI = phanhois;
-                        resolve(true);
+            // const getAllResponseOfFeedBack = danhgias.map((f, idx) => {
+            //     return new Promise(async (resolve, reject) => {
+            //         try {
+            //             const sql = `SELECT * FROM PHAN_HOI WHERE MA_DG='${f.MA_DG}'`;
+            //             const phanhois = await executeQuery(sql);
+            //             danhgias[idx].PHAN_HOI = phanhois;
+            //             resolve(true);
 
-                        console.log({ status: 'Done: ' + f.MA_DG })
-                    } catch (error) {
-                        console.log({ error })
-                        reject(error);
-                    }
-                })
-            });
+            //             console.log({ status: 'Done: ' + f.MA_DG })
+            //         } catch (error) {
+            //             console.log({ error })
+            //             reject(error);
+            //         }
+            //     })
+            // });
 
-            await Promise.all(getAllResponseOfFeedBack);
+            // await Promise.all(getAllResponseOfFeedBack);
             res.json({
                 result: danhgias,
                 totalRecord: data[0].total,
@@ -90,6 +86,7 @@ module.exports = {
     },
     post_danhgias: async (req, res) => {
         try {
+            console.log(req.body)
             const { MA_SP, NOI_DUNG, SO_SAO } = req.body;
             const { USER_ID } = req.user.data;
 

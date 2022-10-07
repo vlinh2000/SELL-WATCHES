@@ -1,14 +1,13 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import { Col, Row, Tag } from 'antd';
+import { sukienApi } from 'api/sukienApi';
+import { uudaiApi } from 'api/uudaiApi';
 import { BANNER_GIVE_VOUCHER } from 'constants/commonContants';
-import './EventUI.scss';
-import { Col, Divider, Row, Tag } from 'antd';
+import moment from 'moment';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import CountDownTimer from '../CountDownTimer';
 import Voucher from '../Voucher';
-import { uudaiApi } from 'api/uudaiApi';
-import moment from 'moment';
-import { sukienApi } from 'api/sukienApi';
-import { useSelector } from 'react-redux';
+import './EventUI.scss';
 EventUI.propTypes = {
 
 };
@@ -94,8 +93,9 @@ function EventUI(props) {
                 <Row>
                     <Col xs={24} sm={16} md={16} lg={16}>
                         <div className='main-info'>
-                            <img src={BANNER_GIVE_VOUCHER} />
+                            <img alt='voucher-img' src={BANNER_GIVE_VOUCHER} />
                             <div className='more-info'>
+                                <div>Tên sự kiện: <strong>{eventNearest?.TEN_SK}</strong></div>
                                 <div>Thời gian: <strong>{moment(eventNearest?.TG_BAT_DAU).format('DD-MM-YYYY')}</strong> đến <strong>{moment(eventNearest?.TG_KET_THUC).format('DD-MM-YYYY')}</strong></div>
                                 <div>Khung giờ: {moment('2022-1-1 ' + eventNearest?.KHUNG_GIO_TU).format('HH:mm:ss')} đến {moment('2022-1-1 ' + eventNearest?.KHUNG_GIO_DEN).format('HH:mm:ss')}</div>
                                 <i>Lưu ý: Chỉ áp dụng đối với KH đã mua hàng bên web</i>

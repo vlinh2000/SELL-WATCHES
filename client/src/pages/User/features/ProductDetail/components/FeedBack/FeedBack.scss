@@ -2,4 +2,21 @@
     .replyTo{
         color: rgb(67, 67, 149);
     }
+
+    .ant-comment-inner {
+        padding-bottom: 0;
+    }
+    .ant-comment-actions{
+        margin-top: 3px;
+        margin-bottom: 5px;
+    }
+
+    .ant-collapse-header-text{
+        // color: #3f51b5;
+        // font-size: 12px;
+    }
+
+    .ant-collapse-borderless > .ant-collapse-item > .ant-collapse-content{
+        background-color: #FFF;
+    }
 }

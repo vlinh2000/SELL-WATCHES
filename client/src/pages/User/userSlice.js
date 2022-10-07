@@ -79,6 +79,7 @@ const initialState = {
         statisticalMyOrders: [0, 0, 0, 0]
     },
     cart: [],
+    productInCartListID: [],
     payments: {},
     groupFilter: {},
     sortBy: {},
@@ -122,15 +123,18 @@ const userPage = createSlice({
                 const currentProduct = state.cart[index];
                 state.cart[index] = { ...currentProduct, SL_TRONG_GIO: currentProduct.SL_TRONG_GIO + (quantity || 1) }
             }
+            state.productInCartListID = state.cart.map(e => e.MA_SP);
         },
         removeFromCart: (state, action) => {
             const id = action.payload;
             const index = state.cart.findIndex((sp) => sp.MA_SP === id);
             if (index === -1) return;
             state.cart.splice(index, 1);
+            state.productInCartListID = state.cart.map(e => e.MA_SP);
         },
         resetCart: (state, action) => {
             state.cart = [];
+            state.productInCartListID = [];
         },
         changeQuantityInCart: (state, action) => {
             const { id, quantity } = action.payload
@@ -169,11 +173,8 @@ const userPage = createSlice({
         },
         [fetch_favouriteList.fulfilled]: (state, action) => {
             state.loading.favouriteList = false;
-            // state.data.favouriteList = action.payload.result.map((e, idx) => ({ ...e, key: idx }));
             state.data.favouriteList = action.payload.result;
-            // const totalRecord = action.payload.totalRecord;
-            // state.pagination.favouriteList._totalRecord = totalRecord;
-            // state.pagination.favouriteList._totalPage = Math.ceil(totalRecord / state.pagination.favouriteList._limit);
+            state.data.favouriteListID = action.payload.result.map(e => e.MA_SP);
         },
         [fetch_favouriteList.rejected]: (state, action) => {
             state.loading.favouriteList = false;

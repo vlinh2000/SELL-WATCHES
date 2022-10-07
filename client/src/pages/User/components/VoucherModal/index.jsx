@@ -1,15 +1,11 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Divider, Empty, Modal, Radio, Space } from 'antd';
 import { selectVoucher, switch_voucherModal } from 'pages/User/userSlice';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import SelectField from 'custom-fields/SelectField';
-import { Button, Divider, Form, Modal, Popconfirm, Radio, Space, Table } from 'antd';
-import { DeleteOutlined, EditOutlined, PlusSquareOutlined } from '@ant-design/icons';
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import { diachighApi } from 'api/diachighApi';
 import Voucher from '../Voucher';
-import { uudaiApi } from 'api/uudaiApi';
+import './VoucherModal.scss';
 
 VoucherModal.propTypes = {
     addressList: PropTypes.array,
@@ -22,12 +18,9 @@ VoucherModal.defaultProps = {
 };
 
 function VoucherModal(props) {
-    const { addressList: defaultList, onReload } = props;
-    const { user, data: { myVouchers } } = useSelector(state => state.userInfo);
+    const { data: { myVouchers } } = useSelector(state => state.userInfo);
     const dispatch = useDispatch();
     const { isVisibleVoucherModal } = useSelector(state => state.userInfo)
-    const [isLoading, setIsLoading] = React.useState(false);
-    const [voucherList, setVoucherList] = React.useState([]);
     const [voucherSelected, setVoucherSelected] = React.useState('');
 
     // React.useEffect(() => {
@@ -58,6 +51,12 @@ function VoucherModal(props) {
                 onOk={handleChoose}
                 visible={isVisibleVoucherModal}
                 onCancel={() => dispatch(switch_voucherModal(false))}>
+                {
+                    myVouchers?.length < 1 && <>
+                        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+
+                    </>
+                }
                 <Radio.Group onChange={({ target }) => setVoucherSelected(myVouchers[target.value])}>
                     <Space style={{ width: '100%' }} direction="vertical">
                         {
@@ -67,6 +66,15 @@ function VoucherModal(props) {
                         }
                     </Space>
                 </Radio.Group>
+                <Divider />
+                <div className='tips-get-voucher-wrapper'>
+                    <div className='tips-get-voucher-wrapper__title'><QuestionCircleOutlined /> Mẹo nhận voucher của shop:</div>
+                    <ol className='tips-get-voucher-wrapper__list'>
+                        <li>Tham gia sự kiện săn voucher hàng tháng.</li>
+                        <li>Mua hàng ủng hộ shop để có cơ hội được tặng ngẫu nhiên qua email.</li>
+                        <li>Nhắn anh Linh bên facebook để được trao tận tay.</li>
+                    </ol>
+                </div>
             </Modal>
         </div >
     );

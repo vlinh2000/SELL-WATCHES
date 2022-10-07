@@ -60,10 +60,10 @@ function FilterItem(props) {
                         onChange={handleFilter}>
                         <Space style={{ width: "100%" }} direction="vertical">
                             {
-                                listItem.map((item, idx) => <Checkbox key={idx} value={item.id} className='item'>
+                                listItem.map((item, idx) => item.label ? <Checkbox key={idx} value={item.id} className='item'>
                                     <span>{item.label}</span>
                                     <span className='quantity'>({item.quantity})</span>
-                                </Checkbox>)
+                                </Checkbox> : <></>)
                             }
 
                         </Space>

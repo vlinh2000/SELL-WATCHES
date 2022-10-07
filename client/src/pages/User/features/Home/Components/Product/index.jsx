@@ -1,16 +1,14 @@
-import { DotChartOutlined, EyeFilled, EyeOutlined, EyeTwoTone, HeartFilled, HeartOutlined, SearchOutlined, ShoppingCartOutlined, ShoppingOutlined } from '@ant-design/icons';
-import { Button, Col, message, Skeleton, Space, Spin, Tooltip } from 'antd';
+import { HeartFilled, HeartOutlined, SearchOutlined, ShoppingOutlined } from '@ant-design/icons';
+import { Col, Rate, Skeleton, Spin, Tooltip } from 'antd';
+import { yeuthichApi } from 'api/yeuthichApi';
+import { numberWithCommas } from 'assets/admin';
+import { addToCart, fetch_favouriteList } from 'pages/User/userSlice';
+import Proptypes from 'prop-types';
+import React from 'react';
+import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import './Product.scss';
-import Proptypes from 'prop-types';
-import { numberWithCommas } from 'assets/admin';
-import toast, { LoaderIcon } from 'react-hot-toast';
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { addToCart, addToFavouriteList, fetch_favouriteList } from 'pages/User/userSlice';
-import { yeuthichApi } from 'api/yeuthichApi';
-import Loader from 'components/Loader';
-import ButtonCustom from 'components/ButtonCustom';
 
 Product.propTypes = {
     product: Proptypes.object,
@@ -73,8 +71,11 @@ function Product(props) {
                             <div className='product__category'>{product.TEN_DANH_MUC}</div>
                             <Link to={`/products/${product.MA_SP}`} className='product__name'>{product.TEN_SP}</Link>
                             <div className='product__price'>
-                                {/* <div className="old-price">20,217,000&nbsp;₫</div> */}
+                                {product.GIA_BAN < product.GIA_BAN_CU && <div className="old-price">{numberWithCommas(product.GIA_BAN_CU)}&nbsp;₫</div>}
                                 <div className="price">{numberWithCommas(product.GIA_BAN)}&nbsp;₫</div>
+                            </div>
+                            <div>
+                                {product.DIEM_TB ? <Rate style={{ fontSize: 13 }} disabled value={product.DIEM_TB} /> : "Chưa có đánh giá"}
                             </div>
                             {
                                 product.SO_LUONG > 0 &&
@@ -106,7 +107,8 @@ function Product(props) {
                                 }
                             </div>
                             {product.SO_LUONG < 1 && <div className="product__out-of-stock">Hết hàng</div>}
-                            {/* <div className="product__discount">10%</div> */}
+                            {product.GIA_BAN < product.GIA_BAN_CU && <div className="product__discount">{parseFloat(((product.GIA_BAN_CU - product.GIA_BAN) / product.GIA_BAN_CU) * 100).toFixed(0)}%</div>}
+
                         </div>
                     </div>
             }

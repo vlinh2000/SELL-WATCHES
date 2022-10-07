@@ -31,13 +31,15 @@ function ProductInfo(props) {
         <div className='product-info'>
             <div className='product-info__name'>{product.TEN_SP}</div>
             <div className='product-info__description'>{product.MO_TA}</div>
-            {product.SO_LUONG < 1 && <div className="product-info__status-stock">Sản phẩm này đã hết hàng hoặc không có sẵn.</div>}
-            <div className="product-info__group-quantity">
-                <Button className='btn-decrease' disabled={quantity < 2} onClick={() => setQuantity(prev => prev - 1)}>-</Button>
-                <div className='current-quantity'>{quantity}</div>
-                <Button className='btn-increase' disabled={quantity === product.SO_LUONG} onClick={() => setQuantity(prev => prev + 1)}>+</Button>
-                <ButtonCustom onClick={handleAddToCart} className="btn-add-to-cart" text="Thêm vào giỏ"></ButtonCustom>
-            </div>
+            {product.SO_LUONG < 1 ? <div className="product-info__status-stock">Sản phẩm này đã hết hàng hoặc không có sẵn.</div>
+                :
+                <div className="product-info__group-quantity">
+                    <Button className='btn-decrease' disabled={quantity < 2} onClick={() => setQuantity(prev => prev - 1)}>-</Button>
+                    <div className='current-quantity'>{quantity}</div>
+                    <Button className='btn-increase' disabled={quantity === product.SO_LUONG} onClick={() => setQuantity(prev => prev + 1)}>+</Button>
+                    <ButtonCustom onClick={handleAddToCart} className="btn-add-to-cart" text="Thêm vào giỏ"></ButtonCustom>
+                </div>
+            }
 
             <ul className="product-info__info-list">
                 <li className="info-item">

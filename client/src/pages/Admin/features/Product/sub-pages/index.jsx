@@ -24,7 +24,7 @@ let schema = yup.object().shape({
     TEN_SP: yup.string().required('Tên sản phẩm không được để trống.'),
     GIA_GOC: yup.number().positive().integer().required('Giá gốc không được để trống.').typeError('Vui lòng nhập giá hợp lệ.'),
     GIA_BAN: yup.number().positive().integer().required('Giá bán không được để trống.').typeError('Vui lòng nhập giá hợp lệ.'),
-    SO_LUONG: yup.number().positive().integer().required('Số lượng không được để trống.').typeError('Vui lòng nhập số.'),
+    SO_LUONG: yup.number().integer().test('', 'Số lượng không thể âm', (value) => value >= 0).required('Số lượng không được để trống.').typeError('Vui lòng nhập số.'),
     MO_TA: yup.string().required('Mô tả không được để trống.'),
     CHAT_LIEU_DAY: yup.string().required('Chất liệu dây không được để trống.'),
     CHAT_LIEU_MAT_KINH: yup.string().required('Chất liệu mặt kính không được để trống.'),
@@ -45,6 +45,7 @@ function ProductEdit(props) {
     const { mode, currentSelected } = useSelector(({ adminInfo }) => adminInfo.screenUpdateOn.products);
     const { products: pagination } = useSelector(({ adminInfo }) => adminInfo.pagination);
     const [isLoading, setIsLoading] = React.useState(false);
+    const [isAccessory, setIsAccessory] = React.useState(false);
     const [removeList, setRemoveList] = React.useState([]);
     const [options_category, setOptions_category] = React.useState([]);
     const [options_brand, setOptions_brand] = React.useState([]);
@@ -58,7 +59,8 @@ function ProductEdit(props) {
         TEN_SP: currentSelected?.TEN_SP || '',
         GIA_GOC: currentSelected?.GIA_GOC || '',
         GIA_BAN: currentSelected?.GIA_BAN || '',
-        SO_LUONG: currentSelected?.SO_LUONG || '',
+        GIA_BAN_CU: currentSelected?.GIA_BAN || 0,
+        SO_LUONG: currentSelected?.SO_LUONG || 0,
         MO_TA: currentSelected?.MO_TA || '',
         CHAT_LIEU_DAY: currentSelected?.CHAT_LIEU_DAY || '',
         CHAT_LIEU_MAT_KINH: currentSelected?.CHAT_LIEU_MAT_KINH || '',
@@ -69,6 +71,7 @@ function ProductEdit(props) {
         KICH_THUOC_MAT_SO: currentSelected?.KICH_THUOC_MAT_SO || '',
         ANH_SAN_PHAM: currentSelected?.ANH_SAN_PHAM || [],
     }
+    console.log({ initialValues })
 
     const handleSave = async (values) => {
 
@@ -86,15 +89,16 @@ function ProductEdit(props) {
             data.append('TEN_SP', values.TEN_SP);
             data.append('GIA_GOC', values.GIA_GOC);
             data.append('GIA_BAN', values.GIA_BAN);
+            data.append('GIA_BAN_CU', initialValues.GIA_BAN_CU);
             data.append('SO_LUONG', values.SO_LUONG);
             data.append('MO_TA', values.MO_TA);
             data.append('CHAT_LIEU_DAY', values.CHAT_LIEU_DAY);
-            data.append('CHAT_LIEU_MAT_KINH', values.CHAT_LIEU_MAT_KINH);
-            data.append('PIN', values.PIN);
-            data.append('MUC_CHONG_NUOC', values.MUC_CHONG_NUOC);
-            data.append('HINH_DANG_MAT_SO', values.HINH_DANG_MAT_SO);
-            data.append('MAU_MAT_SO', values.MAU_MAT_SO);
-            data.append('KICH_THUOC_MAT_SO', values.KICH_THUOC_MAT_SO);
+            data.append('CHAT_LIEU_MAT_KINH', values.CHAT_LIEU_MAT_KINH || '');
+            data.append('PIN', values.PIN || '');
+            data.append('MUC_CHONG_NUOC', values.MUC_CHONG_NUOC || '');
+            data.append('HINH_DANG_MAT_SO', values.HINH_DANG_MAT_SO || '');
+            data.append('MAU_MAT_SO', values.MAU_MAT_SO || '');
+            data.append('KICH_THUOC_MAT_SO', values.KICH_THUOC_MAT_SO || '');
 
             ANH_SAN_PHAM_NEW?.forEach(f => {
                 data.append('ANH_SAN_PHAM', f);
@@ -104,11 +108,11 @@ function ProductEdit(props) {
 
             const { message } = mode === 'ADD' ? await sanphamApi.post(data) : await sanphamApi.update(currentSelected.MA_SP, data);
             await dispatch(fetch_products({ _limit: pagination._limit, _page: pagination._page }));
-            if (mode === 'ADD') {
-                form.resetFields()
-            } else {
-                navigate('/admin/products/view');
-            }
+            // if (mode === 'ADD') {
+            //     form.resetFields()
+            // } else {
+            // }
+            navigate('/admin/products/view');
             setIsLoading(false);
             toast.success(message);
         } catch (error) {
@@ -144,6 +148,10 @@ function ProductEdit(props) {
         fetchAllbrand();
     }, [])
 
+    React.useEffect(() => {
+        setIsAccessory(currentSelected?.MA_LOAI_SP === 'LSP_phukien');
+    }, [currentSelected])
+
     return (
         <div className='employee-edit box'>
             <Form
@@ -153,7 +161,7 @@ function ProductEdit(props) {
                 layout='vertical'>
                 <Row gutter={[40, 0]}>
                     <Col xs={24} sm={24} md={12} lg={12}>
-                        <SelectField name='MA_LOAI_SP' label='Loại sản phẩm' options={options_category} rules={[yupSync]} />
+                        <SelectField name='MA_LOAI_SP' label='Loại sản phẩm' options={options_category} onChange={value => setIsAccessory(value === 'LSP_phukien')} rules={[yupSync]} />
                         <SelectField name='MA_THUONG_HIEU' label='Thương hiệu' options={options_brand} rules={[yupSync]} />
                         <InputField name='TEN_SP' label='Tên sản phẩm' rules={[yupSync]} />
                         <InputField name='GIA_GOC' label='Giá gốc' rules={[yupSync]} />
@@ -163,13 +171,18 @@ function ProductEdit(props) {
 
                     </Col>
                     <Col xs={24} sm={24} md={12} lg={12}>
-                        <InputField name='CHAT_LIEU_DAY' label='Chất liệu dây' rules={[yupSync]} />
-                        <InputField name='CHAT_LIEU_MAT_KINH' label='Chất liệu mặt kính' rules={[yupSync]} />
-                        <InputField name='PIN' label='Pin' rules={[yupSync]} />
-                        <InputField name='MUC_CHONG_NUOC' label='Mức chống nước' rules={[yupSync]} />
-                        <InputField name='HINH_DANG_MAT_SO' label='Hình dạng mặt số' rules={[yupSync]} />
-                        <InputField name='MAU_MAT_SO' label='Màu mặt số' rules={[yupSync]} />
-                        <InputField name='KICH_THUOC_MAT_SO' label='Kích thước mặt số' rules={[yupSync]} />
+                        <InputField name='CHAT_LIEU_DAY' label='Chất liệu dây' rules={isAccessory ? [] : [yupSync]} />
+                        {
+                            !isAccessory &&
+                            <>
+                                <InputField name='CHAT_LIEU_MAT_KINH' label='Chất liệu mặt kính' rules={[yupSync]} />
+                                <InputField name='PIN' label='Pin' rules={[yupSync]} />
+                                <InputField name='MUC_CHONG_NUOC' label='Mức chống nước' rules={[yupSync]} />
+                                <InputField name='HINH_DANG_MAT_SO' label='Hình dạng mặt số' rules={[yupSync]} />
+                                <InputField name='MAU_MAT_SO' label='Màu mặt số' rules={[yupSync]} />
+                                <InputField name='KICH_THUOC_MAT_SO' label='Kích thước mặt số' rules={[yupSync]} />
+                            </>
+                        }
                         <UploadField saveData={(fileList) => form.setFieldValue("ANH_SAN_PHAM", fileList)} onRemove={(file) => {
                             if (!file.originFileObj) setRemoveList(prev => [...prev, file.uid])
                         }}

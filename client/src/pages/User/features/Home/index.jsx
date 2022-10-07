@@ -1,10 +1,11 @@
 import Aos from 'aos';
 import { sanphamApi } from 'api/sanphamApi';
 import EventUI from 'pages/User/components/EventUI';
-import React, { useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import Banner from './Components/Banner';
 import ListProducts from './Components/ListProducts';
+import './Home.scss';
 
 
 Home.propTypes = {
@@ -12,8 +13,7 @@ Home.propTypes = {
 };
 const animations = ['fade-up', 'slide-up', 'zoom-in-up'];
 function Home(props) {
-    const dispatch = useDispatch();
-    const { cart, data: { favouriteList, productTypeList } } = useSelector(state => state.userInfo);
+    const { productInCartListID, data: { favouriteListID, productTypeList } } = useSelector(state => state.userInfo);
 
     React.useEffect(() => {
         Aos.init({
@@ -38,8 +38,6 @@ function Home(props) {
         })
     }, [productTypeList])
 
-    const favouriteList_ID = useMemo(() => favouriteList?.map(f => f.MA_SP), [favouriteList])
-    const productInCartList_ID = useMemo(() => cart?.map(f => f.MA_SP), [cart])
 
     return (
         <div className='home'>
@@ -50,8 +48,8 @@ function Home(props) {
                     <ListProducts
                         productList={productList.length > 0 ? productList[idx] : []}
                         key={idx}
-                        favouriteList={favouriteList_ID}
-                        productInCartList={productInCartList_ID}
+                        favouriteList={favouriteListID}
+                        productInCartList={productInCartListID}
                         categoryTitle={productType.TEN_LOAI_SP}
                         categoryID={productType.MA_LOAI_SP}
                         animation={animations[idx % animations.length]} />

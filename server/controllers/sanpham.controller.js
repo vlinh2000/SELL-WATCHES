@@ -53,7 +53,7 @@ module.exports = {
             }
 
             // get all products normal
-            const sql = `SELECT a.MA_SP,a.MA_LOAI_SP,a.MA_THUONG_HIEU,a.TEN_SP,a.GIA_GOC,a.GIA_BAN,a.SO_LUONG,a.MO_TA,a.CHAT_LIEU_DAY,a.CHAT_LIEU_MAT_KINH,a.PIN,a.MUC_CHONG_NUOC,a.HINH_DANG_MAT_SO,a.KICH_THUOC_MAT_SO,a.MAU_MAT_SO,a.TRANG_THAI,a.NGAY_TAO,a.CAP_NHAT,b.TEN_LOAI_SP,c.TEN_THUONG_HIEU,e.HINH_ANH, COALESCE(AVG(d.SO_SAO),0) as DIEM_TB 
+            const sql = `SELECT a.MA_SP,a.MA_LOAI_SP,a.MA_THUONG_HIEU,a.TEN_SP,a.GIA_GOC,a.GIA_BAN,a.GIA_BAN_CU,a.SO_LUONG,a.MO_TA,a.CHAT_LIEU_DAY,a.CHAT_LIEU_MAT_KINH,a.PIN,a.MUC_CHONG_NUOC,a.HINH_DANG_MAT_SO,a.KICH_THUOC_MAT_SO,a.MAU_MAT_SO,a.TRANG_THAI,a.NGAY_TAO,a.CAP_NHAT,b.TEN_LOAI_SP,c.TEN_THUONG_HIEU,e.HINH_ANH, COALESCE(AVG(d.SO_SAO),0) as DIEM_TB 
                         FROM SAN_PHAM a
                         LEFT JOIN DANH_GIA d ON a.MA_SP = d.MA_SP
                         INNER JOIN LOAI_SAN_PHAM b ON a.MA_LOAI_SP = b.MA_LOAI_SP
@@ -109,7 +109,7 @@ module.exports = {
     get_sanpham: async (req, res) => {
         try {
             const { sanphamID } = req.params;
-            const sql = `SELECT a.MA_SP,a.MA_LOAI_SP,a.MA_THUONG_HIEU,a.TEN_SP,a.GIA_GOC,a.GIA_BAN,a.SO_LUONG,a.MO_TA,a.CHAT_LIEU_DAY,a.CHAT_LIEU_MAT_KINH,a.PIN,a.MUC_CHONG_NUOC,a.HINH_DANG_MAT_SO,a.KICH_THUOC_MAT_SO,a.MAU_MAT_SO,a.TRANG_THAI,a.NGAY_TAO,a.CAP_NHAT,b.TEN_LOAI_SP,c.TEN_THUONG_HIEU,c.QUOC_GIA, COALESCE(AVG(d.SO_SAO),0) as DIEM_TB 
+            const sql = `SELECT a.MA_SP,a.MA_LOAI_SP,a.MA_THUONG_HIEU,a.TEN_SP,a.GIA_GOC,a.GIA_BAN,a.GIA_BAN_CU,a.SO_LUONG,a.MO_TA,a.CHAT_LIEU_DAY,a.CHAT_LIEU_MAT_KINH,a.PIN,a.MUC_CHONG_NUOC,a.HINH_DANG_MAT_SO,a.KICH_THUOC_MAT_SO,a.MAU_MAT_SO,a.TRANG_THAI,a.NGAY_TAO,a.CAP_NHAT,b.TEN_LOAI_SP,c.TEN_THUONG_HIEU,c.QUOC_GIA, COALESCE(AVG(d.SO_SAO),0) as DIEM_TB 
                         FROM SAN_PHAM a
                         LEFT JOIN DANH_GIA d ON a.MA_SP = d.MA_SP
                         INNER JOIN LOAI_SAN_PHAM b ON a.MA_LOAI_SP = b.MA_LOAI_SP
@@ -132,11 +132,11 @@ module.exports = {
     },
     post_sanphams: async (req, res) => {
         try {
-            const { MA_DANH_MUC, MA_THUONG_HIEU, TEN_SP, GIA_GOC, GIA_BAN, SO_LUONG, MO_TA, CHAT_LIEU_DAY, CHAT_LIEU_MAT_KINH, PIN, MUC_CHONG_NUOC, HINH_DANG_MAT_SO, MAU_MAT_SO, KICH_THUOC_MAT_SO } = req.body;
+            const { MA_LOAI_SP, MA_THUONG_HIEU, TEN_SP, GIA_GOC, GIA_BAN, SO_LUONG, MO_TA, CHAT_LIEU_DAY, CHAT_LIEU_MAT_KINH, PIN, MUC_CHONG_NUOC, HINH_DANG_MAT_SO, MAU_MAT_SO, KICH_THUOC_MAT_SO } = req.body;
 
             const MA_SP = 'SP_' + randomString();
-            const sql = `INSERT INTO SAN_PHAM(MA_SP,MA_DANH_MUC, MA_THUONG_HIEU, TEN_SP, GIA_GOC, GIA_BAN, SO_LUONG, MO_TA, CHAT_LIEU_DAY,CHAT_LIEU_MAT_KINH,PIN,MUC_CHONG_NUOC,HINH_DANG_MAT_SO,MAU_MAT_SO,KICH_THUOC_MAT_SO) 
-            VALUES ('${MA_SP}','${MA_DANH_MUC}','${MA_THUONG_HIEU}','${TEN_SP}','${GIA_GOC}','${GIA_BAN}','${SO_LUONG}','${MO_TA}','${CHAT_LIEU_DAY}','${CHAT_LIEU_MAT_KINH}','${PIN}','${MUC_CHONG_NUOC}','${HINH_DANG_MAT_SO}','${MAU_MAT_SO}','${KICH_THUOC_MAT_SO}')`;
+            const sql = `INSERT INTO SAN_PHAM(MA_SP,MA_LOAI_SP, MA_THUONG_HIEU, TEN_SP, GIA_GOC, GIA_BAN,GIA_BAN_CU, SO_LUONG, MO_TA, CHAT_LIEU_DAY,CHAT_LIEU_MAT_KINH,PIN,MUC_CHONG_NUOC,HINH_DANG_MAT_SO,MAU_MAT_SO,KICH_THUOC_MAT_SO) 
+            VALUES ('${MA_SP}','${MA_LOAI_SP}','${MA_THUONG_HIEU}','${TEN_SP}','${GIA_GOC}','${GIA_BAN}','${GIA_BAN}','${SO_LUONG}','${MO_TA}','${CHAT_LIEU_DAY}','${CHAT_LIEU_MAT_KINH || ''}','${PIN || ''}','${MUC_CHONG_NUOC || ''}','${HINH_DANG_MAT_SO || ''}','${MAU_MAT_SO || ''}','${KICH_THUOC_MAT_SO || ''}')`;
             await executeQuery(sql);
 
             // save img to database
@@ -172,11 +172,12 @@ module.exports = {
 
             const data = {
                 MA_LOAI_SP: req.body.MA_LOAI_SP, MA_THUONG_HIEU: req.body.MA_THUONG_HIEU,
-                TEN_SP: req.body.TEN_SP, GIA_GOC: req.body.GIA_GOC, GIA_BAN: req.body.GIA_BAN,
+                TEN_SP: req.body.TEN_SP, GIA_GOC: req.body.GIA_GOC, GIA_BAN: req.body.GIA_BAN, GIA_BAN_CU: req.body.GIA_BAN_CU,
                 SO_LUONG: req.body.SO_LUONG, MO_TA: req.body.MO_TA, CHAT_LIEU_DAY: req.body.CHAT_LIEU_DAY,
-                CHAT_LIEU_MAT_KINH: req.body.CHAT_LIEU_MAT_KINH, PIN: req.body.PIN, MUC_CHONG_NUOC: req.body.MUC_CHONG_NUOC,
-                HINH_DANG_MAT_SO: req.body.HINH_DANG_MAT_SO, MAU_MAT_SO: req.body.MAU_MAT_SO, KICH_THUOC_MAT_SO: req.body.KICH_THUOC_MAT_SO, CAP_NHAT: getNow()
+                CHAT_LIEU_MAT_KINH: req.body.CHAT_LIEU_MAT_KINH || '', PIN: req.body.PIN || '', MUC_CHONG_NUOC: req.body.MUC_CHONG_NUOC || '',
+                HINH_DANG_MAT_SO: req.body.HINH_DANG_MAT_SO || '', MAU_MAT_SO: req.body.MAU_MAT_SO || '', KICH_THUOC_MAT_SO: req.body.KICH_THUOC_MAT_SO || '', CAP_NHAT: getNow()
             }
+            console.log({ data })
             const sql = `UPDATE SAN_PHAM SET ? WHERE MA_SP='${sanphamID}'`;
             console.log({ sql });
             await executeUpdateQuery(sql, { ...data });

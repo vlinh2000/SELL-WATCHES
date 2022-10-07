@@ -1,0 +1,24 @@
+@media only screen and (max-width: 769px) {
+    .home .list-products{
+        width: 100%;
+    }
+
+    .event-ui{
+        width: 90%;
+    }
+
+    .event-ui .count-down{
+        margin-top: 1rem;
+        justify-content: center;
+    }
+
+}
+
+
+@media only screen and (max-width: 420px) {
+
+    .event-ui img{
+        height: 50px;
+        width: 100%;
+    }
+}

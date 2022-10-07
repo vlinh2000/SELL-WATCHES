@@ -101,6 +101,10 @@ function GroupInfoAndFeedBack(props) {
         }
     }
 
+    const onReFreshFeedBackList = () => {
+        setReloadFeedBackList(prev => !prev);
+    }
+
     return (
         <div className='group-info-and-feedback'>
             <Tabs defaultActiveKey={defaultActiveKey} onChange={onChange}>
@@ -108,38 +112,49 @@ function GroupInfoAndFeedBack(props) {
                     <Row justify='space-between'>
                         <Col xs={24} sm={24} md={24} lg={11}>
                             <ul className="group-info">
-                                <li className="group-info-item">
-                                    <span className='info-name'>bộ máy & năng lượng</span>
-                                    <span className='info-value'>{product.PIN}</span>
-                                </li>
-                                <li className="group-info-item">
-                                    <span className='info-name'>CHẤT LIỆU DÂY</span>
-                                    <span className='info-value'>{product.CHAT_LIEU_DAY}</span>
-                                </li>
-                                <li className="group-info-item">
-                                    <span className='info-name'>CHẤT LIỆU MẶT KÍNH</span>
-                                    <span className='info-value'>{product.CHAT_LIEU_MAT_KINH}</span>
-                                </li>
+                                {
+                                    product.MA_LOAI_SP !== 'LSP_phukien' &&
+                                    <>
+                                        <li className="group-info-item">
+                                            <span className='info-name'>bộ máy & năng lượng</span>
+                                            <span className='info-value'>{product.PIN}</span>
+                                        </li>
+
+                                        <li className="group-info-item">
+                                            <span className='info-name'>CHẤT LIỆU MẶT KÍNH</span>
+                                            <span className='info-value'>{product.CHAT_LIEU_MAT_KINH}</span>
+                                        </li>
+
+                                        <li className="group-info-item">
+                                            <span className='info-name'>HÌNH DẠNG MẶT SỐ</span>
+                                            <span className='info-value'>{product.HINH_DANG_MAT_SO}</span>
+                                        </li>
+                                        <li className="group-info-item">
+                                            <span className='info-name'>KÍCH THƯỚC MẶT SỐ</span>
+                                            <span className='info-value'>{product.KICH_THUOC_MAT_SO}</span>
+                                        </li>
+                                        <li className="group-info-item">
+                                            <span className='info-name'>MÀU MẶT SỐ</span>
+                                            <span className='info-value'>{product.MAU_MAT_SO}</span>
+                                        </li>
+                                        <li className="group-info-item">
+                                            <span className='info-name'>MỨC CHỐNG NƯỚC</span>
+                                            <span className='info-value'>{product.MUC_CHONG_NUOC}</span>
+                                        </li>
+                                    </>
+                                }
                                 <li className="group-info-item">
                                     <span className='info-name'>LOẠI SẢN PHẨM</span>
                                     <span className='info-value'>{product.TEN_LOAI_SP}</span>
                                 </li>
-                                <li className="group-info-item">
-                                    <span className='info-name'>HÌNH DẠNG MẶT SỐ</span>
-                                    <span className='info-value'>{product.HINH_DANG_MAT_SO}</span>
-                                </li>
-                                <li className="group-info-item">
-                                    <span className='info-name'>KÍCH THƯỚC MẶT SỐ</span>
-                                    <span className='info-value'>{product.KICH_THUOC_MAT_SO}</span>
-                                </li>
-                                <li className="group-info-item">
-                                    <span className='info-name'>MÀU MẶT SỐ</span>
-                                    <span className='info-value'>{product.MAU_MAT_SO}</span>
-                                </li>
-                                <li className="group-info-item">
-                                    <span className='info-name'>MỨC CHỐNG NƯỚC</span>
-                                    <span className='info-value'>{product.MUC_CHONG_NUOC}</span>
-                                </li>
+                                {
+                                    product.CHAT_LIEU_DAY &&
+                                    <li className="group-info-item">
+                                        <span className='info-name'>CHẤT LIỆU DÂY</span>
+                                        <span className='info-value'>{product.CHAT_LIEU_DAY}</span>
+                                    </li>
+
+                                }
                                 <li className="group-info-item">
                                     <span className='info-name'>THƯƠNG HIỆU</span>
                                     <span className='info-value'>{product.TEN_THUONG_HIEU}</span>
@@ -219,56 +234,59 @@ function GroupInfoAndFeedBack(props) {
                                                 { label: 'Đánh giá thấp', value: 'SO_SAO ASC', },
                                             ]} />
                                     </Form>
-                                    <FeedBackList feedBackList={feedBackList} isLoading={loading?.feedBackList} />
+                                    <FeedBackList feedBackAvailable={feedBackAvailable} onReFreshFeedBackList={onReFreshFeedBackList} feedBackList={feedBackList} isLoading={loading?.feedBackList} />
                                     <Pagination onChange={(_page) => setPagination(prev => ({ ...prev, _page }))} current={pagination._page} total={pagination._totalPage} pageSize={1} />
                                 </div>
                             </div>
                     }
                 </Tabs.TabPane>
-                <Tabs.TabPane tab="Viết đánh giá" key="3">
-                    <div className="feedback-wrapper">
-                        <div className='my-feedback'>
-                            {
-                                isAuth ?
-                                    (
-                                        feedBackAvailable ?
-                                            <Form
-                                                onFinish={handleFeedBack}
-                                                form={form} initialValues={initialValues} className="form-feedback" layout='vertical'>
-                                                <div className="vote">
-                                                    <div className='label'>Đánh giá của bạn</div>
-                                                    <Form.Item
-                                                        rules={[{ required: true, message: "Số sao không được để trống." }]}
-                                                        name="SO_SAO">
-                                                        <Rate count={5} />
-                                                    </Form.Item>
-                                                </div>
-                                                <div className="comments">
-                                                    <InputEmoijField
-                                                        rules={[{ required: true, message: "Nội dung không được để trống." }]} name="NOI_DUNG" label="Nhận xét của bạn"
-                                                    />
-                                                </div>
-                                                <Row gutter={[20, 0]}>
-                                                    <Col xs={24} sm={12} md={12} lg={12}>
-                                                        <InputField disabled name="HO_TEN" label="Tên" />
-                                                    </Col>
-                                                    <Col xs={24} sm={12} md={12} lg={12}>
-                                                        <InputField disabled name="EMAIL" label="Email" />
-                                                    </Col>
-                                                </Row>
-                                                <ButtonCustom type='submit' text="Gửi" isLoading={loading?.sendFeedBack} />
-                                            </Form>
-                                            :
-                                            <i>Chỉ những khách hàng đã mua sản phẩm mới có thể đánh giá.</i>
+                {
+                    user?.USER_ID &&
+                    <Tabs.TabPane tab="Viết đánh giá" key="3">
+                        <div className="feedback-wrapper">
+                            <div className='my-feedback'>
+                                {
+                                    isAuth ?
+                                        (
+                                            feedBackAvailable ?
+                                                <Form
+                                                    onFinish={handleFeedBack}
+                                                    form={form} initialValues={initialValues} className="form-feedback" layout='vertical'>
+                                                    <div className="vote">
+                                                        <div className='label'>Đánh giá của bạn</div>
+                                                        <Form.Item
+                                                            rules={[{ required: true, message: "Số sao không được để trống." }]}
+                                                            name="SO_SAO">
+                                                            <Rate count={5} />
+                                                        </Form.Item>
+                                                    </div>
+                                                    <div className="comments">
+                                                        <InputEmoijField
+                                                            rules={[{ required: true, message: "Nội dung không được để trống." }]} name="NOI_DUNG" label="Nhận xét của bạn"
+                                                        />
+                                                    </div>
+                                                    <Row gutter={[20, 0]}>
+                                                        <Col xs={24} sm={12} md={12} lg={12}>
+                                                            <InputField disabled name="HO_TEN" label="Tên" />
+                                                        </Col>
+                                                        <Col xs={24} sm={12} md={12} lg={12}>
+                                                            <InputField disabled name="EMAIL" label="Email" />
+                                                        </Col>
+                                                    </Row>
+                                                    <ButtonCustom type='submit' text="Gửi" isLoading={loading?.sendFeedBack} />
+                                                </Form>
+                                                :
+                                                <i>Chỉ những khách hàng đã mua sản phẩm mới có thể đánh giá.</i>
 
-                                    )
+                                        )
 
-                                    :
-                                    <p>Vui lòng <Link to="" onClick={() => dispatch(switch_screenLogin(true))}>đăng nhập</Link> để đánh giá</p>
-                            }
+                                        :
+                                        <p>Vui lòng <Link to="" onClick={() => dispatch(switch_screenLogin(true))}>đăng nhập</Link> để đánh giá</p>
+                                }
+                            </div>
                         </div>
-                    </div>
-                </Tabs.TabPane>
+                    </Tabs.TabPane>
+                }
 
             </Tabs>
         </div >
