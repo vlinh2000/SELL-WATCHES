@@ -60,11 +60,11 @@ module.exports = {
     patch_users: async (req, res) => {
         try {
             const { userID } = req.params;
-            const { USER_ID: authorId } = req.user.data;
+            const { USER_ID: authorId, NV_ID } = req.user.data;
 
             const isExist = await checkIsExist('USER', 'USER_ID', userID);
             if (!isExist) return res.status(400).json({ message: "Người dùng không tồn tại." });
-            else if (authorId !== userID) return res.status(400).json({ message: "Chỉ có thể cập nhật thông tin cho bản thân." });
+            else if (authorId !== userID && !NV_ID) return res.status(400).json({ message: "Chỉ có thể cập nhật thông tin cho bản thân." });
 
             let data = { ...req.body, CAP_NHAT: getNow() };
             const avatarUrl = req.file?.path;
@@ -111,7 +111,7 @@ module.exports = {
             }
             user = response[0];
             console.log({ user });
-            if (user.BI_KHOA == '1') return res.status(400).json({ message: `Tài khoản [${EMAIL}] đã bị khóa.` });
+            if (user.BI_KHOA == '1') return res.status(400).json({ message: `Tài khoản [${EMAIL}] đang bị khóa vui lòng liên hệ bộ phận CSKH để được giải quyết.` });
 
             const isValid = await compareString(MAT_KHAU, user.MAT_KHAU)
             if (!isValid) return res.status(400).json({ message: `Email hoặc mật khẩu không chính xác.` });
@@ -173,6 +173,8 @@ module.exports = {
             const sql_getInfo = `SELECT * FROM USER WHERE LOAI_TAI_KHOAN != 'tao_moi' AND EMAIL='${EMAIL}'`;
             const data = await executeQuery(sql_getInfo);
             const user = data[0];
+            console.log({ user })
+            if (user.BI_KHOA == 1) return res.status(400).json({ message: 'Tài khoản đang bị khóa vui lòng liên hệ bộ phận CSKH để được giải quyết' })
             console.log({ sql_getInfo, user });
             const token = await generateToken(user);
             const refreshToken = await generateRefreshToken(user);

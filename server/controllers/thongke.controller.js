@@ -20,8 +20,8 @@ module.exports = {
                     sql: `SELECT b.MA_SP,c.TEN_SP,c.MO_TA,d.HINH_ANH,SUM(b.SO_LUONG) as DA_BAN 
                         FROM DON_HANG a, CHI_TIET_DON_HANG b, SAN_PHAM c, ANH_SAN_PHAM d 
                         WHERE 
-                            MONTH(a.TG_DAT_HANG) = '${new Date().getMonth() + 1}'
-                            AND a.MA_DH = b.MA_DH 
+                           
+                            a.MA_DH = b.MA_DH 
                             AND ( a.TRANG_THAI = 2 OR a.DA_THANH_TOAN = '1') 
                             AND b.MA_SP = c.MA_SP 
                             AND d.MA_SP = c.MA_SP 
@@ -29,7 +29,9 @@ module.exports = {
                         LIMIT 4`, saveTo: 'TOP_SP_BAN_CHAY'
                 },
             ]
-            // save img to database
+            // MONTH(a.TG_DAT_HANG) = '${new Date().getMonth() + 1}'
+            // AND
+
             const processes = sqls.map(item => {
                 return new Promise(async (resolve, reject) => {
                     try {

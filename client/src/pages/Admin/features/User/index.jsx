@@ -3,7 +3,6 @@ import React from 'react';
 import { DeleteOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
 import { Avatar, Button, Divider, Pagination, Popconfirm, Table, Tag } from 'antd';
 import { nguoidungApi } from 'api/nguoidungApi';
-import moment from 'moment';
 import { fetch_users, prepareDataEdit, savePagination } from 'pages/Admin/adminSlice';
 import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
 import toast from 'react-hot-toast';
@@ -31,10 +30,10 @@ function User(props) {
     }, [pagination._limit, pagination._page]);
 
 
-    const onEdit = (data) => {
-        dispatch(prepareDataEdit({ screen: 'users', mode: 'EDIT', data }));
-        navigate('/admin/users/edit');
-    }
+    // const onEdit = (data) => {
+    //     dispatch(prepareDataEdit({ screen: 'users', mode: 'EDIT', data }));
+    //     navigate('/admin/users/edit');
+    // }
 
     const onDelete = async (id) => {
         try {
@@ -66,7 +65,7 @@ function User(props) {
         {
             title: 'Avatar',
             dataIndex: 'ANH_DAI_DIEN',
-            render: (text) => text ? <Avatar src={text} size="large"></Avatar> : <Avatar style={{ backgroundColor: colorList[Math.ceil(Math.random() * colorList.length) % colorList.length], verticalAlign: 'middle' }} size="large">{text || '-'}</Avatar>
+            render: (text) => text ? <Avatar src={text} ></Avatar> : <Avatar style={{ backgroundColor: colorList[Math.ceil(Math.random() * colorList.length) % colorList.length], verticalAlign: 'middle' }}>{text || '-'}</Avatar>
         },
         {
             title: 'Họ tên',
@@ -99,16 +98,16 @@ function User(props) {
             render: (text, record) => <Tag color={record.BI_KHOA === "1" ? "red" : "green"}>{text}</Tag>
             // render: (text) => numberWithCommas(text)
         },
-        {
-            title: 'Ngày tạo',
-            dataIndex: 'NGAY_TAO',
-            render: (text) => moment(text).format('DD-MM-YYYY HH:mm:ss')
-        },
-        {
-            title: 'Cập nhật',
-            dataIndex: 'CAP_NHAT',
-            render: (text) => moment(text).format('DD-MM-YYYY HH:mm:ss')
-        },
+        // {
+        //     title: 'Ngày tạo',
+        //     dataIndex: 'NGAY_TAO',
+        //     render: (text) => moment(text).format('DD-MM-YYYY HH:mm:ss')
+        // },
+        // {
+        //     title: 'Cập nhật',
+        //     dataIndex: 'CAP_NHAT',
+        //     render: (text) => moment(text).format('DD-MM-YYYY HH:mm:ss')
+        // },
         {
             title: 'Hành động',
             dataIndex: 'USER_ID',

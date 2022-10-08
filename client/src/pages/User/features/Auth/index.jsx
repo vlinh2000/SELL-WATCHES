@@ -172,9 +172,13 @@ function Auth(props) {
             ANH_DAI_DIEN: data.picture?.data?.url || data.picture,
             LOAI_TAI_KHOAN: accountType
         }
-        console.log({ data, user })
-        // send to sever
-        await dispatch(login_socialMedia(user));
+        const { error, payload } = await dispatch(login_socialMedia(user));
+        if (error) {
+            const { message } = payload.response.data;
+            toast.error(message);
+            return;
+        }
+
         dispatch(switch_screenLogin(false));
 
     }

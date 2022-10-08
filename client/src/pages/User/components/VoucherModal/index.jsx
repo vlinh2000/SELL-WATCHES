@@ -52,7 +52,7 @@ function VoucherModal(props) {
                 visible={isVisibleVoucherModal}
                 onCancel={() => dispatch(switch_voucherModal(false))}>
                 {
-                    myVouchers?.length < 1 && <>
+                    (myVouchers?.length < 1 || !myVouchers) && <>
                         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
 
                     </>

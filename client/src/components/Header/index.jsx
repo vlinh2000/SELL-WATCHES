@@ -1,16 +1,14 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import './Header.scss';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Button, Col, Divider, Popover, Row, Skeleton, Tooltip } from 'antd'
-import { BarsOutlined, CloseOutlined, EnvironmentOutlined, FacebookFilled, FacebookOutlined, HeartOutlined, InstagramOutlined, PhoneOutlined, SearchOutlined, ShoppingCartOutlined, ShoppingOutlined, TwitterOutlined } from '@ant-design/icons';
-import ButtonCustom from 'components/ButtonCustom';
-import { useDispatch, useSelector } from 'react-redux';
-import { onFilter, onSearch, removeFromCart, switch_screenLogin, switch_suggestionModal } from 'pages/User/userSlice';
+import { BarsOutlined, CloseOutlined, EnvironmentOutlined, FacebookFilled, HeartOutlined, InstagramOutlined, PhoneOutlined, SearchOutlined, ShoppingOutlined, TwitterOutlined } from '@ant-design/icons';
+import { Button, Col, Divider, Popover, Row, Skeleton, Tooltip } from 'antd';
+import { sanphamApi } from 'api/sanphamApi';
 import { numberWithCommas } from 'assets/admin';
 import { getTotalPrice } from 'assets/common';
-import { sanphamApi } from 'api/sanphamApi';
+import { onSearch, removeFromCart, switch_screenLogin, switch_suggestionModal } from 'pages/User/userSlice';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import reactStringReplace from 'react-string-replace';
+import './Header.scss';
 
 Header.propTypes = {
 
@@ -28,7 +26,7 @@ function CartInfo(props) {
                         <li key={idx} className="item">
                             <Row>
                                 <Col className='item-image' span={6}>
-                                    <img src={(product?.ANH_SAN_PHAM?.length > 0 && product?.ANH_SAN_PHAM[0]?.HINH_ANH) || product?.HINH_ANH} alt='image' />
+                                    <img src={(product?.ANH_SAN_PHAM?.length > 0 && product?.ANH_SAN_PHAM[0]?.HINH_ANH) || product?.HINH_ANH} alt='product-img' />
                                 </Col>
                                 <Col className='item-info' span={14}>
                                     <Link to="" className='item-name'>{product?.TEN_SP}</Link>
@@ -140,17 +138,17 @@ function Header(props) {
                     </div>
                     <div className="header-wrapper__header__top-nav__right">
                         <Tooltip title="Follow on facebook">
-                            <a href='https://facebook.com' target='_blank'>
+                            <a href='https://facebook.com' target='_blank' rel="noreferrer" >
                                 <FacebookFilled />
                             </a>
                         </Tooltip>
                         <Tooltip title="Follow on Instagram">
-                            <a href='https://instagram.com' target='_blank'>
+                            <a href='https://instagram.com' target='_blank' rel="noreferrer">
                                 <InstagramOutlined />
                             </a>
                         </Tooltip>
                         <Tooltip title="Follow on Twitter">
-                            <a href='https://twitter.com' target='_blank'>
+                            <a href='https://twitter.com' target='_blank' rel="noreferrer">
                                 <TwitterOutlined />
                             </a>
                         </Tooltip>
@@ -203,7 +201,7 @@ function Header(props) {
                                                     }
                                                     onClick={() => dispatch(switch_suggestionModal(false))}
                                                     to="" className='suggestions-wrapper__item__content'>
-                                                    <img width={40} height={50} src={product.HINH_ANH} />
+                                                    <img width={40} height={50} src={product.HINH_ANH} alt='product-img' />
                                                     <div className='info'>
                                                         <div>{reactStringReplace(product.TEN_SP, searchValue, (match, i) => <span style={{ color: 'red' }}>{match}</span>)}</div>
                                                         <div><span className='category'>{reactStringReplace(product.TEN_LOAI_SP, searchValue, (match, i) => <span style={{ color: 'red' }}>{match}</span>)}</span><Divider type="vertical" /><strong className='price'>{numberWithCommas(product.GIA_BAN || 0)}&nbsp;₫</strong></div>
@@ -255,7 +253,11 @@ function Header(props) {
                         <li className="navbar-item">
                             <Link to="/contact" className={pathname?.includes('contact') ? 'active' : ''} >Liên hệ</Link>
                         </li>
-                        <li className="navbar-item user-logged">
+                        <li className="navbar-item user-logged" onClick={() => {
+                            handleCloseNavbar();
+                            dispatch(switch_screenLogin(true))
+                        }
+                        }>
                             <Link to="">Đăng nhập</Link>
                         </li>
                     </ul>
