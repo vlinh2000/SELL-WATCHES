@@ -177,7 +177,6 @@ module.exports = {
                 CHAT_LIEU_MAT_KINH: req.body.CHAT_LIEU_MAT_KINH || '', PIN: req.body.PIN || '', MUC_CHONG_NUOC: req.body.MUC_CHONG_NUOC || '',
                 HINH_DANG_MAT_SO: req.body.HINH_DANG_MAT_SO || '', MAU_MAT_SO: req.body.MAU_MAT_SO || '', KICH_THUOC_MAT_SO: req.body.KICH_THUOC_MAT_SO || '', CAP_NHAT: getNow()
             }
-            console.log({ data })
             const sql = `UPDATE SAN_PHAM SET ? WHERE MA_SP='${sanphamID}'`;
             console.log({ sql });
             await executeUpdateQuery(sql, { ...data });
