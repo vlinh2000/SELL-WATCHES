@@ -1,3 +1,4 @@
+const moment = require("moment/moment");
 const { executeQuery, checkExist, checkIsExist, executeUpdateQuery } = require("../mysql");
 const { randomString, getNow, handleMomoPayment } = require("../utils/global");
 
@@ -6,29 +7,38 @@ module.exports = {
         try {
             const { _limit, _page, action, MA_SP } = req.query;
             let { status } = req.query;
-            console.log({ status })
             const user = req.user?.data;
+            let subSqlSearch = '';
 
             if (action === 'check_had_order') {
                 const sql = `SELECT COUNT(a.MA_DH) as total
                              FROM DON_HANG a, CHI_TIET_DON_HANG b 
                              WHERE a.USER_ID='${user?.USER_ID}' AND a.MA_DH=b.MA_DH AND b.MA_SP='${MA_SP}'`;
                 let data = await executeQuery(sql);
-                console.log({ sql })
-                console.log({ data })
                 return res.json({
                     // result: data,
                     available: data[0].total > 0 ? true : false,
                     message: 'Thành công'
                 });
+            } else if (action === 'search') {
+                console.log(req.query.searchInfo);
+                const searchInfo = JSON.parse(req.query.searchInfo);
+                subSqlSearch = `
+                ${searchInfo.MA_DH ? ` AND a.MA_DH LIKE '%${searchInfo.MA_DH}%'` : ''}
+                ${searchInfo.HO_TEN_NGUOI_DAT ? ` AND a.HO_TEN_NGUOI_DAT LIKE '%${searchInfo.HO_TEN_NGUOI_DAT}%'` : ''}
+                ${searchInfo.SDT_NGUOI_DAT ? ` AND a.SDT_NGUOI_DAT LIKE '%${searchInfo.SDT_NGUOI_DAT}%'` : ''}
+                ${(searchInfo.TG_DAT_HANG_TU || searchInfo.TG_DAT_HANG_DEN) ? ` AND a.TG_DAT_HANG BETWEEN '${moment(searchInfo.TG_DAT_HANG_TU || '1-1-1970').format('YYYY-MM-DD') + ' 00:00:00'}' AND '${moment(searchInfo.TG_DAT_HANG_DEN || moment()).format('YYYY-MM-DD') + ' 23:59:59'}'` : ''}
+                ${searchInfo.HINH_THUC_THANH_TOAN ? ` AND a.HINH_THUC_THANH_TOAN='${searchInfo.HINH_THUC_THANH_TOAN}'` : ''}`;
+                console.log({ subSqlSearch })
             }
 
-            const sql = `SELECT a.MA_DH,a.HO_TEN_NGUOI_DAT,a.EMAIL_NGUOI_DAT,a.SDT_NGUOI_DAT,a.NV_ID,a.DON_VI_VAN_CHUYEN, b.HO_TEN, a.USER_ID, a.TG_DAT_HANG, a.TG_GIAO_HANG, a.DIA_CHI, a.GIAM_GIA, a.TONG_TIEN, a.TRANG_THAI, a.DA_THANH_TOAN, a.HINH_THUC_THANH_TOAN, a.PHI_SHIP, a.GHI_CHU, a.NGAY_TAO,c.MA_UU_DAI,c.TEN_UU_DAI,c.MPVC 
+            const sql = `SELECT a.MA_DH,a.HO_TEN_NGUOI_DAT,a.EMAIL_NGUOI_DAT,a.SDT_NGUOI_DAT,a.NV_ID,a.DON_VI_VAN_CHUYEN, b.HO_TEN, a.USER_ID, a.TG_DAT_HANG, a.TG_GIAO_HANG, a.DIA_CHI, a.GIAM_GIA, a.TONG_TIEN, a.TRANG_THAI, a.DA_THANH_TOAN, a.HINH_THUC_THANH_TOAN, a.PHI_SHIP, a.GHI_CHU, a.NGAY_TAO,a.CAP_NHAT,c.MA_UU_DAI,c.TEN_UU_DAI,c.MPVC 
                         FROM DON_HANG a
                         LEFT JOIN NHAN_VIEN b ON a.NV_ID = b.NV_ID 
                         LEFT JOIN UU_DAI c ON a.MA_UU_DAI = c.MA_UU_DAI 
                         WHERE 1=1
                         ${action === 'get_my_orders' ? ` AND a.USER_ID ='${user.USER_ID}'` : ''} 
+                        ${action === 'search' ? subSqlSearch : ''} 
                         ${status ? 'AND a.TRANG_THAI IN ' + JSON.parse(status)?.replace('[', '(')?.replace(']', ')') : ''} 
                         ORDER BY a.NGAY_TAO DESC ${(_page && _limit) ? ' LIMIT ' + _limit + ' OFFSET ' + _limit * (_page - 1) : ''}`;
             console.log({ sql })
@@ -38,6 +48,7 @@ module.exports = {
                         LEFT JOIN NHAN_VIEN b ON a.NV_ID = b.NV_ID 
                         WHERE 1=1
                         ${action === 'get_my_orders' ? ` AND a.USER_ID ='${user.USER_ID}'` : ''} 
+                        ${action === 'search' ? subSqlSearch : ''} 
                         ${status ? 'AND a.TRANG_THAI IN ' + JSON.parse(status)?.replace('[', '(')?.replace(']', ')') : ''} `;
             const data = await executeQuery(sql_count);
 
@@ -91,7 +102,7 @@ module.exports = {
             if (action === 'get_only_statistical') {
                 let result = [];
                 const sqls = [
-                    `SELECT COALESCE(SUM(a.TONG_TIEN),0) as DOANH_THU FROM DON_HANG a WHERE a.DA_THANH_TOAN = '1'`,
+                    `SELECT COALESCE(SUM(a.TONG_TIEN),0) as DOANH_THU FROM DON_HANG a WHERE a.TRANG_THAI !=3`,
                     `SELECT COALESCE(SUM(a.TONG_TIEN),0) as TIEN_VON FROM PHIEU_NHAP_KHO a`
                 ];
 
@@ -155,12 +166,54 @@ module.exports = {
                         WHERE 
                             a.MA_DH=b.MA_DH  
                             AND a.TG_DAT_HANG between '${dateFrom + ' 00:00:00'}' AND '${dateTo + ' 23:59:59'}' 
-                            AND a.DA_THANH_TOAN = '1'
-                        GROUP BY ${groupByName}`;
+                            AND a.TRANG_THAI != 3
+                            GROUP BY ${groupByName}`;
             const thongkes = await executeQuery(sql);
-            console.log({ sql })
+            console.log({ sql1: sql })
+
+            const result = {};
+            if (action === 'more-data') {
+                // get top seller
+                // get top bought
+                const sqls_moreData = [
+                    `
+                    SELECT b.MA_SP,c.TEN_SP,d.HINH_ANH,e.TEN_LOAI_SP,COUNT(c.MA_SP) AS TONG_SO
+                    FROM DON_HANG a,CHI_TIET_DON_HANG b,SAN_PHAM c
+                    LEFT JOIN ANH_SAN_PHAM d ON c.MA_SP =d.MA_SP
+                    LEFT JOIN LOAI_SAN_PHAM e ON c.MA_LOAI_SP =e.MA_LOAI_SP
+                    WHERE 
+                    a.MA_DH=b.MA_DH AND b.MA_SP=c.MA_SP AND a.TG_DAT_HANG 
+                    BETWEEN '${dateFrom + ' 00:00:00'}' AND '${dateTo + ' 23:59:59'}'   
+                    AND a.TRANG_THAI !=3 GROUP BY b.MA_SP ORDER BY TONG_SO DESC LIMIT 5`
+                    ,
+                    `SELECT b.USER_ID,b.HO_TEN,a.DIA_CHI,b.ANH_DAI_DIEN,b.LOAI_TAI_KHOAN,SUM(a.TONG_TIEN) AS TONG_SO
+                    FROM DON_HANG a, USER b
+                    WHERE 
+                    a.USER_ID=b.USER_ID AND a.TG_DAT_HANG 
+                    BETWEEN '${dateFrom + ' 00:00:00'}' AND '${dateTo + ' 23:59:59'}'  
+                    AND a.TRANG_THAI !=3 GROUP BY a.USER_ID ORDER BY TONG_SO DESC LIMIT 5	`
+                ];
+
+                const processes_moreData = sqls_moreData.map((sql, idx) => {
+                    return new Promise(async (resolve, reject) => {
+                        try {
+                            const data = await executeQuery(sql);
+                            const key = idx === 0 ? 'TOP_SP_BAN_CHAY' : 'TOP_USER'
+                            result[key] = data;
+                            resolve(true)
+                        } catch (error) {
+                            console.log({ error })
+                            reject(false);
+                        }
+                    })
+                })
+                await Promise.all(processes_moreData);
+
+            }
+
             res.json({
                 result: thongkes,
+                moreData: result,
                 message: 'Thành công'
             });
         } catch (error) {
@@ -224,7 +277,7 @@ module.exports = {
                 data = { TRANG_THAI: 1, CAP_NHAT, NV_ID, TG_GIAO_HANG }
             }
             else if (action === 'received') {
-                data = { TRANG_THAI: 2, CAP_NHAT, DA_THANH_TOAN: 1 }
+                data = { TRANG_THAI: 2, CAP_NHAT, DA_THANH_TOAN: 1, TG_GIAO_HANG: getNow() }
             }
             else if (action === 'cancle') {
                 const sql_restore = `SELECT MA_SP,SO_LUONG FROM CHI_TIET_DON_HANG WHERE MA_DH='${donhangID}'`;

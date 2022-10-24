@@ -20,6 +20,7 @@ import VoucherModal from 'pages/User/components/VoucherModal';
 import toast from 'react-hot-toast';
 import { donhangApi } from 'api/donhangApi';
 import { handleMomoPayment } from 'assets/payment';
+import CheckField from 'custom-fields/CheckField';
 
 Payments.propTypes = {
 
@@ -270,20 +271,8 @@ function Payments(props) {
     return (
         <div className='wrapper-content'>
             <div className="payments">
-                {
-                    !isAuth &&
-                    <div className='note'>
-                        Bạn đã có tài khoản? <a href='' onClick={(e) => {
-                            e.preventDefault();
-                            dispatch(switch_screenLogin(true))
-                        }}>Ấn vào đây để đăng nhập</a>
-                    </div>
-                }
                 <Form
                     onValuesChange={(values) => {
-                        // if (values.DIA_CHI && form.getFieldValue('')) {
-
-                        // }
                         values.DIA_CHI_GH && setReloadFeeShip(prev => !prev)
                     }}
                     form={form}
@@ -315,49 +304,14 @@ function Payments(props) {
                                 <div className="left-side">
                                     <h1>Thông tin thanh toán</h1>
 
-                                    <InputField name='HO_TEN' label='Họ tên' required rules={[yupSync]} />
-                                    <InputField name='SO_DIEN_THOAI' label='Số điện thoại' required rules={[yupSync]} />
-                                    <InputField name='EMAIL' label='Email' required rules={[yupSync]} />
-                                    {
-                                        !isAuth &&
-                                        <>
-                                            <SelectField
-                                                required
-                                                label='Tỉnh/Thành phố'
-                                                rules={[{ required: true, message: '...' }]}
-                                                onChange={(_, options) => {
-                                                    form.setFieldValue('DISTRICT', '');
-                                                    form.setFieldValue('WARD', '');
-                                                    setAddressCode(prev => ({ ...prev, provincesCode: options.code, districtCode: null }))
-                                                }}
-                                                name="PROVINCE" options={options_Provinces} />
-
-                                            <SelectField
-                                                required
-                                                label='Quận/Huyện'
-                                                rules={[{ required: true, message: '...' }]}
-                                                onChange={(_, options) => {
-                                                    form.setFieldValue('WARD', '');
-                                                    setAddressCode(prev => ({ ...prev, districtCode: options.code, wardsCode: null }))
-                                                }}
-                                                name="DISTRICT" options={options_district} />
-                                            <SelectField
-                                                onChange={(value) => {
-                                                    const DIA_CHI_GH = value + ', ' + form.getFieldValue('DISTRICT') + ', ' + form.getFieldValue('PROVINCE')
-                                                    form.setFieldValue('DIA_CHI_GH', DIA_CHI_GH);
-                                                    setReloadFeeShip(prev => !prev)
-                                                }}
-                                                required
-                                                label='Phường/Xã'
-                                                rules={[{ required: true, message: '...' }]}
-                                                name="WARD" options={options_wards} />
-                                        </>
-                                    }
+                                    <InputField name='HO_TEN' label='Họ tên' required rules={[yupSync]} placeHolder="-- Nhập họ tên --" />
+                                    <InputField name='SO_DIEN_THOAI' label='Số điện thoại' required rules={[yupSync]} placeHolder="-- Nhập số điện thoại --" />
+                                    <InputField name='EMAIL' label='Email' required rules={[yupSync]} placeHolder="-- Nhập email --" />
                                     <InputField
                                         name='GHI_CHU'
                                         label='Ghi chú đơn hàng'
                                         type='textarea'
-                                        rows={isAuth ? 10 : 3}
+                                        rows={10}
                                         placeHolder='Ghi chú về đơn hàng, ví dụ: thời gian hay chỉ dẫn địa điểm giao hàng chi tiết hơn.'
                                     // rules={[yupSync]}
                                     />
@@ -406,15 +360,15 @@ function Payments(props) {
 
                                         <div>
                                             <div className='title-custom'>Phương thức thanh toán</div>
-                                            <Form.Item name="HINH_THUC_THANH_TOAN">
-                                                <Radio.Group>
-                                                    <Space direction="vertical" >
-                                                        <Radio checked value='cod'>Thanh toán khi nhận hàng (COD)</Radio>
-                                                        {/* <Radio value='zalopay_wallet'>Thanh toán ZaloPay</Radio> */}
-                                                        <Radio value='momo_wallet'>Thanh toán Momo (MOMO_WALLET)</Radio>
-                                                    </Space>
-                                                </Radio.Group>
-                                            </Form.Item>
+                                            <CheckField
+                                                direction='vertical'
+                                                name="HINH_THUC_THANH_TOAN"
+                                                type='radio-box'
+                                                options={[
+                                                    { label: 'Thanh toán khi nhận hàng (COD)', value: 'cod' },
+                                                    { label: 'Thanh toán Momo (MOMO_WALLET)', value: 'momo_wallet' },
+                                                ]}
+                                            />
                                         </div>
                                         {
                                             isAuth &&
@@ -431,8 +385,9 @@ function Payments(props) {
                                                 <ChooseAddressModal onReload={handleReloadDeliveryAddress} addressList={deliveryAddressList} />
                                                 {
                                                     deliveryAddressList.length < 1 &&
-                                                    <p>Vui lòng chọn địa chỉ giao hàng</p>
+                                                    <p className='alert-not-address-choosen'>Vui lòng chọn địa chỉ giao hàng</p>
                                                 }
+
                                                 <Form.Item name="DIA_CHI_GH" rules={[yupSync]}>
                                                     <Radio.Group>
                                                         <Space direction="vertical" >
@@ -448,10 +403,10 @@ function Payments(props) {
 
                                         }
                                         {/* </Form>  */}
-                                        <ButtonCustom isLoading={isLoading} type='submit' style={{ width: '100%', justifyContent: 'center', textTransform: 'uppercase' }} text="Đặt hàng" />
-                                        {
+                                        <ButtonCustom isLoading={isLoading} type='submit' style={{ width: '100%', justifyContent: 'center' }} >Đặt hàng</ButtonCustom>
+                                        {/* {
                                             !isAuth && <InputField name='DIA_CHI_GH' type='hidden' />
-                                        }
+                                        } */}
                                     </div>
                                 </div>
 

@@ -1,6 +1,7 @@
 
 import { Button, Col, Form, Row } from 'antd';
 import { chucvuApi } from 'api/chucvuApi';
+import ButtonCustom from 'components/ButtonCustom';
 import InputField from 'custom-fields/InputField';
 import SelectField from 'custom-fields/SelectField';
 import { fetch_positions, reload } from 'pages/Admin/adminSlice';
@@ -70,10 +71,10 @@ function PositionEdit(props) {
                 form={form}
                 initialValues={initialValues}
                 layout='vertical'>
-                <InputField name='TEN_CV' label='Tên chức vụ' rules={[yupSync]} />
-                <InputField name='LUONG_CO_BAN' label='Lương cơ bản' rules={[yupSync]} />
+                <InputField name='TEN_CV' label='Tên chức vụ' placeHolder='-- Nhập tên chức vụ --' rules={[yupSync]} />
+                <InputField name='LUONG_CO_BAN' label='Lương cơ bản' placeHolder='-- Nhập lương cơ bản --' rules={[yupSync]} />
                 <br />
-                <Button htmlType='submit' className='admin-custom-btn bottom-btn' loading={isLoading}>Lưu</Button>
+                <ButtonCustom htmlType='submit' isLoading={isLoading}>Lưu</ButtonCustom>
             </Form>
         </div>
     );

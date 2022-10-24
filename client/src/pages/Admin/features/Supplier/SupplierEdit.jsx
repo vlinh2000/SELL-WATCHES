@@ -2,6 +2,7 @@
 import { Button, Form } from 'antd';
 import { nhacungcapApi } from 'api/nhacungcapApi';
 import axios from 'axios';
+import ButtonCustom from 'components/ButtonCustom';
 import InputField from 'custom-fields/InputField';
 import SelectField from 'custom-fields/SelectField';
 import { fetch_suppliers } from 'pages/Admin/adminSlice';
@@ -50,9 +51,9 @@ function SupplierEdit(props) {
     const initialValues = {
         TEN_NCC: currentSelected?.TEN_NCC || '',
         SO_DIEN_THOAI: currentSelected?.SO_DIEN_THOAI || '',
-        PROVINCES: currentSelected?.PROVINCES || '',
-        DISTRICT: currentSelected?.DISTRICT || '',
-        WARDS: currentSelected?.WARDS || '',
+        PROVINCES: currentSelected?.PROVINCES || undefined,
+        DISTRICT: currentSelected?.DISTRICT || undefined,
+        WARDS: currentSelected?.WARDS || undefined,
     }
 
     const handleSave = async (values) => {
@@ -138,23 +139,29 @@ function SupplierEdit(props) {
                 form={form}
                 initialValues={initialValues}
                 layout='vertical'>
-                <InputField name='TEN_NCC' label='Tên nhà cung cấp' rules={[yupSync]} />
-                <InputField name='SO_DIEN_THOAI' label='Số điện thoại' rules={[yupSync]} />
+                <InputField name='TEN_NCC' label='Tên nhà cung cấp' placeHolder='-- Nhập tên nhà cung cấp --' rules={[yupSync]} />
+                <InputField name='SO_DIEN_THOAI' label='Số điện thoại' placeHolder='-- Nhập số điện thoại --' rules={[yupSync]} />
 
-                <SelectField onChange={(_, options) => {
-                    setAddressCode(prev => ({ ...prev, provincesCode: options.code, districtCode: null }))
-                    form.setFieldValue('DISTRICT', '');
-                    form.setFieldValue('WARDS', '');
-                }} name='PROVINCES' label='Tỉnh/Thành phố' rules={[yupSync]} options={options_Provinces} />
+                <SelectField
+                    placeHolder='-- Chọn tỉnh/thành phố --'
+                    onChange={(_, options) => {
+                        setAddressCode(prev => ({ ...prev, provincesCode: options.code, districtCode: null }))
+                        form.setFieldValue('DISTRICT', '');
+                        form.setFieldValue('WARDS', '');
+                    }} name='PROVINCES' label='Tỉnh/Thành phố' rules={[yupSync]} options={options_Provinces} />
 
-                <SelectField onChange={(_, options) => {
-                    setAddressCode(prev => ({ ...prev, districtCode: options.code, wardsCode: null }))
-                    form.setFieldValue('WARDS', '');
-                }} name='DISTRICT' label='Quận/Huyện' rules={[yupSync]} options={options_district} />
+                <SelectField
+                    placeHolder='-- Chọn quận/huyện --'
+                    onChange={(_, options) => {
+                        setAddressCode(prev => ({ ...prev, districtCode: options.code, wardsCode: null }))
+                        form.setFieldValue('WARDS', '');
+                    }} name='DISTRICT' label='Quận/Huyện' rules={[yupSync]} options={options_district} />
 
-                <SelectField name='WARDS' label='Phường/Xã' rules={[yupSync]} options={options_wards} />
+                <SelectField
+                    placeHolder='-- Chọn phường/xã --'
+                    name='WARDS' label='Phường/Xã' rules={[yupSync]} options={options_wards} />
                 <br />
-                <Button htmlType='submit' className='admin-custom-btn bottom-btn' loading={isLoading}>Lưu</Button>
+                <ButtonCustom type='submit' isLoading={isLoading}>Lưu</ButtonCustom>
             </Form>
         </div>
     );

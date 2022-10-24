@@ -1,12 +1,14 @@
 .auth-wrapper{
 
+   
+
 }
 
 .group-login-social-media{
     margin-top: 1rem;
     // padding-top: 1rem;
     // border-top: 4px solid #eaeaea;
-
+    
     p{
         text-transform: uppercase;
         text-align: center;
@@ -24,4 +26,16 @@
 .ant-drawer-body{
     padding-left: 2rem;
     padding-right: 2rem;
+
+}
+
+.auth-drawer{
+    .forget-pass-btn{
+        font-size: 13px;
+    }
+
+    .ant-drawer-title{
+        font-size: 13.5px;
+        text-transform: 'uppercase';
+    }
 }

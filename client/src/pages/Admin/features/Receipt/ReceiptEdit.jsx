@@ -1,9 +1,12 @@
 
 import { DeleteOutlined, PlusSquareOutlined } from '@ant-design/icons';
-import { Button, Col, Divider, Form, Row } from 'antd';
+import { Button, Col, Divider, Form, Row, Select, Table } from 'antd';
 import { nhacungcapApi } from 'api/nhacungcapApi';
 import { phieunhapApi } from 'api/phieunhapApi';
 import { sanphamApi } from 'api/sanphamApi';
+import { numberWithCommas } from 'assets/admin';
+import { getTotalPrice } from 'assets/common';
+import ButtonCustom from 'components/ButtonCustom';
 import InputField from 'custom-fields/InputField';
 import SelectField from 'custom-fields/SelectField';
 import { fetch_receipts } from 'pages/Admin/adminSlice';
@@ -12,6 +15,7 @@ import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
+import './ReceiptEdit.scss';
 
 ReceiptEdit.propTypes = {
 
@@ -47,6 +51,7 @@ function ReceiptEdit(props) {
     const [isLoading, setIsLoading] = React.useState(false);
     const [options_Supplier, setOptions_Supplier] = React.useState([]);
     const [options_Product, setOptions_Product] = React.useState([]);
+    const [formClone, setFormClone] = React.useState([]);
     const [listProduct, setListProduct] = React.useState(() => new Array(currentSelected?.SAN_PHAM?.length || 1).fill(true));
     const [form] = Form.useForm();
     const navigate = useNavigate();
@@ -55,15 +60,15 @@ function ReceiptEdit(props) {
     const initialValues = {
         NV_ID: currentSelected?.NV_ID || user.NV_ID,
         HO_TEN: currentSelected?.HO_TEN || user.HO_TEN,
-        MA_NCC: currentSelected?.MA_NCC || '',
+        MA_NCC: currentSelected?.MA_NCC || undefined,
         GHI_CHU: currentSelected?.GHI_CHU || '',
         SAN_PHAM: currentSelected?.SAN_PHAM || '',
     }
 
     const handleSave = async (values) => {
         try {
-            values.TONG_TIEN = values.SAN_PHAM.reduce((a, b) => a + b.GIA, 0);
-            console.log({ values });
+            if (!values.SAN_PHAM || values.SAN_PHAM.length < 1) return toast.error("Vui lòng chọn sản phẩm nhập");
+            values.TONG_TIEN = values.SAN_PHAM?.reduce((a, b) => a + b.GIA, 0);
             setIsLoading(true);
             const { message } = mode === 'ADD' ? await phieunhapApi.post(values) : await phieunhapApi.update(currentSelected.MA_PHIEU_NHAP, values);
             await dispatch(fetch_receipts({ _limit: pagination._limit, _page: pagination._page }));
@@ -99,7 +104,7 @@ function ReceiptEdit(props) {
         const fetchAllProduct = async () => {
             try {
                 const { result } = await sanphamApi.getAll();
-                const options = result.map((e) => ({ label: e.MA_SP + ' - ' + e.TEN_SP, value: e.MA_SP }));
+                const options = result.map((e) => ({ label: e.TEN_SP, value: e.MA_SP }));
                 setOptions_Product(options);
             } catch (error) {
                 console.log({ error });
@@ -109,9 +114,9 @@ function ReceiptEdit(props) {
         fetchAllProduct();
     }, [])
 
-    // React.useEffect(() => {
-    //     form.setFieldValue('SAN_PHAM', listProduct);
-    // }, [listProduct])
+    React.useEffect(() => {
+        currentSelected && setFormClone(currentSelected?.SAN_PHAM);
+    }, [currentSelected])
 
     const handleChangeProduct = (idx) => {
         let SAN_PHAM = form.getFieldValue('SAN_PHAM');
@@ -138,10 +143,56 @@ function ReceiptEdit(props) {
         setOptions_Product(new_options);
     }
 
+    const columns = [
+        {
+            title: 'STT',
+            dataIndex: 'IDX',
+            render: (text, row) => text + 1
+        },
+        {
+            title: 'Sản phẩm',
+            dataIndex: 'TEN_SP',
+            render: (text, row) => <SelectField placeHolder='-- Chọn sản phẩm --' style={{ minWidth: 500 }} name={['SAN_PHAM', row.IDX, 'MA_SP']} required
+                rules={[{ required: true, message: 'Sản phẩm không được để trống.' }]}
+                options={options_Product} />
+        },
+        {
+            title: 'Số lượng',
+            dataIndex: 'SO_LUONG',
+            render: (text, row) => <InputField placeHolder='-- Nhập số lượng --' type='number' style={{ minWidth: 150 }} name={['SAN_PHAM', row.IDX, 'DON_GIA']} required rules={[{ required: true, message: '...' }]} />
+        },
+        {
+            title: 'Đơn giá',
+            dataIndex: 'DON_GIA',
+            render: (text, row) => <InputField placeHolder='-- Nhập đơn giá --' type='number' style={{ minWidth: 150 }} name={['SAN_PHAM', row.IDX, 'SO_LUONG']} required rules={[{ required: true, message: '...' }]} />
+        },
+        {
+            title: 'Thành tiền',
+            dataIndex: 'GIA',
+            render: (text, row) => <InputField shouldUpdate placeHolder='-- Thành tiền --' readOnly name={['SAN_PHAM', row.IDX, 'GIA']} style={{ minWidth: 150 }} />
+        },
+        {
+            title: 'Hành động',
+            // dataIndex: 'GIA',
+            render: (text, row, idx) => idx !== 0 && <Button onClick={() => {
+                handleRemoveProduct(row.IDX)
+                handleChangeOptions();
+            }}
+                icon={<DeleteOutlined style={{ fontSize: 13 }} />} danger shape="circle"></Button>
+        },
+    ];
+
+    const dataSource = React.useMemo(() => listProduct?.map((_, idx) => ({ KEY: idx, IDX: idx })), [listProduct])
+
+    React.useEffect(() => {
+        console.log({ formClone })
+    }, [formClone])
+
     return (
-        <div className='employee-edit box'>
+        <div className='receipt-edit box'>
             <Form
                 onValuesChange={({ SAN_PHAM = [] }) => {
+                    setFormClone(form.getFieldValue('SAN_PHAM'));
                     const current_SP = [...SAN_PHAM].pop();
                     if (current_SP && (current_SP.SO_LUONG || current_SP.DON_GIA)) handleChangeProduct(SAN_PHAM.length - 1)
                     else if (current_SP?.MA_SP) handleChangeOptions();
@@ -150,17 +201,25 @@ function ReceiptEdit(props) {
                 form={form}
                 initialValues={initialValues}
                 layout='vertical'>
-                <Row gutter={[20, 0]} justify="space-between" align='middle'>
-                    <Col xs={24} sm={12} md={9} lg={9}>
-                        <InputField name='NV_ID' label='Mã nhân viên' disabled />
-                        <InputField name='HO_TEN' label='Tên nhân viên' disabled />
-                        <SelectField name='MA_NCC' label='Nhà cung cấp' rules={[yupSync]} options={options_Supplier} />
+                <Row gutter={[20, 0]} justify="space-between" >
+                    <Col xs={24} sm={12} md={8} lg={6}>
+                        <InputField name='NV_ID' label='Mã nhân viên nhập' readOnly />
+                        <InputField name='HO_TEN' label='Tên nhân viên nhập' readOnly />
                     </Col>
                     <Col xs={24} sm={12} md={13} lg={13}>
-                        <InputField name='GHI_CHU' label='Ghi chú' type='textarea' rows={9} />
+                        <SelectField name='MA_NCC' placeHolder='-- Chọn nhà cung cấp --' label='Nhà cung cấp' rules={[yupSync]} options={options_Supplier} />
+                        <InputField name='GHI_CHU' placeHolder='Những điều cần lưu ý' label='Ghi chú' type='textarea' rows={3} />
                     </Col>
                 </Row>
-                <Divider />
+                <br />
+                <Table
+                    className='table-product-list'
+                    size='small'
+                    columns={columns}
+                    dataSource={dataSource}
+                    pagination={false}
+                />
+                {/* <Divider />
                 {
                     listProduct?.map((_, idx) => <Row key={idx} gutter={[20, 0]} >
                         <Col xs={24} sm={8} md={11} lg={11}>
@@ -188,13 +247,21 @@ function ReceiptEdit(props) {
                         }
                     </Row>
                     )
-                }
+                } */}
                 <br />
-                <Button onClick={() => setListProduct(prev => [...prev, true])} icon={<PlusSquareOutlined />}>Thêm</Button>
+                <button type='button' onClick={() => setListProduct(prev => [...prev, true])} className='button-1'>Thêm sản phẩm</button>
+                {/* <Button >Thêm sản phẩm</Button> */}
                 <br />
                 <br />
                 <Divider />
-                <Button htmlType='submit' className='admin-custom-btn bottom-btn' loading={isLoading}>Lưu</Button>
+                <Row justify='space-between' className='action-group'>
+                    <Col xs={24} md={5}>
+                        <ButtonCustom type='submit' isLoading={isLoading}>Lưu phiếu nhập</ButtonCustom>
+                    </Col>
+                    <Col xs={24} md={5}>
+                        <div className='total-price'><i>Tổng tiền:</i> <span>{numberWithCommas(getTotalPrice(formClone, 'DON_GIA', 'SO_LUONG') || 0)} ₫</span></div>
+                    </Col>
+                </Row>
             </Form>
 
         </div>

@@ -115,11 +115,11 @@ function getBreadcrumbFromSecond(path) {
             key = "12121";
             break;
         }
-        // case '/admin/rules/edit_rule_employee': {
-        //     paths = ['Quản lý quyền', 'Cập nhật quyền nhân viên'];
-        //     key = "12122";
-        //     break;
-        // }
+        case '/admin/rules/rule_employee': {
+            paths = ['Quản lý quyền', 'Phân quyền nhân viên'];
+            key = "12122";
+            break;
+        }
         case '/admin/rules/view': {
             paths = ['Quản lý quyền', 'Danh sách quyền'];
             key = "12123";
@@ -155,7 +155,7 @@ function numberWithCommas(x) {
 }
 
 function getStatusOrder(num) {
-    return num == 0 ? 'Chờ xử lý' : num == 1 ? 'Đang giao' : num === 2 ? 'Đã giao' : num == 3 ? 'Đã hủy' : 'Không xác định';
+    return num == 0 ? 'Chờ xử lý' : num == 1 ? 'Đang vận chuyển' : num === 2 ? 'Đã giao' : num == 3 ? 'Đã hủy' : 'Không xác định';
 }
 
 function getStatusOrderClassName(num) {
@@ -163,7 +163,7 @@ function getStatusOrderClassName(num) {
 }
 
 function getStatusOrderColor(num) {
-    return num == 0 ? 'warning' : num == 1 ? '#55acee' : num === 2 ? '#87d068' : '#cd201f';
+    return num == 0 ? '#ffcb2b' : num == 1 ? '#55acee' : num === 2 ? '#41b883' : '#cd201f';
 }
 
 function formatDate(date, formart = "YYYY-MM-DD") {

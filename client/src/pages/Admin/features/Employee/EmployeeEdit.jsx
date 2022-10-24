@@ -1,10 +1,11 @@
 import { CameraOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Col, Form, Row, Space } from 'antd';
+import { Button, Checkbox, Col, Divider, Form, Row, Space, Table } from 'antd';
 import { chucvuApi } from 'api/chucvuApi';
 import { nhacungcapApi } from 'api/nhacungcapApi';
 import { nhanvienApi } from 'api/nhanvienApi';
 import { quyenApi } from 'api/quyenApi';
 import axios from 'axios';
+import ButtonCustom from 'components/ButtonCustom';
 import InputField from 'custom-fields/InputField';
 import SelectField from 'custom-fields/SelectField';
 import UploadField from 'custom-fields/UploadField';
@@ -36,7 +37,7 @@ let schema = yup.object().shape({
     PROVINCES: yup.string().required('Tỉnh/Thành phố không được để trống.'),
     DISTRICT: yup.string().required('Quận/Huyện không được để trống.'),
     WARDS: yup.string().required('Phường/Xã không được để trống.'),
-    QUYEN: yup.array().min(1, "Quyền không được để trống.")
+    // QUYEN: yup.array().min(1, "Quyền không được để trống.")
 });
 
 const yupSync = {
@@ -63,15 +64,15 @@ function EmployeeEdit(props) {
     const dispatch = useDispatch()
 
     const initialValues = {
-        MA_CV: currentSelected?.MA_CV || '',
+        MA_CV: currentSelected?.MA_CV || undefined,
         HO_TEN: currentSelected?.HO_TEN || '',
         SO_DIEN_THOAI: currentSelected?.SO_DIEN_THOAI || '',
         EMAIL: currentSelected?.EMAIL || '',
-        GIOI_TINH: currentSelected?.GIOI_TINH || '',
+        GIOI_TINH: currentSelected?.GIOI_TINH || undefined,
         MAT_KHAU: currentSelected?.MAT_KHAU || '',
-        PROVINCES: currentSelected?.PROVINCES || '',
-        DISTRICT: currentSelected?.DISTRICT || '',
-        WARDS: currentSelected?.WARDS || '',
+        PROVINCES: currentSelected?.PROVINCES || undefined,
+        DISTRICT: currentSelected?.DISTRICT || undefined,
+        WARDS: currentSelected?.WARDS || undefined,
         ANH_DAI_DIEN: currentSelected?.ANH_DAI_DIEN || '',
         // QUYEN: currentSelected?.QUYEN || [],
     }
@@ -88,7 +89,7 @@ function EmployeeEdit(props) {
             data.append('GIOI_TINH', values.GIOI_TINH);
             data.append('MAT_KHAU', values.MAT_KHAU);
             data.append('DIA_CHI', address);
-            data.append('QUYEN', JSON.stringify(values.QUYEN));
+            // data.append('QUYEN', JSON.stringify(values.QUYEN));
 
             setIsLoading(true);
             const { message } = mode === 'ADD' ? await nhanvienApi.post(data) : await nhanvienApi.update(currentSelected.NV_ID, data);
@@ -193,6 +194,17 @@ function EmployeeEdit(props) {
         currentSelected?.NV_ID && fetchUserRules();
     }, [currentSelected?.NV_ID])
 
+    const columns = [
+        {
+            title: 'Quyền',
+            dataIndex: 'label'
+        },
+        {
+            title: 'Trạng thái',
+            dataIndex: 'value',
+        },
+    ];
+
     return (
         <div className='employee-edit box'>
 
@@ -201,51 +213,58 @@ function EmployeeEdit(props) {
                 form={form}
                 initialValues={initialValues}
                 layout='vertical'>
-                <Row gutter={[20, 0]}>
-                    <Col xs={24} sm={12} md={12} lg={12}>
-                        <div className='avatar-wrapper'>
-                            <div className='avatar'>
-                                <div className='show-avatar'>
-                                    <img src={currentAvatar} alt='avatar'></img>
-                                </div>
-                                <UploadField name='ANH_DAI_DIEN' icon={<CameraOutlined className='icon-camera' />} getUrl={(url) => setCurrentAvatar(url)} />
-                            </div>
+                <div className='avatar-wrapper'>
+                    <div className='avatar'>
+                        <div className='show-avatar'>
+                            <img src={currentAvatar} alt='avatar'></img>
                         </div>
-                        <InputField name='HO_TEN' label='Họ tên' rules={[yupSync]} />
-                        <InputField name='SO_DIEN_THOAI' label='Số điện thoại' rules={[yupSync]} />
-                        <InputField name='EMAIL' label='Email' disabled={currentSelected?.NV_ID} rules={[yupSync]} />
+                        <UploadField name='ANH_DAI_DIEN' icon={<CameraOutlined className='icon-camera' />} getUrl={(url) => setCurrentAvatar(url)} />
+                    </div>
+                </div>
+                <Row gutter={[20, 0]} justify="center">
+                    <Col xs={24} sm={12} md={10} lg={8}>
+                        <InputField name='HO_TEN' label='Họ tên' rules={[yupSync]} placeHolder="-- Nhập họ tên --" />
+                        <InputField name='SO_DIEN_THOAI' label='Số điện thoại' rules={[yupSync]} placeHolder="-- Nhập số điện thoại --" />
+                        <InputField name='EMAIL' label='Email' disabled={currentSelected?.NV_ID} rules={[yupSync]} placeHolder="-- Nhập email --" />
                         <SelectField name='GIOI_TINH' label='Giới tính' rules={[yupSync]}
+                            placeHolder="-- Chọn giới tính --"
                             options={[{ value: 'Nam', labe: 'Nam' }, { value: 'Nữ', labe: 'Nữ' }, { value: 'Khác', labe: 'Khác' }]} />
-                        <InputField name='MAT_KHAU' label='Mật khẩu' rules={[yupSync]} />
-                        <SelectField name='MA_CV' label='Chức vụ' options={options_Position} rules={[yupSync]} />
+                        <InputField name='MAT_KHAU' label='Mật khẩu' rules={[yupSync]} placeHolder="-- Nhập mật khẩu --" />
                     </Col>
-                    <Col xs={24} sm={12} md={12} lg={12}>
-
+                    <Col xs={24} sm={12} md={10} lg={8}>
+                        <SelectField name='MA_CV' label='Chức vụ' options={options_Position} rules={[yupSync]} placeHolder="-- Nhập chức vụ --" />
                         <SelectField onChange={(_, options) => {
                             setAddressCode(prev => ({ ...prev, provincesCode: options.code, districtCode: null }))
                             form.setFieldValue('DISTRICT', '');
                             form.setFieldValue('WARDS', '');
-                        }} name='PROVINCES' label='Tỉnh/Thành phố' rules={[yupSync]} options={options_Provinces} />
+                        }}
+                            name='PROVINCES'
+                            label='Tỉnh/Thành phố'
+                            rules={[yupSync]}
+                            options={options_Provinces}
+                            placeHolder="-- Chọn tỉnh/thành phố --" />
 
                         <SelectField onChange={(_, options) => {
                             setAddressCode(prev => ({ ...prev, districtCode: options.code, wardsCode: null }))
                             form.setFieldValue('WARDS', '');
-                        }} name='DISTRICT' label='Quận/Huyện' rules={[yupSync]} options={options_district} />
+                        }}
+                            name='DISTRICT'
+                            label='Quận/Huyện'
+                            rules={[yupSync]}
+                            options={options_district}
+                            placeHolder="-- Chọn quận/huyện --" />
 
-                        <SelectField name='WARDS' label='Phường/Xã' rules={[yupSync]} options={options_wards} />
-                        <Form.Item name="QUYEN" label="Quyền" >
-                            <Checkbox.Group>
-                                <Space direction='vertical'>
-                                    {
-                                        options_rules?.map((rule) => <Checkbox key={rule.value} value={rule.value}>{rule.label}</Checkbox>)
-                                    }
-                                </Space>
-                            </Checkbox.Group>
-                        </Form.Item>
+                        <SelectField name='WARDS'
+                            label='Phường/Xã'
+                            rules={[yupSync]}
+                            options={options_wards}
+                            placeHolder="-- Chọn phường/xã --" />
+                    </Col>
+                    <Col xs={24} sm={24} md={20} lg={16}>
+                        <br />
+                        <ButtonCustom type='submit' isLoading={isLoading}>Lưu</ButtonCustom>
                     </Col>
                 </Row>
-                <br />
-                <Button htmlType='submit' className='admin-custom-btn bottom-btn' loading={isLoading}>Lưu</Button>
             </Form>
         </div>
     );

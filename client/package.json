@@ -28,6 +28,7 @@
     "react-string-replace": "^1.1.0",
     "react-timer-hook": "^3.0.5",
     "reactjs-social-login": "^2.5.6",
+    "recharts": "^2.1.14",
     "redux-persist": "^6.0.0",
     "sass": "^1.54.4",
     "web-vitals": "^2.1.4",

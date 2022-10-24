@@ -66,14 +66,14 @@ function Brand(props) {
         {
             title: 'Hành động',
             dataIndex: 'MA_THUONG_HIEU',
-            render: (text, record) => <> <Button onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
+            render: (text, record) => <> <Button shape='circle' onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
                 <Popconfirm
                     title={`Bạn có chắc muốn xóa thương hiệu ID [${text}]`}
                     onConfirm={() => { onDelete(text) }}
                     okText="Yes"
                     cancelText="No"
                 >
-                    <Button style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
+                    <Button shape='circle' style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
                 </Popconfirm>
             </>
         },
@@ -93,15 +93,14 @@ function Brand(props) {
                             dataSource={brands}
                             pagination={false}
                         />
-                        <Divider />
-                        <Pagination
-                            pageSize={1}
-                            current={pagination._page}
-                            total={pagination._totalPage}
-                            onChange={(page) => dispatch(savePagination({ screen: 'brands', page }))} ></Pagination>
                     </>
 
             }
+            <Pagination
+                pageSize={1}
+                current={pagination._page}
+                total={pagination._totalPage}
+                onChange={(page) => dispatch(savePagination({ screen: 'brands', page }))} ></Pagination>
         </div>
     );
 }

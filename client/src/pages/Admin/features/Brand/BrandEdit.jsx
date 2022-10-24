@@ -2,6 +2,7 @@
 import { Button, Form } from 'antd';
 import { thuonghieuApi } from 'api/thuonghieuApi';
 import axios from 'axios';
+import ButtonCustom from 'components/ButtonCustom';
 import InputField from 'custom-fields/InputField';
 import SelectField from 'custom-fields/SelectField';
 import { fetch_brands } from 'pages/Admin/adminSlice';
@@ -43,7 +44,7 @@ function BrandEdit(props) {
 
     const initialValues = {
         TEN_THUONG_HIEU: currentSelected?.TEN_THUONG_HIEU || '',
-        QUOC_GIA: currentSelected?.QUOC_GIA || '',
+        QUOC_GIA: currentSelected?.QUOC_GIA || undefined,
         NAM_THANH_LAP: currentSelected?.NAM_THANH_LAP || '',
     }
 
@@ -88,11 +89,11 @@ function BrandEdit(props) {
                 form={form}
                 initialValues={initialValues}
                 layout='vertical'>
-                <InputField name='TEN_THUONG_HIEU' label='Tên thương hiệu' rules={[yupSync]} />
-                <SelectField name='QUOC_GIA' label='Quốc gia' options={options_country} rules={[yupSync]} />
-                <InputField name='NAM_THANH_LAP' label='Năm thành lập' rules={[yupSync]} />
+                <InputField placeHolder='-- Nhập tên thương hiệu --' name='TEN_THUONG_HIEU' label='Tên thương hiệu' rules={[yupSync]} />
+                <SelectField placeHolder='-- Chọn quốc gia --' name='QUOC_GIA' label='Quốc gia' options={options_country} rules={[yupSync]} />
+                <InputField placeHolder='-- Nhập năm thành lập --' name='NAM_THANH_LAP' label='Năm thành lập' rules={[yupSync]} />
                 <br />
-                <Button htmlType='submit' className='admin-custom-btn bottom-btn' loading={isLoading}>Lưu</Button>
+                <ButtonCustom type='submit' isLoading={isLoading}>Lưu</ButtonCustom>
             </Form>
         </div>
     );

@@ -1,4 +1,5 @@
 var mysql = require('mysql');
+require('dotenv').config();
 
 var con = mysql.createConnection({
     host: "localhost",
@@ -7,6 +8,14 @@ var con = mysql.createConnection({
     port: 3308,
     database: "quan_ly_ban_hang"
 });
+
+// var con = mysql.createConnection({
+//     host: process.env.DB_HOST,
+//     user: process.env.DB_USER,
+//     password: process.env.DB_PASSWORD,
+//     port: process.env.DB_PORT,
+//     database: process.env.DB_DATABASE
+// });
 
 function executeQuery(sql) {
     return new Promise((resolve, reject) => {
@@ -37,3 +46,4 @@ function checkIsExist(table, fieldName, id) {
 }
 
 module.exports = { con, executeQuery, executeUpdateQuery, checkIsExist };
+

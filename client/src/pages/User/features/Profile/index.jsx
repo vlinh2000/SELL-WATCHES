@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Col, Collapse, Divider, Form, Pagination, Row, Tabs, Tooltip } from 'antd';
+import { Alert, Col, Collapse, Divider, Empty, Form, Pagination, Row, Tabs, Tooltip } from 'antd';
 import { AndroidOutlined, AppleOutlined, CameraOutlined, CarOutlined, HistoryOutlined, HourglassOutlined, LogoutOutlined, SettingOutlined, ShoppingOutlined, UserOutlined, WarningOutlined } from '@ant-design/icons';
 import InputField from 'custom-fields/InputField';
 import ButtonCustom from 'components/ButtonCustom';
@@ -136,9 +136,10 @@ function Profile(props) {
                                         rules={[yupSync]}
                                         rows={5} disabled={user?.USER_ID && user?.LOAI_TAI_KHOAN !== isAccountOfThisSite} />
 
+                                    <br />
                                     {
                                         (user.NV_ID || user?.LOAI_TAI_KHOAN === isAccountOfThisSite) &&
-                                        <ButtonCustom isLoading={loading} type='submit' text='Lưu'></ButtonCustom>
+                                        <ButtonCustom isLoading={loading} type='submit'>Lưu thay đổi</ButtonCustom>
                                     }
                                 </Form>
                             </Col>
@@ -156,7 +157,9 @@ function Profile(props) {
                             }
                             key="2"
                         >
-                            <HistoryOrder myOrders={myOrders} />
+                            {
+                                pagination?._totalRecord > 0 ? <HistoryOrder myOrders={myOrders} /> : <Empty />
+                            }
                         </Tabs.TabPane>
                     }
                     {

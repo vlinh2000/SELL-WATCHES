@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
+import ButtonCustom from 'components/ButtonCustom';
 
 RuleEdit.propTypes = {
 
@@ -82,11 +83,11 @@ function RuleEdit(props) {
                 form={form}
                 initialValues={initialValues}
                 layout='vertical'>
-                <InputField name='MA_QUYEN' label='Mã quyền' rules={[yupSync]} />
-                <InputField name='TEN_QUYEN' label='Tên quyền' rules={[yupSync]} />
+                <InputField name='MA_QUYEN' label='Mã quyền' placeHolder='-- Nhập mã quyền --' rules={[yupSync]} />
+                <InputField name='TEN_QUYEN' label='Tên quyền' placeHolder='-- Nhập tên quyền --' rules={[yupSync]} />
                 {/* <SelectField name='MA_LOAI_SP' label='Loại sản phẩm' rules={[yupSync]} options={options_ProductType} /> */}
                 <br />
-                <Button htmlType='submit' className='admin-custom-btn bottom-btn' loading={isLoading}>Lưu</Button>
+                <ButtonCustom type='submit' isLoading={isLoading}>Lưu</ButtonCustom>
             </Form>
         </div>
     );

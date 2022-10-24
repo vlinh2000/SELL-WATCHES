@@ -15,18 +15,7 @@ import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
 Dashboard.propTypes = {
 
 };
-const options = {
-    responsive: true,
-    plugins: {
-        legend: {
-            position: 'top'
-        },
-        title: {
-            display: false,
-            text: 'Thống kê doanh thu',
-        },
-    },
-};
+
 function Dashboard(props) {
 
     const {
@@ -36,18 +25,7 @@ function Dashboard(props) {
     const [loading, setLoading] = React.useState(false);
     const [date, setDate] = React.useState(() => ([moment().startOf('month'), moment().endOf('month')]))
 
-    const [chartInfo, setChartInfo] = React.useState({
-        labels: [],
-        datasets: [
-            {
-                fill: true,
-                label: 'Doanh thu',
-                data: [],
-                borderColor: 'rgb(53, 162, 235)',
-                backgroundColor: 'rgba(53, 162, 235, 0.5)',
-            },
-        ],
-    });
+    const [chartInfo, setChartInfo] = React.useState([]);
 
     React.useEffect(() => {
         const onFilterRevenue = async () => {
@@ -56,13 +34,8 @@ function Dashboard(props) {
                 const dateFrom = date[0].format().slice(0, 10);
                 const dateTo = date[1].format().slice(0, 10);
                 const { result } = await donhangApi.getThongKes({ groupBy: 'day', dateFrom, dateTo });
-                const labels = [];
-                const data = [];
-                result.forEach(dh => {
-                    labels.push(dh.TEN_THONG_KE);
-                    data.push(dh.TONG_TIEN);
-                })
-                setChartInfo(prev => ({ ...prev, labels, datasets: [{ ...prev.datasets[0], data }] }))
+                const data = result.map(dh => ({ name: dh.TEN_THONG_KE, 'Doanh thu': dh.TONG_TIEN, "Lợi nhuận": dh.TONG_TIEN - dh.TIEN_VON }));
+                setChartInfo(data)
                 setLoading(false);
             } catch (error) {
                 setLoading(false);
@@ -181,7 +154,7 @@ function Dashboard(props) {
             <div className="box">
                 <div className='sub-title'>Doanh thu tháng này ({date[0]?.format('MM-YYYY')}) <Link to="/admin/revenues/view">Xem chi tiết</Link></div>
                 <br />
-                <Chart isLoading={loading} options={options} data={chartInfo} />
+                <Chart isLoading={loading} data={chartInfo} />
             </div>
 
         </div>

@@ -3,7 +3,10 @@ import { PercentageOutlined } from '@ant-design/icons';
 import { Button, Col, DatePicker, Form, Input, Radio, Row, Space } from 'antd';
 import { chucvuApi } from 'api/chucvuApi';
 import { uudaiApi } from 'api/uudaiApi';
+import ButtonCustom from 'components/ButtonCustom';
+import CheckField from 'custom-fields/CheckField';
 import InputField from 'custom-fields/InputField';
+import PickDateField from 'custom-fields/PickDateField';
 import SelectField from 'custom-fields/SelectField';
 import moment from 'moment';
 import { fetch_vouchers, reload } from 'pages/Admin/adminSlice';
@@ -69,7 +72,7 @@ function VoucherEdit(props) {
             const data = {
                 TEN_UU_DAI: values.TEN_UU_DAI,
                 SO_LUONG_BAN_DAU: values.SO_LUONG_BAN_DAU,
-                SO_LUONG_CON_LAI: values.SO_LUONG_CON_LAI,
+                SO_LUONG_CON_LAI: values.SO_LUONG_BAN_DAU,
                 HSD: values.HSD.utc(true),
                 MPVC: values.MPVC,
                 GIA_TRI: values.GIA_TRI === -1 ? values.GIA_TRI_SO : values.GIA_TRI,
@@ -97,26 +100,24 @@ function VoucherEdit(props) {
         <div className='voucher-edit box'>
             <Form
                 onValuesChange={values => {
-                    if (values.SO_LUONG_BAN_DAU) form.setFieldValue('SO_LUONG_CON_LAI', values.SO_LUONG_BAN_DAU);
-                    else if (values.GIA_TRI) form.setFieldValue('GIA_TRI_SO', values.GIA_TRI === -1 ? '' : values.GIA_TRI)
+                    if (values.GIA_TRI) form.setFieldValue('GIA_TRI_SO', values.GIA_TRI === -1 ? '' : values.GIA_TRI)
                 }}
                 onFinish={handleSave}
                 form={form}
                 initialValues={initialValues}
                 layout='vertical'>
-                <Row gutter={[40, 0]}>
-                    <Col xs={24} sm={24} md={12} lg={12}>
-                        <InputField name='TEN_UU_DAI' label='Tên ưu đãi' rules={[yupSync]} />
-                        <InputField min={1} type='number' name='SO_LUONG_BAN_DAU' label='Số lượng' rules={[yupSync]} />
-                        <InputField min={1} shouldUpdate type='number' disabled name='SO_LUONG_CON_LAI' label='Số lượng còn lại' rules={[yupSync]} />
+                <Row gutter={[40, 0]} justify="center">
+                    <Col xs={24} sm={24} md={24} lg={24}>
+                        <InputField name='TEN_UU_DAI' label='Tên ưu đãi' placeHolder='-- Nhập tên ưu đãi --' rules={[yupSync]} />
+                        <InputField min={1} type='number' name='SO_LUONG_BAN_DAU' label='Số lượng' placeHolder='-- Nhập số lượng --' rules={[yupSync]} />
+                        {/* <InputField min={1} shouldUpdate type='number' disabled name='SO_LUONG_CON_LAI' label='Số lượng còn lại' rules={[yupSync]} /> */}
+                        <PickDateField
+                            showTime
+                            placeHolder='-- Nhập hạn sử dụng --'
+                            name='HSD' label='Hạn sử dụng' rules={[yupSync]}
+                        />
                         <Form.Item
-                            name='HSD' label='Hạn sử dụng' rules={[yupSync]}>
-                            <DatePicker style={{ width: '100%' }} showTime />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={24} md={12} lg={12}>
-
-                        <Form.Item
+                            className='check-field'
                             name='MPVC' label='Loại ưu đãi' rules={[yupSync]}>
                             <Radio.Group onChange={({ target }) => target.value === 0 ? setisVisibleValueInput(true) : setisVisibleValueInput(false)}>
                                 <Space direction="vertical">
@@ -142,7 +143,7 @@ function VoucherEdit(props) {
                                 {
                                     isVisibleVNDChoosen ?
                                         <>
-                                            <Form.Item name='GIA_TRI' label='Giá trị' >
+                                            <Form.Item className='check-field' name='GIA_TRI' label='Giá trị' >
                                                 <Radio.Group className='radio-button-custom'>
                                                     <Radio.Button value={10000}>10.000 đ</Radio.Button>
                                                     <Radio.Button value={20000}>20.000 đ</Radio.Button>
@@ -155,12 +156,12 @@ function VoucherEdit(props) {
                                                 </Radio.Group>
                                             </Form.Item>
                                             <Form.Item name='GIA_TRI_SO' rules={[{ required: true, message: "Vui lòng chọn giá trị giảm giá." }]}>
-                                                <Input shouldUpdate prefix="₫ " type="number" style={{ margin: '20px 0' }} placeholder='Khác'></Input>
+                                                <Input shouldUpdate prefix="₫ " type="number" placeholder='Khác'></Input>
                                             </Form.Item>
                                         </>
                                         :
                                         <>
-                                            <Form.Item name='GIA_TRI' label='Giá trị' >
+                                            <Form.Item className='check-field' name='GIA_TRI' label='Giá trị' >
                                                 <Radio.Group className='radio-button-custom'>
                                                     <Radio.Button value={5}>5%</Radio.Button>
                                                     <Radio.Button value={10}>10%</Radio.Button>
@@ -173,19 +174,17 @@ function VoucherEdit(props) {
                                                 </Radio.Group>
                                             </Form.Item>
                                             <Form.Item name='GIA_TRI_SO' rules={[{ required: true, message: "Vui lòng chọn giá trị giảm giá." }]}>
-                                                <Input prefix="% " type="number" style={{ margin: '20px 0' }} placeholder='Khác'></Input>
+                                                <Input prefix="% " type="number" placeholder='Khác'></Input>
                                             </Form.Item>
                                         </>
                                 }
 
                             </>
                         }
+                        <br />
+                        <ButtonCustom type='submit' isLoading={isLoading}>Lưu</ButtonCustom>
                     </Col>
                 </Row>
-
-
-                <br />
-                <Button htmlType='submit' className='admin-custom-btn bottom-btn' loading={isLoading}>Lưu</Button>
             </Form>
         </div >
     );

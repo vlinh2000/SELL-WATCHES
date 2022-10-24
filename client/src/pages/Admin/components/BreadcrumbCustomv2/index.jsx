@@ -34,7 +34,7 @@ function BreadcrumbCustomv2(props) {
                     paths.map((path, idx) => <Breadcrumb.Item key={idx}>{path}</Breadcrumb.Item>)
                 }
             </Breadcrumb>
-            <div className='name-page'>{paths[1] || paths[0]}</div>
+            {/* <div className='name-page'>{paths[1] || paths[0]}</div> */}
         </div>
     );
 }

@@ -91,7 +91,7 @@ function UserPage(props) {
     }, [searchParams])
 
     return (
-        <>
+        <div className='user-page'>
             <Header />
             <Routes>
                 <Route path='/' element={<Home />} index></Route>
@@ -102,13 +102,13 @@ function UserPage(props) {
                 <Route path='cart' element={<Cart />}></Route>
                 <Route path='wishlist' element={<ProtectedRoute isAllow={isAuth}><WishList /></ProtectedRoute>}></Route>
                 <Route path='contact' element={<Contact />}></Route>
-                <Route path='payments' element={<Payments />}></Route>
+                <Route path='payments' element={<ProtectedRoute isAllow={isAuth}><Payments /></ProtectedRoute>}></Route>
                 <Route path='profile' element={<ProtectedRoute isAllow={isAuth}><Profile /></ProtectedRoute>}></Route>
                 <Route path='*' element={<NotFound />}></Route>
             </Routes>
             <Auth />
             <Footer />
-        </>
+        </div>
     );
 }
 

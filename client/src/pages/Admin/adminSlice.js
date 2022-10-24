@@ -195,6 +195,7 @@ export const fetch_events = createAsyncThunk("adminPage/fetch_events", async (pa
 })
 
 const initialState = {
+    isToggleSideBar: false,
     screenUpdateOn: {
         employees: { mode: 'ADD' },
         positions: { mode: 'ADD' },
@@ -323,6 +324,10 @@ const adminPage = createSlice({
         saveSelectedKey: (state, action) => {
             const { key } = action.payload;
             state.selectedKey = key;
+        },
+        toggleSideBarOnBigScreen: (state, action) => {
+            const isToggle = action.payload;
+            state.isToggleSideBar = isToggle;
         },
     },
     extraReducers: {
@@ -556,5 +561,5 @@ const adminPage = createSlice({
 })
 
 const { actions, reducer } = adminPage;
-export const { prepareDataEdit, savePagination, saveSelectedKey } = actions;
+export const { prepareDataEdit, savePagination, saveSelectedKey, toggleSideBarOnBigScreen } = actions;
 export default reducer;

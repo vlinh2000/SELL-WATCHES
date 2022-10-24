@@ -2,6 +2,7 @@
 import { Button, Col, Form, Row } from 'antd';
 import { chucvuApi } from 'api/chucvuApi';
 import { loaisanphamApi } from 'api/loaisanphamApi';
+import ButtonCustom from 'components/ButtonCustom';
 import InputField from 'custom-fields/InputField';
 import SelectField from 'custom-fields/SelectField';
 import { fetch_productTypes } from 'pages/Admin/adminSlice';
@@ -63,9 +64,11 @@ function ProductTypeEdit(props) {
                 form={form}
                 initialValues={initialValues}
                 layout='vertical'>
-                <InputField name='TEN_LOAI_SP' label='Tên loại sản phẩm' rules={[yupSync]} />
+                <InputField name='TEN_LOAI_SP' label='Tên loại sản phẩm' placeHolder='-- Nhập tên loại sản phẩm --' rules={[yupSync]} />
                 <br />
-                <Button htmlType='submit' className='admin-custom-btn bottom-btn' loading={isLoading}>Lưu</Button>
+                <ButtonCustom
+                    type='submit'
+                    isLoading={isLoading}>Lưu</ButtonCustom>
             </Form>
         </div>
     );

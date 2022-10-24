@@ -64,6 +64,19 @@
                     width: 90%;
                     position: relative;
                     display: block;
+
+                    .audio-icon{
+                     position: absolute;
+                     left: -20px;
+                     color: #333;
+                     top: 3px;
+                     cursor: pointer;
+                    }
+                }
+
+                .voice-container{
+                    position: relative;
+                    display: inline;
                 }
 
                 .search-input{
@@ -72,7 +85,7 @@
                     border: 0;
                     width: 70%;
                     height: 2.8em;
-                    font-size: .9rem;
+                    font-size: 13px;
                     background-color: #FFF;
                     box-shadow: inset 0 1px 2px rgb(0 0 0 / 10%);
                     transition: color .3s, border .3s, background .3s, opacity .3s;
@@ -86,10 +99,10 @@
                 }
                 
                 .btn-search{
-                    height: 2.8em;
+                    height: 2.82em;
                     width: 10%;
                     border: 0;
-                    font-size: .9rem;
+                    font-size: 13px;
                     color: #333333;
                     border-top-right-radius: 5px;
                     border-bottom-right-radius: 5px;
@@ -221,11 +234,20 @@
                 .info{
                     margin-left: 10px;
 
+                    .product-name{
+                        margin-bottom: 0;
+                    }
+
+                    .info-bottom{
+                        margin-top: -10px;
+                    }
+
                     .category{
                         color: #394b6a;
                         font-weight: 500;
                         font-style: italic;
                         font-size: 10px;
+                        margin-right: 10px;
                     }
                     .price{
                         color: #b55f5a;

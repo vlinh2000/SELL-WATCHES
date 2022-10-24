@@ -44,7 +44,7 @@ function SelectField(props) {
             label={label}
             rules={rules}
             name={name}>
-            <Select disabled={disabled} onChange={onChange} mode={mode} labelInValue={labelInValue} style={style} options={options} />
+            <Select disabled={disabled} placeholder={placeHolder} onChange={onChange} mode={mode} labelInValue={labelInValue} style={style} options={options} />
         </Form.Item>
     );
 }

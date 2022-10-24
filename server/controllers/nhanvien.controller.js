@@ -42,8 +42,8 @@ module.exports = {
     post_nhanviens: async (req, res) => {
         try {
             const { HO_TEN, SO_DIEN_THOAI, EMAIL, ANH_DAI_DIEN, DIA_CHI, GIOI_TINH, MA_CV } = req.body;
-            let { QUYEN, MAT_KHAU } = req.body;
-            QUYEN = JSON.parse(QUYEN);
+            let { MAT_KHAU } = req.body;
+            // QUYEN = JSON.parse(QUYEN);
             const avatarUrl = req.file?.path || ANH_DAI_DIEN;
             MAT_KHAU = await hashString(MAT_KHAU);
 
@@ -52,19 +52,19 @@ module.exports = {
                                         VALUES ('${NV_ID}','${MA_CV}','${HO_TEN}','${SO_DIEN_THOAI}','${EMAIL}','${avatarUrl || ""}','${DIA_CHI}','${GIOI_TINH}','${MAT_KHAU}')`;
             await executeQuery(sql);
 
-            const processes = QUYEN?.map((ma_quyen) => {
-                return new Promise(async (resolve, reject) => {
-                    try {
-                        const sql_newRule = `INSERT INTO QUYEN_NHAN_VIEN(MA_QUYEN,NV_ID) VALUES ('${ma_quyen}','${NV_ID}')`
-                        await executeQuery(sql_newRule);
-                        resolve(true);
-                    } catch (error) {
-                        reject(error);
-                    }
-                })
-            })
+            // const processes = QUYEN?.map((ma_quyen) => {
+            //     return new Promise(async (resolve, reject) => {
+            //         try {
+            //             const sql_newRule = `INSERT INTO QUYEN_NHAN_VIEN(MA_QUYEN,NV_ID) VALUES ('${ma_quyen}','${NV_ID}')`
+            //             await executeQuery(sql_newRule);
+            //             resolve(true);
+            //         } catch (error) {
+            //             reject(error);
+            //         }
+            //     })
+            // })
 
-            await Promise.all(processes);
+            // await Promise.all(processes);
             res.json({ message: 'Thêm nhân viên thành công.' });
         } catch (error) {
             console.log({ error: error.message });
@@ -75,8 +75,8 @@ module.exports = {
         try {
             const { nhanvienID } = req.params;
             const { HO_TEN, SO_DIEN_THOAI, EMAIL, ANH_DAI_DIEN, DIA_CHI, GIOI_TINH, MA_CV } = req.body;
-            let { QUYEN, MAT_KHAU } = req.body;
-            QUYEN = JSON.parse(QUYEN);
+            let { MAT_KHAU } = req.body;
+            // QUYEN = JSON.parse(QUYEN);
             MAT_KHAU = MAT_KHAU.includes('$') ? MAT_KHAU : await hashString(MAT_KHAU);
 
             const isExist = await checkIsExist('NHAN_VIEN', 'NV_ID', nhanvienID);
@@ -91,22 +91,7 @@ module.exports = {
             const sql = `UPDATE NHAN_VIEN SET ? WHERE NV_ID='${nhanvienID}'`;
             await executeUpdateQuery(sql, data);
 
-            const sql_resetRules = `DELETE FROM QUYEN_NHAN_VIEN WHERE NV_ID='${nhanvienID}'`
-            await executeQuery(sql_resetRules);
 
-            const processes = QUYEN?.map((ma_quyen) => {
-                return new Promise(async (resolve, reject) => {
-                    try {
-                        const sql_newRule = `INSERT INTO QUYEN_NHAN_VIEN(MA_QUYEN,NV_ID) VALUES ('${ma_quyen}','${nhanvienID}')`
-                        await executeQuery(sql_newRule);
-                        resolve(true);
-                    } catch (error) {
-                        reject(error);
-                    }
-                })
-            })
-
-            await Promise.all(processes);
             res.json({ message: 'Cập nhật nhân viên thành công.' });
         } catch (error) {
             console.log({ error: error.message });

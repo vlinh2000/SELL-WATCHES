@@ -4,6 +4,7 @@ import { Button, Col, Form, Row } from 'antd';
 import { loaisanphamApi } from 'api/loaisanphamApi';
 import { sanphamApi } from 'api/sanphamApi';
 import { thuonghieuApi } from 'api/thuonghieuApi';
+import ButtonCustom from 'components/ButtonCustom';
 import InputField from 'custom-fields/InputField';
 import SelectField from 'custom-fields/SelectField';
 import UploadField from 'custom-fields/UploadField';
@@ -54,8 +55,8 @@ function ProductEdit(props) {
     const dispatch = useDispatch()
 
     const initialValues = {
-        MA_LOAI_SP: currentSelected?.MA_LOAI_SP || '',
-        MA_THUONG_HIEU: currentSelected?.MA_THUONG_HIEU || '',
+        MA_LOAI_SP: currentSelected?.MA_LOAI_SP || undefined,
+        MA_THUONG_HIEU: currentSelected?.MA_THUONG_HIEU || undefined,
         TEN_SP: currentSelected?.TEN_SP || '',
         GIA_GOC: currentSelected?.GIA_GOC || '',
         GIA_BAN: currentSelected?.GIA_BAN || '',
@@ -161,26 +162,26 @@ function ProductEdit(props) {
                 layout='vertical'>
                 <Row gutter={[40, 0]}>
                     <Col xs={24} sm={24} md={12} lg={12}>
-                        <SelectField name='MA_LOAI_SP' label='Loại sản phẩm' options={options_category} onChange={value => setIsAccessory(value === 'LSP_phukien')} rules={[yupSync]} />
-                        <SelectField name='MA_THUONG_HIEU' label='Thương hiệu' options={options_brand} rules={[yupSync]} />
-                        <InputField name='TEN_SP' label='Tên sản phẩm' rules={[yupSync]} />
-                        <InputField name='GIA_GOC' label='Giá gốc' rules={[yupSync]} />
-                        <InputField name='GIA_BAN' label='Giá bán' rules={[yupSync]} />
-                        <InputField name='SO_LUONG' label='Số lượng' rules={[yupSync]} />
-                        <InputField name='MO_TA' type='textarea' label='Mô tả' rules={[yupSync]} />
+                        <SelectField name='MA_LOAI_SP' label='Loại sản phẩm' placeHolder='-- Chọn loại sản phẩm --' options={options_category} onChange={value => setIsAccessory(value === 'LSP_phukien')} rules={[yupSync]} />
+                        <SelectField name='MA_THUONG_HIEU' label='Thương hiệu' placeHolder='-- Chọn thương hiệu --' options={options_brand} rules={[yupSync]} />
+                        <InputField name='TEN_SP' label='Tên sản phẩm' placeHolder='-- Nhập tên sản phẩm --' rules={[yupSync]} />
+                        <InputField name='GIA_GOC' label='Giá gốc' placeHolder='-- Nhập giá gốc --' rules={[yupSync]} />
+                        <InputField name='GIA_BAN' label='Giá bán' placeHolder='-- Nhập giá bán --' rules={[yupSync]} />
+                        <InputField name='SO_LUONG' label='Số lượng' placeHolder='-- Nhập số lượng --' rules={[yupSync]} />
+                        <InputField name='MO_TA' type='textarea' label='Mô tả' placeHolder='-- Nhập mô tả --' rules={[yupSync]} />
 
                     </Col>
                     <Col xs={24} sm={24} md={12} lg={12}>
-                        <InputField name='CHAT_LIEU_DAY' label='Chất liệu dây' rules={isAccessory ? [] : [yupSync]} />
+                        <InputField name='CHAT_LIEU_DAY' label='Chất liệu dây' placeHolder='-- Nhập chất liệu dây --' rules={isAccessory ? [] : [yupSync]} />
                         {
                             !isAccessory &&
                             <>
-                                <InputField name='CHAT_LIEU_MAT_KINH' label='Chất liệu mặt kính' rules={[yupSync]} />
-                                <InputField name='PIN' label='Pin' rules={[yupSync]} />
-                                <InputField name='MUC_CHONG_NUOC' label='Mức chống nước' rules={[yupSync]} />
-                                <InputField name='HINH_DANG_MAT_SO' label='Hình dạng mặt số' rules={[yupSync]} />
-                                <InputField name='MAU_MAT_SO' label='Màu mặt số' rules={[yupSync]} />
-                                <InputField name='KICH_THUOC_MAT_SO' label='Kích thước mặt số' rules={[yupSync]} />
+                                <InputField name='CHAT_LIEU_MAT_KINH' label='Chất liệu mặt kính' placeHolder='-- Nhập chất liệu mặt kính --' rules={[yupSync]} />
+                                <InputField name='PIN' label='Pin' placeHolder='-- Nhập pin --' rules={[yupSync]} />
+                                <InputField name='MUC_CHONG_NUOC' label='Mức chống nước' placeHolder='-- Nhập mức chống nước --' rules={[yupSync]} />
+                                <InputField name='HINH_DANG_MAT_SO' label='Hình dạng mặt số' placeHolder='-- Nhập hình dạng mặt số --' rules={[yupSync]} />
+                                <InputField name='MAU_MAT_SO' label='Màu mặt số' placeHolder='-- Nhập màu mặt số --' rules={[yupSync]} />
+                                <InputField name='KICH_THUOC_MAT_SO' label='Kích thước mặt số' placeHolder='-- Nhập kích thước mặt số --' rules={[yupSync]} />
                             </>
                         }
                         <UploadField saveData={(fileList) => form.setFieldValue("ANH_SAN_PHAM", fileList)} onRemove={(file) => {
@@ -191,7 +192,7 @@ function ProductEdit(props) {
                 </Row>
                 {/* <SelectField name='CHAT_LIEU_MAT_KINH' label='Chất liệu mặt kính' rules={[yupSync]} options={options_ProductType} /> */}
                 <br />
-                <Button htmlType='submit' className='admin-custom-btn bottom-btn' loading={isLoading}>Lưu</Button>
+                <ButtonCustom type='submit' isLoading={isLoading}>Lưu</ButtonCustom>
             </Form>
         </div>
     );

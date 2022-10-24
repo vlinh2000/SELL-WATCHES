@@ -32,8 +32,9 @@ function ButtonCustom(props) {
     }
 
     return (
-        <button disabled={disabled} onClick={handleClick} type={type} className={`button-custom ${className}`} style={style}>
-            {text} {isLoading && <Loader />}
+        // <button disabled={disabled} onClick={handleClick} type={type} className={`button-custom ${className}`} style={style}>
+        <button disabled={disabled} onClick={handleClick} type={type} className={`button-3 ${className}`} style={style}>
+            <span>{props.children} </span> {isLoading && <Loader />}
         </ button>
     );
 }

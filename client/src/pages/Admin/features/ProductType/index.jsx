@@ -60,14 +60,13 @@ function ProductType(props) {
         {
             title: 'Hành động',
             dataIndex: 'MA_LOAI_SP',
-            render: (text, record) => <> <Button onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
+            render: (text, record) => <> <Button onClick={() => { onEdit(record); }} shape="circle" icon={<EditOutlined />}></Button>
                 <Popconfirm
                     title={`Bạn có chắc muốn xóa loại sản phẩm ID [${text}]`}
                     onConfirm={() => { onDelete(text) }}
                     okText="Yes"
-                    cancelText="No"
-                >
-                    <Button style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
+                    cancelText="No">
+                    <Button style={{ marginLeft: 5 }} shape="circle" danger icon={<DeleteOutlined />}></Button>
                 </Popconfirm>
             </>
         },
@@ -87,15 +86,14 @@ function ProductType(props) {
                             dataSource={productTypes}
                             pagination={false}
                         />
-                        <Divider />
-                        <Pagination
-                            pageSize={1}
-                            current={pagination._page}
-                            total={pagination._totalPage}
-                            onChange={(page) => dispatch(savePagination({ screen: 'productTypes', page }))} ></Pagination>
                     </>
 
             }
+            <Pagination
+                pageSize={1}
+                current={pagination._page}
+                total={pagination._totalPage}
+                onChange={(page) => dispatch(savePagination({ screen: 'productTypes', page }))} ></Pagination>
         </div>
     );
 }

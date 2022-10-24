@@ -41,6 +41,7 @@ module.exports = {
                 }
                 const processes = DS_USER.map(u => {
                     const user = u.USER_ID ? u : JSON.parse(u);
+                    console.log({ user })
                     return new Promise(async (resolve, reject) => {
                         try {
                             const note = [];
@@ -57,7 +58,7 @@ module.exports = {
                                         console.log("USER" + user.USER_ID + " OK: " + voucher.MA_UU_DAI)
                                         resolveSub(true);
                                     } catch (error) {
-                                        rejectSub(false);
+                                        rejectSub(error);
                                     }
                                 })
 
@@ -70,7 +71,7 @@ module.exports = {
                             console.log("USER" + user.USER_ID + " SEND MAIL: OK")
                             resolve(true);
                         } catch (error) {
-                            reject(false);
+                            reject(error);
                         }
                     })
                 })
@@ -83,7 +84,7 @@ module.exports = {
             await executeQuery(sql);
             res.json({ message: 'Lưu voucher thành công.' });
         } catch (error) {
-            console.log({ error: error.message });
+            console.log({ error });
             res.status(500).json({ message: "Đã xảy ra lỗi! Hãy thử lại sau." })
         }
     },

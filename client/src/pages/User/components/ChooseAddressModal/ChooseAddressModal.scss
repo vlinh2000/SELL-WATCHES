@@ -6,4 +6,20 @@
 
     .form-address{
     }
+
+     .ant-table-wrapper tr{
+        background: #FFF!important;
+    }
+     .ant-table-wrapper th{
+        background: #394b6a;
+        color: #FFF;
+        font-size: 12px;
+        text-align: center;
+        white-space: nowrap;
+    }
+    
+     .ant-table-wrapper td{
+        font-size: 13.5px;
+        text-align: center;
+    }
 }

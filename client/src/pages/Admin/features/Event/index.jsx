@@ -78,19 +78,19 @@ function Event(props) {
         {
             title: 'DS mã ưu đãi',
             dataIndex: 'VOUCHERS',
-            render: (text) => text?.map(voucher => <Tag color='#55acee' key={voucher.MA_UU_DAI}>{voucher.MA_UU_DAI}</Tag>)
+            render: (text) => <div style={{ width: 300 }}>{text?.map(voucher => <Tag style={{ marginBottom: 5 }} color='#55acee' key={voucher.MA_UU_DAI}>{voucher.MA_UU_DAI}</Tag>)}</div>
         },
         {
             title: 'Hành động',
             dataIndex: 'MA_SK',
-            render: (text, record) => <> <Button onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
+            render: (text, record) => <> <Button shape='circle' onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
                 <Popconfirm
                     title={`Bạn có chắc muốn xóa sự kiện ID [${text}]`}
                     onConfirm={() => { onDelete(text) }}
                     okText="Yes"
                     cancelText="No"
                 >
-                    <Button style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
+                    <Button shape='circle' style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
                 </Popconfirm>
             </>
         },
@@ -111,15 +111,14 @@ function Event(props) {
                             dataSource={events}
                             pagination={false}
                         />
-                        <Divider />
-                        <Pagination
-                            pageSize={1}
-                            current={pagination._page}
-                            total={pagination._totalPage}
-                            onChange={(page) => dispatch(savePagination({ screen: 'events', page }))} ></Pagination>
                     </>
 
             }
+            <Pagination
+                pageSize={1}
+                current={pagination._page}
+                total={pagination._totalPage}
+                onChange={(page) => dispatch(savePagination({ screen: 'events', page }))} ></Pagination>
         </div>
     );
 }

@@ -120,14 +120,14 @@ function Employee(props) {
         {
             title: 'Hành động',
             dataIndex: 'NV_ID',
-            render: (text, record) => <div style={{ width: 120 }}> <Button onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
+            render: (text, record) => <div style={{ width: 120 }}> <Button shape='circle' onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
                 <Popconfirm
                     placement='left'
                     title={`Bạn có chắc muốn ${record.BI_KHOA === "0" ? 'khóa' : 'mở khóa'} tài khoản [${text}] ?`}
                     onConfirm={() => { onHandleUser(text, record.BI_KHOA === '0') }}
                     okText="Yes"
                     cancelText="No">
-                    <Button style={{ marginLeft: 5 }} icon={record.BI_KHOA === "0" ? <LockOutlined /> : <UnlockOutlined />}></Button>
+                    <Button shape='circle' style={{ marginLeft: 5 }} icon={record.BI_KHOA === "0" ? <LockOutlined /> : <UnlockOutlined />}></Button>
                 </Popconfirm>
                 <Popconfirm
                     placement='left'
@@ -135,7 +135,7 @@ function Employee(props) {
                     onConfirm={() => { onDelete(text) }}
                     okText="Yes"
                     cancelText="No">
-                    <Button style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
+                    <Button shape='circle' style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
                 </Popconfirm>
             </div>
         },
@@ -155,15 +155,14 @@ function Employee(props) {
                             dataSource={employees}
                             pagination={false}
                         />
-                        <Divider />
-                        <Pagination
-                            pageSize={1}
-                            current={pagination._page}
-                            total={pagination._totalPage}
-                            onChange={(page) => dispatch(savePagination({ screen: 'employees', page }))} ></Pagination>
                     </>
 
             }
+            <Pagination
+                pageSize={1}
+                current={pagination._page}
+                total={pagination._totalPage}
+                onChange={(page) => dispatch(savePagination({ screen: 'employees', page }))} ></Pagination>
         </div>
     );
 }

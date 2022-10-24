@@ -31,8 +31,18 @@ a:hover{
 
 
 @media only screen and (max-width: 767px) {
-  
+
+  .admin-page .header-admin{
+    line-height: 35px;
+
+    .right-side{
+      text-align: right;
+      display: block;
+    }
+  }
+
     .admin-page .sidebar{
+      margin-top: 0;
         position: fixed;
         // display: none;
         z-index: 9999;
@@ -61,6 +71,10 @@ a:hover{
             background-color: transparent;
         }
         
+        .ant-menu-dark .ant-menu-item, .ant-menu-dark .ant-menu-item-group-title, .ant-menu-dark .ant-menu-item > a, .ant-menu-dark .ant-menu-item > span > a {
+            color: #2C3338; 
+        }
+
         .ant-menu-dark .ant-menu-item:hover, .ant-menu-dark .ant-menu-submenu-title:hover{
             color: var(--mainColor)!important;
         }
@@ -72,11 +86,25 @@ a:hover{
         .ant-menu.ant-menu-dark, .ant-menu-dark .ant-menu-sub, .ant-menu.ant-menu-dark .ant-menu-sub{
             background-color: rgba(255, 255, 255,0.8);
         }
-    
+        .ant-menu:not(.ant-menu-sub){
+            margin-top: 0;
+        }
     }
 
     .menu-btn{
         display: block!important;
+    }
+
+    .menu-btn-big-screen{
+        display: none;
+    }
+
+    .logo-first{
+      display: none;
+    }
+
+    .logo-second{
+      display: block!important;
     }
 
     .toggle-bg::after{
@@ -86,7 +114,7 @@ a:hover{
         height: 100%;
         position: absolute;
         background-color: rgba(#000000, 0.7);
-        z-index: 100;
+        z-index: 6;
         top: 0;
         left: 0;
 
@@ -96,5 +124,117 @@ a:hover{
         opacity: 1!important;
         transform: scale(1)!important;
     }
+
+   
   }
 
+/*--------------BUTTON------------------------*/
+/* CSS */
+.button-1 {
+  background-color: #e1ecf4;
+  border-radius: 3px;
+  border: 1px solid #7aa7c7;
+  box-shadow: rgba(255, 255, 255, .7) 0 1px 0 0 inset;
+  box-sizing: border-box;
+  color: #39739d;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system,system-ui,"Segoe UI","Liberation Sans",sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.15385;
+  margin: 0;
+  outline: none;
+  padding: 8px .8em;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+.button-1:hover{
+  background-color: #b3d3ea;
+  color: #2c5777;
+}
+
+// .button-1:focus {
+//   box-shadow: 0 0 0 4px rgba(0, 149, 255, .15);
+// }
+
+// .button-1:active {
+//   background-color: #a0c7e4;
+//   box-shadow: none;
+//   color: #2c5777;
+// }
+
+/* CSS */
+.button-2 {
+  background-color: #0095ff;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  box-shadow: rgba(255, 255, 255, .4) 0 1px 0 0 inset;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system,system-ui,"Segoe UI","Liberation Sans",sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.15385;
+  margin: 0;
+  outline: none;
+  padding: 8px .8em;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+.button-2:hover,
+.button-2:focus {
+  background-color: #07c;
+}
+
+.button-2:focus {
+  box-shadow: 0 0 0 4px rgba(0, 149, 255, .15);
+}
+
+.button-2:active {
+  background-color: #0064bd;
+  box-shadow: none;
+}
+
+/* CSS */
+.button-3 {
+  cursor: pointer;
+  display: flex;
+//   flex-direction: column;
+  align-items: center;
+  padding: 6px 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+  border-radius: 6px;
+  border: none;
+
+  color: #fff;
+  background: linear-gradient(180deg, #4B91F7 0%, #367AF6 100%);
+   background-origin: border-box;
+  box-shadow: 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-3:hover {
+    background: linear-gradient(180deg, #445267 0%, #367AF6 100%);
+//   box-shadow: inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2), 0px 0.5px 1.5px rgba(54, 122, 246, 0.25), 0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
+  outline: 0;
+  color: #fff;
+}

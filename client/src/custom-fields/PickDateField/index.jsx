@@ -9,6 +9,7 @@ PickDateField.propTypes = {
     disabled: PropTypes.bool,
     required: PropTypes.bool,
     readOnly: PropTypes.bool,
+    showTime: PropTypes.bool,
     placeHolder: PropTypes.string,
     label: PropTypes.string,
     rules: PropTypes.array,
@@ -20,6 +21,7 @@ PickDateField.defaultProps = {
     disabled: false,
     required: false,
     readOnly: false,
+    showTime: false,
     placeHolder: '',
     label: '',
     rules: [],
@@ -27,7 +29,7 @@ PickDateField.defaultProps = {
 
 function PickDateField(props) {
 
-    const { name, disabled, placeHolder, label, required, rules, shouldUpdate } = props;
+    const { name, disabled, placeHolder, label, required, rules, shouldUpdate, showTime, picker } = props;
 
     return (
         <Form.Item
@@ -37,7 +39,7 @@ function PickDateField(props) {
             label={label}
             rules={rules}
             name={name}>
-            <DatePicker disabled={disabled} placeholder={placeHolder} />
+            <DatePicker picker={picker} showTime={showTime} disabled={disabled} placeholder={placeHolder} />
         </Form.Item>
     );
 }

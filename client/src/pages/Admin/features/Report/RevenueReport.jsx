@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import SelectField from 'custom-fields/SelectField';
-import { Col, Divider, Form, Row, Space, DatePicker, Statistic } from 'antd';
+import { Col, Divider, Form, Row, Space, DatePicker, Statistic, Button, Table, List, Avatar } from 'antd';
 import ButtonCustom from 'components/ButtonCustom';
 import InputField from 'custom-fields/InputField';
 import moment from 'moment';
-import { formatDate } from 'assets/admin';
+import { formatDate, numberWithCommas } from 'assets/admin';
 import { Chart } from 'pages/Admin/components/Chart';
 import { donhangApi } from 'api/donhangApi';
 import './Report.scss';
@@ -27,10 +27,14 @@ const options = {
         },
     },
 };
+
+const colorList = ['#f56a00', '#7265e6', '#ffbf00', '#00a2ae', '#4B91F7'];
+
 function RevenueReport(props) {
     const [loading, setLoading] = React.useState(false);
     const { user } = useSelector(state => state.auth);
     const [statistical, setStatistical] = React.useState();
+    const [moreData, setMoreData] = React.useState();
     const [chartInfo, setChartInfo] = React.useState({
         labels: [],
         datasets: [
@@ -57,19 +61,10 @@ function RevenueReport(props) {
             setLoading(true);
             const dateFrom = values.dateFrom.format('YYYY-MM-DD');
             const dateTo = values.dateTo.format('YYYY-MM-DD');
-            const { result } = await donhangApi.getThongKes({ groupBy: values.groupBy, dateFrom, dateTo });
-            const labels = [];
-            const data = [];
-            const data_profit = [];
-            result.forEach(dh => {
-                labels.push(dh.TEN_THONG_KE);
-                data.push(dh.TONG_TIEN);
-                data_profit.push(dh.TONG_TIEN - dh.TIEN_VON);
-            })
-            let newDataSets = [...chartInfo.datasets];
-            newDataSets[0] = { ...chartInfo.datasets[0], data }
-            newDataSets[1] = { ...chartInfo.datasets[1], data: data_profit }
-            setChartInfo(prev => ({ ...prev, labels, datasets: newDataSets }))
+            const { result, moreData: resMoreData } = await donhangApi.getThongKes({ groupBy: values.groupBy, dateFrom, dateTo, action: 'more-data' });
+            const data = result.map(dh => ({ name: dh.TEN_THONG_KE, 'Doanh thu': dh.TONG_TIEN, "Lợi nhuận": dh.TONG_TIEN - dh.TIEN_VON }));
+            setChartInfo(data)
+            setMoreData(resMoreData);
             setLoading(false);
         } catch (error) {
             setLoading(false);
@@ -107,6 +102,13 @@ function RevenueReport(props) {
 
     const [form] = Form.useForm();
 
+    const data = [
+        'Racing car sprays burning fuel into crowd.',
+        'Japanese princess to wed commoner.',
+        'Australian walks 100km after outback crash.',
+        'Man charged over missing wedding girl.',
+        'Los Angeles battles huge wildfires.',
+    ];
     return (
         <div className='revenues box'>
             <br />
@@ -153,18 +155,69 @@ function RevenueReport(props) {
                             </div>
                         </Col>
                     </Row>
+
                     <ButtonCustom
                         type='submit'
                         style={{ marginTop: 30 }}
-                        isLoading={loading}
-                        //  onClick={handleFilter} 
-                        className='admin-custom-btn' text='Tìm kiếm'></ButtonCustom>
+                        isLoading={loading}>Tìm kiếm</ButtonCustom>
                 </Form>
 
             </div>
             <br />
+            {/* <br /> */}
+            <Row className='top-seller' justify="space-between">
+                <Col xs={24} sm={24} md={24} lg={13} className="box">
+                    <div className='sub-title'>Top sản phẩm bán chạy nhất</div>
+                    {
+                        <List
+                            bordered
+                            itemLayout="horizontal">
+                            {
+                                moreData?.TOP_SP_BAN_CHAY?.map((sp, idx) =>
+                                    <List.Item key={sp.MA_SP}>
+                                        <List.Item.Meta
+                                            avatar={<><span className='text-order'>#{idx + 1}</span>&nbsp;&nbsp;&nbsp;<Avatar src={sp.HINH_ANH} /></>}
+                                            title={sp.TEN_SP}
+                                            description={sp.TEN_LOAI_SP}
+                                        />
+                                        <div style={{ fontSize: 13 }}>đã bán: {sp.TONG_SO}</div>
+                                    </List.Item>
+                                )
+                            }
+                        </List>
+                    }
+                </Col>
+                <Col xs={24} sm={24} md={24} lg={11} xl={8} className="box">
+                    <div className='sub-title'>Top mua hàng </div>
+                    {
+                        <List
+                            bordered
+                            itemLayout="horizontal">
+
+                            {
+                                moreData?.TOP_USER?.map((user, idx) =>
+                                    <List.Item key={user.USER_ID}>
+                                        <List.Item.Meta
+                                            avatar={<><span className='text-order'>#{idx + 1}</span>&nbsp;&nbsp;&nbsp;<Avatar style={{ backgroundColor: colorList[idx + 4] }} src={user.ANH_DAI_DIEN}>{!user.ANH_DAI_DIEN ? user.HO_TEN.charAt(0).toUpperCase() : ''}</Avatar></>}
+                                            title={user.HO_TEN}
+                                            description={user.DIA_CHI?.split(', ')?.pop()}
+                                        />
+                                        <div style={{ fontSize: 13 }}>đã mua: {numberWithCommas(user.TONG_SO) + ' đ'}</div>
+                                    </List.Item>
+                                )
+                            }
+
+
+                        </List>
+                    }
+                </Col>
+            </Row>
             <br />
-            <Chart type="bar" isLoading={loading} options={options} data={chartInfo} />
+            <br />
+            <div className='sub-title'>Biểu đồ thống kê doanh thu</div>
+            {/* <Divider /> */}
+            <Chart type="bar" isLoading={loading} data={chartInfo} />
+
         </div>
     );
 }

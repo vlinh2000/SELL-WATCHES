@@ -83,6 +83,7 @@ function Auth(props) {
         EMAIL: '',
         GIOI_TINH: '',
         MAT_KHAU: '',
+        MAT_KHAU_XAC_NHAN: '',
         PROVINCES: '',
         DISTRICT: '',
         WARDS: ''
@@ -103,6 +104,7 @@ function Auth(props) {
             const { message } = await nguoidungApi.register(data);
             setLoading(false);
             toast.success(message);
+            formRegister.resetFields();
             await onLogin({ EMAIL: values.EMAIL, MAT_KHAU: values.MAT_KHAU })
         } catch (error) {
             setLoading(false);
@@ -228,6 +230,8 @@ function Auth(props) {
         <div className='auth-wrapper'>
             {
                 <Drawer
+                    className="auth-drawer"
+                    width={500}
                     onClose={() => dispatch(switch_screenLogin(false))}
                     visible={isVisibleScreenLogin}
                     title={screenMode === 'login' ? 'Đăng nhập' : screenMode === 'register' ? 'Đăng ký' : 'Quên mật khẩu'}
@@ -239,15 +243,16 @@ function Auth(props) {
                                 form={formLogin}
                                 layout='vertical'
                                 onFinish={(values) => onLogin(values)}>
-                                <InputField name='EMAIL' label='Email' rules={[yupSync]} />
-                                <InputField name='MAT_KHAU' label='Mật khẩu' type='password' rules={[yupSync]} />
-                                <a onClick={() => setScreenMode('forgetPassword')}>Quên mật khẩu?</a>
+                                <InputField name='EMAIL' label='Email' rules={[yupSync]} placeHolder="-- Nhập email --" />
+                                <InputField name='MAT_KHAU' label='Mật khẩu' type='password' rules={[yupSync]} placeHolder="-- Nhập mật khẩu --" />
+                                <a className='forget-pass-btn' onClick={() => setScreenMode('forgetPassword')}>Quên mật khẩu?</a>
                                 <ButtonCustom
                                     isLoading={isLoading.login || isLoading.getMe}
                                     type='submit'
-                                    style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }}
-                                    text="Đăng nhập" />
-                                <Button block style={{ marginTop: '1rem' }} onClick={() => setScreenMode('register')}>Đăng ký tài khoản mới</Button>
+                                    style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }}>
+                                    Đăng nhập
+                                </ButtonCustom>
+                                <button className='button-1' block style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} onClick={() => setScreenMode('register')}>Đăng ký tài khoản mới</button>
                                 <br />
                                 <br />
                                 <div className="group-login-social-media">
@@ -274,29 +279,43 @@ function Auth(props) {
                                     form={formRegister}
                                     layout='vertical'
                                     onFinish={(values) => onRegister(values)}>
-                                    <InputField name='HO_TEN' label='Họ tên' rules={[yupSync]} />
-                                    <InputField name='EMAIL' label='Email' rules={[yupSync]} />
-                                    <InputField name='MAT_KHAU' label='Mật khẩu' type='password' rules={[yupSync]} />
-                                    <InputField name='SO_DIEN_THOAI' label='Số điện thoại' rules={[yupSync]} />
+                                    <InputField name='HO_TEN' label='Họ tên' rules={[yupSync]} placeHolder="-- Nhập họ tên --" />
+                                    <InputField name='EMAIL' label='Email' rules={[yupSync]} placeHolder="-- Nhập email --" />
+                                    <InputField name='MAT_KHAU' label='Mật khẩu' type='password' rules={[yupSync]} placeHolder="-- Nhập mật khẩu --" />
+                                    <InputField name='MAT_KHAU_XAC_NHAN' label='Xác nhận mật khẩu' type='password'
+                                        rules={[
+                                            yupSync,
+                                            ({ getFieldValue }) => ({
+                                                validator(_, value) {
+                                                    if (!value || getFieldValue('MAT_KHAU') === value) {
+                                                        return Promise.resolve();
+                                                    }
 
-                                    <SelectField name='GIOI_TINH' label='Giới tính' rules={[yupSync]}
+                                                    return Promise.reject(new Error('Mật khẩu xác nhận không trùng khớp.'));
+                                                },
+                                            }),
+                                        ]}
+                                        placeHolder="-- Nhập mật khẩu xác nhận --" />
+                                    <InputField name='SO_DIEN_THOAI' label='Số điện thoại' rules={[yupSync]} placeHolder="-- Nhập số điện thoại --" />
+
+                                    <SelectField name='GIOI_TINH' label='Giới tính' rules={[yupSync]} placeHolder="-- Chọn giới tính --"
                                         options={[{ value: 'Nam', label: 'Nam' }, { value: 'Nữ', label: 'Nữ' }, { value: 'Khác', label: 'Khác' }]} />
 
                                     <SelectField onChange={(_, options) => {
                                         setAddressCode(prev => ({ ...prev, provincesCode: options.code, districtCode: null }))
                                         formRegister.setFieldValue('DISTRICT', '');
                                         formRegister.setFieldValue('WARDS', '');
-                                    }} name='PROVINCES' label='Tỉnh/Thành phố' rules={[yupSync]} options={options_Provinces} />
+                                    }} name='PROVINCES' label='Tỉnh/Thành phố' rules={[yupSync]} options={options_Provinces} placeHolder="-- Chọn tỉnh/thành phố --" />
 
                                     <SelectField onChange={(_, options) => {
                                         setAddressCode(prev => ({ ...prev, districtCode: options.code, wardsCode: null }))
                                         formRegister.setFieldValue('WARDS', '');
-                                    }} name='DISTRICT' label='Quận/Huyện' rules={[yupSync]} options={options_district} />
+                                    }} name='DISTRICT' label='Quận/Huyện' rules={[yupSync]} options={options_district} placeHolder="-- Chọn quận/huyện --" />
 
-                                    <SelectField name='WARDS' label='Phường/Xã' rules={[yupSync]} options={options_wards} />
+                                    <SelectField name='WARDS' label='Phường/Xã' rules={[yupSync]} options={options_wards} placeHolder="-- Chọn phường/xã --" />
                                     <br />
-                                    <ButtonCustom isLoading={loading} htmlType='submit' style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} text="Đăng ký" />
-                                    <Button block style={{ marginTop: '1rem' }} onClick={() => setScreenMode('login')}>Đã có tài khoản?</Button>
+                                    <ButtonCustom isLoading={loading} type='submit' style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }}>Đăng ký</ButtonCustom>
+                                    <button className='button-1' block style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} onClick={() => setScreenMode('login')}>Đã có tài khoản?</button>
                                 </Form>
                                 :
                                 <>
@@ -307,9 +326,9 @@ function Auth(props) {
                                                 form={formForgetPassword}
                                                 layout='vertical'
                                                 onFinish={(values) => handleForgetPassword(values, true)}>
-                                                <InputField name='EMAIL' label='Email khôi phục' rules={[yupSync]} />
+                                                <InputField name='EMAIL' label='Email khôi phục' rules={[yupSync]} placeHolder="-- Nhập email khôi phục --" />
                                                 <br />
-                                                <ButtonCustom isLoading={loading} htmlType='submit' style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} text="Lấy lại mật mẩu" />
+                                                <ButtonCustom isLoading={loading} type='submit' style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }}>Lấy lại mật mẩu</ButtonCustom>
                                             </Form>
                                             :
                                             stepToResetPass === 1 ?
@@ -322,12 +341,12 @@ function Auth(props) {
                                                     form={formResetPassword}
                                                     layout='vertical'
                                                     onFinish={(values) => handleForgetPassword(values, false)}>
-                                                    <InputField name='MAT_KHAU' label='Mật khẩu mới'
+                                                    <InputField name='MAT_KHAU' label='Mật khẩu mới' placeHolder="-- Nhập mật khẩu mới--"
                                                         type='password'
                                                         rules={[yupSync]} />
                                                     <InputField
                                                         dependencies={['MAT_KHAU']}
-                                                        name='MAT_KHAU_XAC_NHAN' label='Xác nhận mật khẩu'
+                                                        name='MAT_KHAU_XAC_NHAN' label='Xác nhận mật khẩu' placeHolder="-- Nhập mật khẩu xác nhận --"
                                                         type='password'
                                                         rules={[
                                                             yupSync,
@@ -342,15 +361,15 @@ function Auth(props) {
                                                             }),
                                                         ]} />
                                                     <br />
-                                                    <ButtonCustom isLoading={loading} htmlType='submit' style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} text="Lấy lại mật mẩu" />
+                                                    <ButtonCustom isLoading={loading} type='submit' style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }} >Lấy lại mật mẩu</ButtonCustom>
                                                 </Form>
                                     }
                                     <br />
-                                    <Button onClick={() => {
+                                    <button className='button-1' onClick={() => {
                                         setScreenMode('login');
                                         setStepToResetPass(0);
                                         formLogin.resetFields();
-                                    }}>Quay lại</Button>
+                                    }}>Quay lại</button>
                                 </>
                     }
                 </Drawer>

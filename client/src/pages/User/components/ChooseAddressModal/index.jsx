@@ -47,7 +47,9 @@ function ChooseAddressModal(props) {
             dataIndex: 'WARDS',
             render: (text, row) => <SelectField
                 rules={[{ required: true, message: '...' }]}
-                name={['DIA_CHI_GH', row.INDEX, 'WARDS']} options={options_wards} />
+                name={['DIA_CHI_GH', row.INDEX, 'WARDS']}
+                placeHolder="-- Chọn phường/xã"
+                options={options_wards} />
         },
         {
             title: 'Quận/Huyện',
@@ -59,7 +61,9 @@ function ChooseAddressModal(props) {
                     // form.setFieldValue(`DIA_CHI_GH[${row.INDEX}].DISTRICT_ID`, options.code);
                 }}
 
-                name={['DIA_CHI_GH', row.INDEX, 'DISTRICT']} options={options_district} />
+                name={['DIA_CHI_GH', row.INDEX, 'DISTRICT']}
+                placeHolder="-- Chọn quận/huyện"
+                options={options_district} />
         },
         {
             title: 'Tỉnh/Thành Phố',
@@ -69,7 +73,9 @@ function ChooseAddressModal(props) {
                 onChange={(_, options) => {
                     setAddressCode(prev => ({ ...prev, provincesCode: options.code, districtCode: null }))
                 }}
-                name={['DIA_CHI_GH', row.INDEX, 'PROVINCES']} options={options_Provinces} />
+                name={['DIA_CHI_GH', row.INDEX, 'PROVINCES']}
+                placeHolder="-- Chọn tỉnh/thành phố"
+                options={options_Provinces} />
         },
         {
             title: 'Hành động',
@@ -83,7 +89,7 @@ function ChooseAddressModal(props) {
                     onConfirm={() => { handleDeleteAddress(record.MA_DC, record.INDEX) }}
                     okText="Yes"
                     cancelText="No">
-                    <Button style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
+                    <Button shape='circle' style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
                 </Popconfirm>
             </>
         },
@@ -224,7 +230,7 @@ function ChooseAddressModal(props) {
                         pagination={false}
                     />
                     <Divider />
-                    <Button icon={<PlusSquareOutlined />} onClick={() => setAddressList(prev => [...prev, { INDEX: prev.length, WARDS: null, DISTRICT: null, PROVINCES: null, key: prev.length + 1 }])}>Thêm</Button>
+                    <button className='button-1' onClick={() => setAddressList(prev => [...prev, { INDEX: prev.length, WARDS: null, DISTRICT: null, PROVINCES: null, key: prev.length + 1 }])}><PlusSquareOutlined /> Thêm địa chỉ</button>
                 </Form>
             </Modal>
         </div>

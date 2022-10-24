@@ -1,12 +1,12 @@
 
-import { SyncOutlined } from '@ant-design/icons';
+import { CaretRightOutlined, SyncOutlined } from '@ant-design/icons';
 import { Col, Collapse, Form, Pagination, Row, Table, Tag } from 'antd';
 import { donhangApi } from 'api/donhangApi';
 import { getStatusOrder, numberWithCommas } from 'assets/admin';
 import ButtonCustom from 'components/ButtonCustom';
 import PickDateField from 'custom-fields/PickDateField';
 import moment from 'moment';
-import { fetch_orders, fetch_orders_pending, savePagination } from 'pages/Admin/adminSlice';
+import { fetch_orders, fetch_orders_pending, fetch_statistical, savePagination } from 'pages/Admin/adminSlice';
 import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
 import React from 'react';
 import toast from 'react-hot-toast';
@@ -51,6 +51,7 @@ function OrderConfirm(props) {
             const { message } = await donhangApi.update(MA_DH, data);
             await dispatch(fetch_orders_pending({ _limit: pagination._limit, _page: pagination._page, status: JSON.stringify('[0]') }));
             dispatch(fetch_orders({ _limit: pagination_order._limit, _page: pagination_order._page }));
+            dispatch(fetch_statistical())
             setLoading(false);
             toast.success(message);
         } catch (error) {
@@ -110,7 +111,9 @@ function OrderConfirm(props) {
                     :
                     <>
                         <p>Tổng số: {ordersConfirm?.length < pagination?._limit ? ordersConfirm.length : pagination._limit}/ {pagination._totalRecord} bản ghi</p>
-                        <Collapse>
+                        <Collapse
+                            expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+                            className="site-collapse-custom-collapse">
                             {
                                 ordersConfirm?.map((order, idx) =>
                                     <Collapse.Panel header="Đơn hàng: HD019302329" key={order.MA_DH}
@@ -175,10 +178,10 @@ function OrderConfirm(props) {
                                                 <Form layout='vertical' onFinish={(values) => handleConfirm(values, order.MA_DH)}>
                                                     <Row gutter={[40, 0]} align="middle">
                                                         <Col xs={24} sm={6}>
-                                                            <PickDateField name='TG_GIAO_HANG' rules={[{ required: true, message: 'Vui lòng chọn ngày.' }]} label='Thời gian giao hàng dự kiến' />
+
                                                         </Col>
                                                         <Col xs={24} sm={12}>
-                                                            <ButtonCustom isLoading={loading} className="btn-info-custom" text='Xác nhận đơn hàng' type='submit' />
+                                                            <ButtonCustom isLoading={loading} type='submit' >Xác nhận đơn hàng</ButtonCustom>
                                                             {/* <ButtonCustom className="btn-success-custom" text='Đã nhận được hàng ?' /> */}
                                                         </Col>
                                                     </Row>

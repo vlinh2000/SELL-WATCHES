@@ -111,14 +111,14 @@ function User(props) {
         {
             title: 'Hành động',
             dataIndex: 'USER_ID',
-            render: (text, record) => <>
+            render: (text, record) => <div style={{ minWidth: 100 }}>
                 <Popconfirm
                     title={`Bạn có chắc muốn ${record.BI_KHOA === "0" ? 'khóa' : 'mở khóa'} tài khoản [${text}]`}
                     onConfirm={() => { onHandleUser(text, record.BI_KHOA === '0') }}
                     okText="Yes"
                     cancelText="No"
                 >
-                    <Button icon={record.BI_KHOA === "0" ? <LockOutlined /> : <UnlockOutlined />}></Button>
+                    <Button shape="circle" icon={record.BI_KHOA === "0" ? <LockOutlined /> : <UnlockOutlined />}></Button>
                 </Popconfirm>
 
                 <Popconfirm
@@ -127,9 +127,9 @@ function User(props) {
                     okText="Yes"
                     cancelText="No"
                 >
-                    <Button style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
+                    <Button style={{ marginLeft: 5 }} shape="circle" danger icon={<DeleteOutlined />}></Button>
                 </Popconfirm>
-            </>
+            </div>
         },
     ];
 
@@ -147,15 +147,14 @@ function User(props) {
                             dataSource={users}
                             pagination={false}
                         />
-                        <Divider />
-                        <Pagination
-                            pageSize={1}
-                            current={pagination._page}
-                            total={pagination._totalPage}
-                            onChange={(page) => dispatch(savePagination({ screen: 'users', page }))} ></Pagination>
                     </>
 
             }
+            <Pagination
+                pageSize={1}
+                current={pagination._page}
+                total={pagination._totalPage}
+                onChange={(page) => dispatch(savePagination({ screen: 'users', page }))} ></Pagination>
         </div>
     );
 }

@@ -9,28 +9,29 @@ import BreadcrumbCustomv2 from './components/BreadcrumbCustomv2';
 import Header from './components/Header';
 import SideBar from './components/SideBar';
 import Brand from './features/Brand';
-import BrandEdit from './features/Brand/sub-pages';
+import BrandEdit from './features/Brand/BrandEdit';
 import Dashboard from './features/DashBoard';
 import Employee from './features/Employee';
-import EmployeeEdit from './features/Employee/sub-pages';
+import EmployeeEdit from './features/Employee/EmployeeEdit';
 import Event from './features/Event';
 import EventEdit from './features/Event/EventEdit';
 import Order from './features/Order';
-import OrderConfirm from './features/Order/sub-pages';
+import OrderConfirm from './features/Order/OrderConfirm';
 import Positon from './features/Position';
-import PositionEdit from './features/Position/sub-pages';
+import PositionEdit from './features/Position/PositionEdit';
 import Product from './features/Product';
-import ProductEdit from './features/Product/sub-pages';
+import ProductEdit from './features/Product/ProductEdit';
 import ProductType from './features/ProductType';
-import ProductTypeEdit from './features/ProductType/sub-pages';
+import ProductTypeEdit from './features/ProductType/ProductTypeEdit';
 import Receipt from './features/Receipt';
-import ReceiptEdit from './features/Receipt/sub-pages';
+import ReceiptEdit from './features/Receipt/ReceiptEdit';
 import RevenueReport from './features/Report/RevenueReport';
 import Rule from './features/Rule';
 import RuleEdit from './features/Rule/RuleEdit';
-import RuleEmployeeEdit from './features/Rule/RuleEmployeeEdit';
+import RuleEmployee from './features/Rule/RuleEmployee';
+import RuleEmployeeEdit from './features/Rule/RuleEmployee';
 import Supplier from './features/Supplier';
-import SupplierEdit from './features/Supplier/sub-pages';
+import SupplierEdit from './features/Supplier/SupplierEdit';
 import User from './features/User';
 import Voucher from './features/Voucher';
 import VoucherEdit from './features/Voucher/VoucherEdit';
@@ -42,10 +43,10 @@ AdminPage.propTypes = {
 
 function AdminPage(props) {
 
-    const { pagination } = useSelector(state => state.adminInfo);
+    const { pagination, isToggleSideBar } = useSelector(state => state.adminInfo);
     const { user } = useSelector(state => state.auth);
     const dispatch = useDispatch();
-
+    console.log({ isToggleSideBar })
     React.useEffect(() => {
         user?.NV_ID && dispatch(fetch_myRoles());
     }, [user])
@@ -86,9 +87,9 @@ function AdminPage(props) {
         dispatch(fetch_products({ _limit: pagination.products._limit, _page: pagination.products._page }));
     }, [pagination.products])
 
-    React.useEffect(() => {
-        dispatch(fetch_orders({ _limit: pagination.orders._limit, _page: pagination.orders._page, status: JSON.stringify('[1,2,3]') }));
-    }, [pagination.orders])
+    // React.useEffect(() => {
+    //     dispatch(fetch_orders({ _limit: pagination.orders._limit, _page: pagination.orders._page, status: JSON.stringify('[1,2,3]') }));
+    // }, [pagination.orders])
 
     React.useEffect(() => {
         dispatch(fetch_vouchers({ _limit: pagination.vouchers._limit, _page: pagination.vouchers._page }));
@@ -102,18 +103,18 @@ function AdminPage(props) {
         dispatch(fetch_statistical());
     }, [])
 
-    React.useEffect(() => {
-        dispatch(fetch_orders_pending({ _limit: pagination.ordersConfirm._limit, _page: pagination.ordersConfirm._page, status: JSON.stringify('[0]') }));
-    }, [pagination.ordersConfirm])
+    // React.useEffect(() => {
+    //     dispatch(fetch_orders_pending({ _limit: pagination.ordersConfirm._limit, _page: pagination.ordersConfirm._page, status: JSON.stringify('[0]') }));
+    // }, [pagination.ordersConfirm])
 
     return (
         <div className='admin-page'>
+            <Header />
             <Row>
-                <Col xs={24} sm={24} md={8} lg={4}>
+                <Col xs={24} sm={24} md={isToggleSideBar ? 4 : 8} lg={isToggleSideBar ? 4 : 6} xl={isToggleSideBar ? 1 : 4} xxl={isToggleSideBar ? 1 : 4} >
                     <SideBar />
                 </Col>
-                <Col xs={24} sm={24} md={16} lg={20}>
-                    <Header />
+                <Col xs={24} sm={24} md={isToggleSideBar ? 20 : 16} lg={isToggleSideBar ? 20 : 18} xl={isToggleSideBar ? 23 : 20} xxl={isToggleSideBar ? 23 : 20}>
                     <div className="main-wrapper">
                         <CloseCircleOutlined onClick={toggleSideBar} className='close-btn' />
                         <BreadcrumbCustomv2 />
@@ -159,7 +160,7 @@ function AdminPage(props) {
                             </Route>
                             <Route path='/orders'>
                                 <Route path='view' element={<Order />}></Route>
-                                <Route path='confirm' element={<OrderConfirm />}></Route>
+                                {/* <Route path='confirm' element={<OrderConfirm />}></Route> */}
                             </Route>
                             <Route path='/vouchers'>
                                 <Route path='view' element={<Voucher />}></Route>
@@ -169,6 +170,7 @@ function AdminPage(props) {
                             <Route path='/rules'>
                                 <Route path='view' element={<Rule />}></Route>
                                 <Route path='edit' element={<RuleEdit />}></Route>
+                                <Route path='rule_employee' element={<RuleEmployee />}></Route>
                             </Route>
                             <Route path='/revenues'>
                                 <Route path='view' element={<RevenueReport />}></Route>

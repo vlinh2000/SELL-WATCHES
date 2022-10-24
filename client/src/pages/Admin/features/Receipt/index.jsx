@@ -83,7 +83,7 @@ function Receipt(props) {
         {
             title: 'Hành động',
             dataIndex: 'MA_PHIEU_NHAP',
-            render: (text, record) => <> <Button onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
+            render: (text, record) => <> <Button shape='circle' onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
                 <Popconfirm
                     title={`Bạn có chắc muốn xóa phiếu nhập ID [${text}]`}
                     onConfirm={() => { onDelete(text) }}
@@ -91,7 +91,7 @@ function Receipt(props) {
                     cancelText="No"
                 >
                     {/* <Button style={{ marginLeft: 5 }} icon={<EyeOutlined />}></Button> */}
-                    <Button style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
+                    <Button style={{ marginLeft: 5 }} shape='circle' danger icon={<DeleteOutlined />}></Button>
                 </Popconfirm>
             </>
         },
@@ -147,15 +147,15 @@ function Receipt(props) {
                                 ),
                             }}
                         />
-                        <Divider />
-                        <Pagination
-                            pageSize={1}
-                            current={pagination._page}
-                            total={pagination._totalPage}
-                            onChange={(page) => dispatch(savePagination({ screen: 'receipts', page }))} ></Pagination>
+
                     </>
 
             }
+            <Pagination
+                pageSize={1}
+                current={pagination._page}
+                total={pagination._totalPage}
+                onChange={(page) => dispatch(savePagination({ screen: 'receipts', page }))} ></Pagination>
         </div>
     );
 }

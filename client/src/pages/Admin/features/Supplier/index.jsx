@@ -69,14 +69,14 @@ function Supplier(props) {
         {
             title: 'Hành động',
             dataIndex: 'MA_NCC',
-            render: (text, record) => <> <Button onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
+            render: (text, record) => <> <Button shape="circle" onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
                 <Popconfirm
                     title={`Bạn có chắc muốn xóa nhà cung cấp ID [${text}]`}
                     onConfirm={() => { onDelete(text) }}
                     okText="Yes"
                     cancelText="No"
                 >
-                    <Button style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
+                    <Button shape="circle" style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
                 </Popconfirm>
             </>
         },
@@ -96,15 +96,14 @@ function Supplier(props) {
                             dataSource={suppliers}
                             pagination={false}
                         />
-                        <Divider />
-                        <Pagination
-                            pageSize={1}
-                            current={pagination._page}
-                            total={pagination._totalPage}
-                            onChange={(page) => dispatch(savePagination({ screen: 'suppliers', page }))} ></Pagination>
                     </>
 
             }
+            <Pagination
+                pageSize={1}
+                current={pagination._page}
+                total={pagination._totalPage}
+                onChange={(page) => dispatch(savePagination({ screen: 'suppliers', page }))} ></Pagination>
         </div>
     );
 }

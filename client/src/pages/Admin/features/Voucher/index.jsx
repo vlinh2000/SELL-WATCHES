@@ -74,24 +74,24 @@ function Voucher(props) {
         {
             title: 'Loại ưu đãi',
             dataIndex: 'MPVC',
-            render: (text) => text === 1 ? <Tag>Miễn phí vận chuyển</Tag> : <Tag>Giảm giá đơn hàng</Tag>
+            render: (text) => text === 1 ? <Tag color='blue'>Miễn phí vận chuyển</Tag> : <Tag color='green'>Giảm giá đơn hàng</Tag>
         },
         {
             title: 'Giá trị',
             dataIndex: 'GIA_TRI',
-            render: (text, record) => record.MPVC === 1 ? <Tag color="#3b5999">100%</Tag> : <Tag color="#3b5999">{numberWithCommas(text) + record.DON_VI_GIAM}</Tag>
+            render: (text, record) => record.MPVC === 1 ? <Tag color="gold">100%</Tag> : <Tag color="purple">{numberWithCommas(text) + record.DON_VI_GIAM}</Tag>
         },
         {
             title: 'Hành động',
             dataIndex: 'MA_UU_DAI',
-            render: (text, record) => <> <Button onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
+            render: (text, record) => <> <Button shape='circle' onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
                 <Popconfirm
                     title={`Bạn có chắc muốn xóa voucher ID [${text}]`}
                     onConfirm={() => { onDelete(text) }}
                     okText="Yes"
                     cancelText="No"
                 >
-                    <Button style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
+                    <Button shape='circle' style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
                 </Popconfirm>
             </>
         },
@@ -112,15 +112,14 @@ function Voucher(props) {
                             dataSource={vouchers}
                             pagination={false}
                         />
-                        <Divider />
-                        <Pagination
-                            pageSize={1}
-                            current={pagination._page}
-                            total={pagination._totalPage}
-                            onChange={(page) => dispatch(savePagination({ screen: 'vouchers', page }))} ></Pagination>
                     </>
 
             }
+            <Pagination
+                pageSize={1}
+                current={pagination._page}
+                total={pagination._totalPage}
+                onChange={(page) => dispatch(savePagination({ screen: 'vouchers', page }))} ></Pagination>
         </div>
     );
 }

@@ -42,7 +42,7 @@ function VoucherModal(props) {
     }
 
     return (
-        <div>
+        <div className='voucher-modal'>
             {/* choose address modal */}
             <Modal
                 width={500}
@@ -57,7 +57,7 @@ function VoucherModal(props) {
 
                     </>
                 }
-                <Radio.Group onChange={({ target }) => setVoucherSelected(myVouchers[target.value])}>
+                <Radio.Group className='voucher-list-choosen' onChange={({ target }) => setVoucherSelected(myVouchers[target.value])}>
                     <Space style={{ width: '100%' }} direction="vertical">
                         {
                             myVouchers?.map((voucher, idx) =>

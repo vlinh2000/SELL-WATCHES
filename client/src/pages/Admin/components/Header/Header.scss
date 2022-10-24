@@ -4,12 +4,33 @@
     position: sticky;
     top: 0;
     z-index: 5;
-    line-height: 35px;
+    // line-height: 35px;
     // padding: 1rem 24px;
 
 
     .left-side{
         text-align: center;
+
+        .logo{
+            text-align: center;
+            background-color: #2C3338;
+            
+            img{
+                width: 70px;
+                height: 35px;
+                object-fit: contain;
+            }
+    
+            // .menu-btn{
+            //     color: #FFF;
+            //     position: absolute;
+            //     left: 10px;
+            //     top: 8px;
+            //     font-size: 18px;
+            //     display: none;
+            // }
+    
+        }
 
         .menu-btn{
             color: #FFF;
@@ -21,10 +42,21 @@
         }
     }
 
+    .menu-btn-big-screen{
+        color: #FFF;
+        font-size: 15px;
+        // display: none;
+        margin-left: 25px;
+    }
+
     .right-side {
         color: #FFF;
-        text-align: right;
+        // text-align: right;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-right: 2rem;
+
         a{
             text-transform: uppercase;
             color: #FFF;

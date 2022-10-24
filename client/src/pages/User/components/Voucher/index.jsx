@@ -29,7 +29,7 @@ Voucher.defaultProps = {
 };
 
 function Voucher(props) {
-    const { mode, id, name, expire, isSaved, saveAvailable, used } = props;
+    const { mode, id, name, expire, isSaved, saveAvailable, used, quantity } = props;
     const dispatch = useDispatch();
     const handleSave = async () => {
         try {
@@ -50,13 +50,15 @@ function Voucher(props) {
                 <div className='name'>{name} {used ? <small>(đã dùng)</small> : ''}</div>
                 <div className='code'>Mã: {id}</div>
                 <div className='description'>HSD: {expire && moment(expire).format('DD-MM-YYYY HH:mm:ss')}</div>
+
             </div>
-            {
-                mode !== 'refer' &&
-                <div className="voucher-bottom">
+            <div className="voucher-bottom">
+                {quantity && <div style={{ fontSize: 10 }}>còn: {quantity}</div>}
+                {
+                    mode !== 'refer' &&
                     <Tag onClick={!isSaved && handleSave} color={isSaved ? '#87d068' : '#c89979'} style={{ cursor: 'pointer' }}>{isSaved ? <span><CheckCircleOutlined />&nbsp;Đã lưu</span> : 'Lưu'}</Tag>
-                </div>
-            }
+                }
+            </div>
         </div>
     );
 }

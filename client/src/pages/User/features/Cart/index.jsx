@@ -81,7 +81,7 @@ function Cart(props) {
                                 }
                             </tbody>
                         </table>
-                        <Button icon={<LeftOutlined />} danger onClick={() => navigate('/')}>Tiếp tục xem sản phẩm</Button>
+                        <button className='button-1' icon={<LeftOutlined />} danger onClick={() => navigate('/')}>Tiếp tục xem sản phẩm</button>
                         <br />
                         <br />
                         <br />
@@ -104,7 +104,7 @@ function Cart(props) {
                             <br />
                             {
                                 cart.length > 0 &&
-                                <ButtonCustom onClick={() => navigate('/payments')} style={{ width: '100%', justifyContent: 'center', textTransform: 'uppercase' }} text="Tiến hành thanh toán" />
+                                <ButtonCustom onClick={() => navigate('/payments')} style={{ width: '100%', justifyContent: 'center' }} >Tiến hành thanh toán</ButtonCustom>
                             }
                         </div>
 

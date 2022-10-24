@@ -1,4 +1,4 @@
-import { Menu } from 'antd';
+import { Affix, Menu } from 'antd';
 import './SideBar.scss';
 
 import {
@@ -37,7 +37,7 @@ function getItem(label, key, icon, children, type) {
 }
 
 function SideBar(props) {
-    const { data: { myRoles } } = useSelector(state => state.adminInfo);
+    const { data: { myRoles }, isToggleSideBar } = useSelector(state => state.adminInfo);
 
     const moduleWithRole = React.useMemo(() => ({
         'ROLE_QLNV': getItem('Quản lý nhân viên', '2', <UsergroupAddOutlined />, [
@@ -45,7 +45,7 @@ function SideBar(props) {
             getItem('Danh sách nhân viên', '222', <Link to="/admin/employees/view"></Link>),
         ]),
         'ROLE_QLDH': getItem('Quản lý đơn hàng', '3', <GroupOutlined />, [
-            getItem('Xác nhận đơn hàng', '331', <Link to="/admin/orders/confirm"></Link>),
+            // getItem('Xác nhận đơn hàng', '331', <Link to="/admin/orders/confirm"></Link>),
             // getItem('Cập nhật đơn hàng', '332', <Link to="/admin/orders/edit"></Link>),
             getItem('Danh sách đơn hàng', '333', <Link to="/admin/orders/view"></Link>),
         ]),
@@ -81,16 +81,17 @@ function SideBar(props) {
             getItem('Cập nhật nhà cung cấp', '11111', <Link to="/admin/suppliers/edit"></Link>),
             getItem('Danh sách nhà cung cấp', '11112', <Link to="/admin/suppliers/view"></Link>),
         ]),
-        'ROLE_QLSK': getItem('Quản lý sự kiện', '12', <NodeExpandOutlined />, [
-            getItem('Cập nhật sự kiện', '12121', <Link to="/admin/events/edit"></Link>),
-            getItem('Danh sách sự kiện', '12122', <Link to="/admin/events/view"></Link>),
+        'ROLE_QLSK': getItem('Quản lý sự kiện', '13', <NodeExpandOutlined />, [
+            getItem('Cập nhật sự kiện', '13131', <Link to="/admin/events/edit"></Link>),
+            getItem('Danh sách sự kiện', '13132', <Link to="/admin/events/view"></Link>),
         ]),
         'ROLE_QLDT': getItem('Quản lý doanh thu', '14', <BarChartOutlined />, [
             getItem('Thống kê doanh thu', '14141', <Link to="/admin/revenues/view"></Link>),
         ]),
-        'ROLE_QLQNV': getItem('Quản lý quyền', '15', <AndroidOutlined />, [
-            getItem('Cập nhật quyền', '15151', <Link to="/admin/rules/edit"></Link>),
-            getItem('Danh sách quyền', '15153', <Link to="/admin/rules/view"></Link>),
+        'ROLE_QLQNV': getItem('Quản lý quyền', '12', <AndroidOutlined />, [
+            getItem('Cập nhật quyền', '12121', <Link to="/admin/rules/edit"></Link>),
+            getItem('Phân quyền', '12122', <Link to="/admin/rules/rule_employee"></Link>),
+            getItem('Danh sách quyền', '12123', <Link to="/admin/rules/view"></Link>),
         ]),
     }),
         [])
@@ -100,33 +101,35 @@ function SideBar(props) {
     const items = React.useMemo(() =>
         [
             getItem('Dashboard', '1', <Link to="/admin/dashboard"><DashboardOutlined /></Link>),
-            ...(myRoles?.map(role => moduleWithRole[role.MA_QUYEN]) || [])
+            ...(myRoles?.map(role => moduleWithRole[role.MA_QUYEN]) || []),
+            getItem('Đăng xuất', 'logout', <Link to="" onClick={() => dispatch(logout())}><LogoutOutlined /></Link>),
         ]
         , [myRoles])
 
-    console.log({ items });
     const { selectedKey } = useSelector(state => state.adminInfo);
 
     return (
-        <div className='sidebar'>
-            <div className="logo">
-                <Link to="/">
-                    <img src='https://mauweb.monamedia.net/donghohaitrieu/wp-content/uploads/2019/07/logo-mona-2.png' alt='img' />
-                </Link>
+        <Affix style={{ zIndex: 100 }} offsetTop={50}>
+            <div className='sidebar'>
+                <div className="logo logo-second" >
+                    <Link to="/">
+                        <img src='https://mauweb.monamedia.net/donghohaitrieu/wp-content/uploads/2019/07/logo-mona-2.png' alt='img' />
+                    </Link>
+                </div>
+                <Menu
+                    // style={{ marginTop: '-4px' }}
+                    // openKeys={}
+                    // onClick={({ item, key, keyPath, domEvent }) => console.log(key)}
+                    selectedKeys={[selectedKey]}
+                    defaultOpenKeys={[selectedKey?.charAt(0)]}
+                    mode="inline"
+                    inlineCollapsed={isToggleSideBar}
+                    theme='dark'
+                    items={items}
+                />
+                {/* <p className="btn-logout" onClick={() => dispatch(logout())}><LogoutOutlined />&nbsp; &nbsp;Đăng xuất </p> */}
             </div>
-            <Menu
-                style={{ marginTop: '-4px' }}
-                // openKeys={}
-                // onClick={({ item, key, keyPath, domEvent }) => console.log(key)}
-                selectedKeys={[selectedKey]}
-                defaultOpenKeys={[selectedKey?.charAt(0)]}
-                mode="inline"
-                // inlineCollapsed={true}
-                theme='dark'
-                items={items}
-            />
-            <p className="btn-logout" onClick={() => dispatch(logout())}><LogoutOutlined />&nbsp; &nbsp;Đăng xuất </p>
-        </div>
+        </Affix>
     );
 }
 

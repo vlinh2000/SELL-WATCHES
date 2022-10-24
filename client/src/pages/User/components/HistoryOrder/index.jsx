@@ -71,58 +71,63 @@ function HistoryOrder(props) {
                                     <Collapse.Panel header={`Đơn hàng: ${order.MA_DH}`} key={idx} extra={<span className={getStatusOrderClassName(order.TRANG_THAI)}>{getStatusOrder(order.TRANG_THAI)}</span>}>
                                         <li className='history-bought__item'>
                                             <div className='history-bought__item__body'>
-                                                <div>
-                                                    <div className='category-label'>
-                                                        <span className='category-label-key'>Họ tên người đặt </span><span className='category-label-value'>{order.HO_TEN_NGUOI_DAT}</span>
-                                                    </div>
-                                                    <div className='category-label'>
-                                                        <span className='category-label-key'>Số điện thoại</span><span className='category-label-value'>{order.SDT_NGUOI_DAT}</span>
-                                                    </div>
-                                                    <div className='category-label'>
-                                                        <span className='category-label-key'>Đơn vị vận chuyển </span><span className='category-label-value'>{order.DON_VI_VAN_CHUYEN}</span>
-                                                    </div>
-                                                    <div className='category-label'>
-                                                        <span className='category-label-key'>Mã ưu đãi </span><span className='category-label-value'>{order.MA_UU_DAI ? `${order.TEN_UU_DAI} (${order.MA_UU_DAI})` : 'Không áp dụng'}</span>
-                                                    </div>
-
-                                                    <div className='category-label'>
-                                                        <span className='category-label-key'>Ngày đặt hàng</span><span className='category-label-value'>{moment(order.TG_DAT_HANG).format('DD-MM-YYYY')}</span>
-                                                    </div>
-                                                    {
-                                                        order.TRANG_THAI > 0 &&
+                                                <Row gutter={[40, 0]}>
+                                                    <Col xs={24} sm={12}>
                                                         <div className='category-label'>
-                                                            <span className='category-label-key'>Ngày giao hàng {order.TRANG_THAI == 1 ? '(dự kiến)' : ''}</span><span className='category-label-value'>{moment(order.TG_GIAO_HANG).format('DD-MM-YYYY')}</span>
+                                                            <span className='category-label-key'>Họ tên người đặt </span><span className='category-label-value'>{order.HO_TEN_NGUOI_DAT}</span>
                                                         </div>
-                                                    }
-                                                    <div className='category-label'>
-                                                        <span className='category-label-key'>Hình thức thanh toán</span><span className='category-label-value'>{order.HINH_THUC_THANH_TOAN}</span>
-                                                    </div>
-                                                    <div className='category-label'>
-                                                        <span className='category-label-key'>Trạng thái thanh toán</span><span className='category-label-value'>{order.DA_THANH_TOAN === 1 ? 'Đã thanh toán' : 'Chưa thanh toán'}</span>
-                                                    </div>
-                                                    <div className='category-label'>
-                                                        <span className='category-label-key'>Địa chỉ</span><span className='category-label-value'>{order.DIA_CHI}</span>
-                                                    </div>
-                                                    <div className='category-label'>
-                                                        <span className='category-label-key'>Ghi chú</span><span className='category-label-value'>{order.GHI_CHU || '...'}</span>
-                                                    </div>
-                                                    <div className='category-label'>
-                                                        <span className='category-label-key'>Phí vận chuyển </span><span className='category-label-value'>{numberWithCommas(order.PHI_SHIP)} ₫</span>
-                                                    </div>
-                                                    <div className='category-label'>
-                                                        <span className='category-label-key'>Tổng tiền hàng</span><span className='category-label-value'>{numberWithCommas(order.TONG_TIEN)} ₫</span>
-                                                    </div>
-                                                    <div className='category-label'>
-                                                        <span className='category-label-key'>Tổng tiền</span><span className='category-label-value'>{numberWithCommas(order.TONG_TIEN + order.PHI_SHIP)} ₫</span>
-                                                    </div>
-                                                    <div className='category-label'>
-                                                        <span className='category-label-key'>Giảm giá </span><span className='category-label-value'>{numberWithCommas(order.GIAM_GIA)}&nbsp;₫</span>
-                                                    </div>
-                                                    <div className='category-label'>
-                                                        <span className='category-label-key'>Tổng cộng </span><strong className='category-label-value' style={{ fontSize: 20 }}>{numberWithCommas(order.TONG_TIEN + order.PHI_SHIP - order.GIAM_GIA)} ₫</strong>
-                                                    </div>
-                                                    <br />
-                                                </div>
+                                                        <div className='category-label'>
+                                                            <span className='category-label-key'>Số điện thoại</span><span className='category-label-value'>{order.SDT_NGUOI_DAT}</span>
+                                                        </div>
+
+                                                        <div className='category-label'>
+                                                            <span className='category-label-key'>Mã ưu đãi </span><span className='category-label-value'>{order.MA_UU_DAI ? `${order.TEN_UU_DAI} (${order.MA_UU_DAI})` : 'Không áp dụng'}</span>
+                                                        </div>
+
+                                                        <div className='category-label'>
+                                                            <span className='category-label-key'>Hình thức thanh toán</span><span className='category-label-value'>{order.HINH_THUC_THANH_TOAN}</span>
+                                                        </div>
+                                                        <div className='category-label'>
+                                                            <span className='category-label-key'>Trạng thái thanh toán</span><span className='category-label-value'>{order.DA_THANH_TOAN === 1 ? 'Đã thanh toán' : 'Chưa thanh toán'}</span>
+                                                        </div>
+                                                        <div className='category-label'>
+                                                            <span className='category-label-key'>Ghi chú</span><span className='category-label-value'>{order.GHI_CHU || '...'}</span>
+                                                        </div>
+                                                        <div className='category-label'>
+                                                            <span className='category-label-key'>Địa chỉ</span><span className='category-label-value'>{order.DIA_CHI}</span>
+                                                        </div>
+                                                    </Col>
+                                                    <Col xs={24} sm={12}>
+                                                        <div className='category-label'>
+                                                            <span className='category-label-key'>Ngày đặt hàng</span><span className='category-label-value'>{moment(order.TG_DAT_HANG).format('DD-MM-YYYY')}</span>
+                                                        </div>
+                                                        {
+                                                            order.TRANG_THAI > 0 &&
+                                                            <div className='category-label'>
+                                                                <span className='category-label-key'>{order.TRANG_THAI === 3 ? 'Thời gian hủy đơn' : 'Ngày giao hàng'} {order.TRANG_THAI == 1 ? '(dự kiến)' : ''}</span><span className='category-label-value'>{moment(order.TRANG_THAI === 3 ? order.CAP_NHAT : order.TG_GIAO_HANG).format('DD-MM-YYYY')}</span>
+                                                            </div>
+                                                        }
+                                                        <div className='category-label'>
+                                                            <span className='category-label-key'>Đơn vị vận chuyển </span><span className='category-label-value'>{order.DON_VI_VAN_CHUYEN}</span>
+                                                        </div>
+                                                        <div className='category-label'>
+                                                            <span className='category-label-key'>Phí vận chuyển </span><span className='category-label-value'>{numberWithCommas(order.PHI_SHIP)} ₫</span>
+                                                        </div>
+                                                        <div className='category-label'>
+                                                            <span className='category-label-key'>Tổng tiền hàng</span><span className='category-label-value'>{numberWithCommas(order.TONG_TIEN)} ₫</span>
+                                                        </div>
+                                                        <div className='category-label'>
+                                                            <span className='category-label-key'>Tổng tiền</span><span className='category-label-value'>{numberWithCommas(order.TONG_TIEN + order.PHI_SHIP)} ₫</span>
+                                                        </div>
+                                                        <div className='category-label'>
+                                                            <span className='category-label-key'>Giảm giá </span><span className='category-label-value'>{numberWithCommas(order.GIAM_GIA)}&nbsp;₫</span>
+                                                        </div>
+                                                        <div className='category-label'>
+                                                            <span className='category-label-key'>Tổng cộng </span><strong className='category-label-value' style={{ fontSize: 20 }}>{numberWithCommas(order.TONG_TIEN + order.PHI_SHIP - order.GIAM_GIA)} ₫</strong>
+                                                        </div>
+                                                    </Col>
+                                                </Row>
+                                                <br />
                                                 <Collapse expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}>
                                                     <Collapse.Panel header="Chi tiết sản phẩm" key={order.MA_DH}>
                                                         <ul className='list-products'>
@@ -132,12 +137,15 @@ function HistoryOrder(props) {
                                                                         <img src={sp.HINH_ANH} />
                                                                         <a href='' className='name'>{sp.TEN_SP}</a>
                                                                         <span>x {sp.SO_LUONG}</span>
-                                                                        <strong>{numberWithCommas(sp.GIA)}&nbsp;₫</strong>
-                                                                        <Link to={`/products/${sp.MA_SP}`} state={{ feedbackFromOrder: true }}>
-                                                                            <Tooltip title="Đánh giá sản phẩm này.">
-                                                                                <MessageOutlined />
-                                                                            </Tooltip>
-                                                                        </Link>
+                                                                        <span>{numberWithCommas(sp.GIA)}&nbsp;₫</span>
+                                                                        {
+                                                                            order.TRANG_THAI === 3 &&
+                                                                            <Link to={`/products/${sp.MA_SP}`} state={{ feedbackFromOrder: true }}>
+                                                                                <Tooltip title="Đánh giá sản phẩm này.">
+                                                                                    <MessageOutlined />
+                                                                                </Tooltip>
+                                                                            </Link>
+                                                                        }
                                                                     </li>)
                                                             }
                                                         </ul>
@@ -148,14 +156,14 @@ function HistoryOrder(props) {
                                                 {
                                                     order.TRANG_THAI === 0 &&
                                                     <Popconfirm title="Bạn muốn hủy đơn hàng này ?" onConfirm={() => handleOrder(order.MA_DH, false)}>
-                                                        <ButtonCustom className="btn-danger-custom" text='Hủy đơn hàng' />
+                                                        <ButtonCustom className="btn-danger-custom" >Hủy đơn hàng</ButtonCustom>
                                                     </Popconfirm>
                                                 }
                                                 {
 
                                                     order.TRANG_THAI === 1 &&
                                                     <Popconfirm title="Xác nhận rằng bạn đã nhận được hàng ?" onConfirm={() => handleOrder(order.MA_DH, true)}>
-                                                        <ButtonCustom className="btn-success-custom" text='Đã nhận được hàng ?' />
+                                                        <ButtonCustom >Đã nhận được hàng ?</ButtonCustom>
                                                     </Popconfirm>
                                                 }
                                             </div>

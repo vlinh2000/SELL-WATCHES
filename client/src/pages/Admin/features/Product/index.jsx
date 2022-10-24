@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Divider, Pagination, Popconfirm, Table } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, Divider, Pagination, Popconfirm, Table, Tag } from 'antd';
 import { sanphamApi } from 'api/sanphamApi';
 import { fetch_products, prepareDataEdit, savePagination } from 'pages/Admin/adminSlice';
 import SkeletonCustom from 'pages/Admin/components/SkeletonCustom';
@@ -51,6 +51,7 @@ function Product(props) {
         {
             title: 'Ảnh sản phẩm',
             dataIndex: 'HINH_ANH',
+            fixed: 'left',
             render: (anhsanphams) => <img className='product-image' src={anhsanphams} alt="anhsanpham" />
         },
         {
@@ -70,12 +71,12 @@ function Product(props) {
         {
             title: 'Giá gốc',
             dataIndex: 'GIA_GOC',
-            render: (text) => numberWithCommas(text)
+            render: (text) => <div style={{ width: 50 }}>{numberWithCommas(text) + ' ₫'}</div>
         },
         {
             title: 'Giá bán',
             dataIndex: 'GIA_BAN',
-            render: (text) => numberWithCommas(text)
+            render: (text) => <div style={{ width: 50 }}>{numberWithCommas(text) + ' ₫'}</div>
         },
         {
             title: 'Số lượng kho',
@@ -116,21 +117,25 @@ function Product(props) {
         },
         {
             title: 'Trạng thái',
-            dataIndex: 'TRANG_THAI'
+            dataIndex: 'TRANG_THAI',
+            render: (text, record) => <div style={{ width: 100 }}>{record.SO_LUONG > 0 ? <Tag icon={<CheckCircleOutlined />} color="success">
+                Còn hàng
+            </Tag> : <Tag icon={<CloseCircleOutlined />} color="warning">Hết hàng</Tag>}</div>
         },
         {
             title: 'Hành động',
             dataIndex: 'MA_SP',
-            render: (text, record) => <> <Button onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
+            fixed: 'right',
+            render: (text, record) => <div style={{ width: 100 }}> <Button shape='circle' onClick={() => { onEdit(record); }} icon={<EditOutlined />}></Button>
                 <Popconfirm
                     title={`Bạn có chắc muốn xóa sản phẩm ID [${text}]`}
                     onConfirm={() => { onDelete(text) }}
                     okText="Yes"
                     cancelText="No"
                 >
-                    <Button style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
+                    <Button shape='circle' style={{ marginLeft: 5 }} danger icon={<DeleteOutlined />}></Button>
                 </Popconfirm>
-            </>
+            </div>
         },
     ];
 
@@ -148,16 +153,14 @@ function Product(props) {
                             dataSource={products}
                             pagination={false}
                         />
-                        <Divider />
-                        <Pagination
-                            pageSize={1}
-                            current={pagination?._page}
-                            total={pagination?._totalPage}
-                            onChange={(page) => dispatch(savePagination({ screen: 'products', page }))} ></Pagination>
 
                     </>
-
             }
+            <Pagination
+                pageSize={1}
+                current={pagination?._page}
+                total={pagination?._totalPage}
+                onChange={(page) => dispatch(savePagination({ screen: 'products', page }))} ></Pagination>
         </div>
     );
 }

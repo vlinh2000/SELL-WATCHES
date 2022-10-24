@@ -1,0 +1,29 @@
+.event-edit{
+    .checkbox-custom{
+        
+        .ant-checkbox-wrapper{
+            display: flex;
+            align-items: center;
+
+            span:last-child{
+                flex-grow: 1;
+            }
+        }
+
+        .voucher-list-choosen{
+            .voucher {
+                height: 65px;
+                font-size: 12px;
+                
+                .voucher-body{
+                    font-size: 10px;
+
+                    .name{
+                        font-size: 12px;
+                        text-transform: uppercase;
+                    }
+                }
+            }
+        }
+    }
+}

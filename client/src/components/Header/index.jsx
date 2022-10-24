@@ -1,8 +1,9 @@
-import { BarsOutlined, CloseOutlined, EnvironmentOutlined, FacebookFilled, HeartOutlined, InstagramOutlined, PhoneOutlined, SearchOutlined, ShoppingOutlined, TwitterOutlined } from '@ant-design/icons';
+import { AudioOutlined, BarsOutlined, CloseOutlined, ConsoleSqlOutlined, EnvironmentOutlined, FacebookFilled, HeartOutlined, InstagramOutlined, PhoneOutlined, SearchOutlined, ShoppingOutlined, TwitterOutlined } from '@ant-design/icons';
 import { Button, Col, Divider, Popover, Row, Skeleton, Tooltip } from 'antd';
 import { sanphamApi } from 'api/sanphamApi';
 import { numberWithCommas } from 'assets/admin';
 import { getTotalPrice } from 'assets/common';
+import SpeechReconigtion from 'components/SpeechRecognition';
 import { onSearch, removeFromCart, switch_screenLogin, switch_suggestionModal } from 'pages/User/userSlice';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,12 +19,13 @@ Header.propTypes = {
 function CartInfo(props) {
     const { productList } = props;
     const dispatch = useDispatch();
+
     return (
         <div className='cart-info'>
             <ul className="list-item">
                 {
                     productList?.map((product, idx) =>
-                        <li key={idx} className="item">
+                        <li key={'product' + idx} className="item">
                             <Row>
                                 <Col className='item-image' span={6}>
                                     <img src={(product?.ANH_SAN_PHAM?.length > 0 && product?.ANH_SAN_PHAM[0]?.HINH_ANH) || product?.HINH_ANH} alt='product-img' />
@@ -59,6 +61,12 @@ function CartInfo(props) {
     );
 }
 
+const audioList = {
+    open: 'https://res.cloudinary.com/vlinh/video/upload/v1666579017/images-tieuluan/open_pbbq0h.m4a',
+    success: 'https://res.cloudinary.com/vlinh/video/upload/v1666579017/images-tieuluan/success_e3al2w.m4a',
+    failure: 'https://res.cloudinary.com/vlinh/video/upload/v1666579017/images-tieuluan/failure_rrqteg.m4a',
+    noInput: 'https://res.cloudinary.com/vlinh/video/upload/v1666579017/images-tieuluan/no_input_glnffd.m4a'
+}
 
 function Header(props) {
 
@@ -72,6 +80,13 @@ function Header(props) {
     const [loading, setLoading] = React.useState(false);
     const [productSuggestions, setProductSuggestions] = React.useState([]);
     const [totalSearchFound, setTotalSearchFound] = React.useState(0);
+
+    const [speechToText, setSpeechToText] = React.useState();
+    const [showModalSpeechRecognition, setshowModalSpeechRecognition] = React.useState(false);
+
+    const [contentListened, setContentListened] = React.useState('');
+    const [isErrorReconigtion, setIsErrorReconigtion] = React.useState(false);
+    const [isListening, setIsListening] = React.useState(false);
 
     const handleShowNavbar = () => {
         document.querySelector('.hide-bg').style.display = 'block';
@@ -110,6 +125,7 @@ function Header(props) {
     }
 
     React.useEffect(() => {
+        console.log({ searchValue })
         const fetchData = async () => {
             try {
                 setLoading(true);
@@ -117,6 +133,11 @@ function Header(props) {
                 setProductSuggestions(result);
                 setTotalSearchFound(totalRecord)
                 setLoading(false);
+
+                const searchInput = document.querySelector('input[name="searchValue"');
+                // searchInput.value = contentListened;
+                // setContentListened('');
+                searchInput.focus();
             } catch (error) {
                 console.log({ error })
                 setLoading(false);
@@ -125,6 +146,98 @@ function Header(props) {
 
         fetchData();
     }, [searchValue])
+
+
+    React.useEffect(() => {
+        var SpeechRecognition = SpeechRecognition || window.webkitSpeechRecognition
+        var recognition = new SpeechRecognition();
+
+        recognition.continuous = false;
+        recognition.lang = 'vi-VN';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        setSpeechToText(recognition);
+    }, [])
+
+
+    React.useEffect(() => {
+        if (speechToText == null) return;
+
+        speechToText.onresult = function (event) {
+            var result = event.results[0][0].transcript;
+            console.log("Đã nghe: " + result);
+            setContentListened(result);
+            handlePlayAudio('success');
+
+
+            const idTimeout = setTimeout(() => {
+                setIsListening(false);
+                setIsErrorReconigtion(false);
+                handleSwitchSpeechRecognition(false);
+                clearTimeout(idTimeout);
+                console.log("stop");
+            }, 2000);
+            // console.log('Confidence: ' + event.results[0][0].confidence);
+        }
+
+        speechToText.onstart = function () {
+            setIsListening(true);
+        }
+
+        speechToText.onspeechend = function () {
+            console.log({ contentListened, status: "dừng", test: contentListened !== '' })
+            speechToText.stop();
+            if (contentListened !== '') {
+                console.log({ contentListened, status: "dừng" })
+                handlePlayAudio('noInput')
+                setIsErrorReconigtion(true);
+                setIsListening(false);
+            }
+        }
+
+        // speechToText.onnomatch = function (event) {
+        //     console.log("no match");
+        // }
+
+        speechToText.onerror = function (event) {
+            // handlePlayAudio('failure')
+            handlePlayAudio('noInput')
+            setIsErrorReconigtion(true);
+            setIsListening(false);
+        }
+
+    }, [speechToText])
+
+    const handleMapDataToSearchInput = () => {
+        const searchInput = document.querySelector('input[name="searchValue"');
+        searchInput.value = contentListened;
+        setSearchValue(contentListened);
+        setContentListened('');
+
+    }
+
+    React.useEffect(() => {
+        contentListened && !showModalSpeechRecognition && handleMapDataToSearchInput();
+    }, [contentListened, showModalSpeechRecognition])
+
+    const handlePlayAudio = (status) => {
+        const audioTag = document.querySelector('#audioSearch');
+        audioTag.src = audioList[status];
+        audioTag.play();
+    }
+
+
+    const handleSearchVoice = () => {
+        // setSearchValue('');
+        handlePlayAudio('open');
+        setIsErrorReconigtion(false);
+        setshowModalSpeechRecognition(true);
+        speechToText.start()
+    }
+
+    const handleSwitchSpeechRecognition = (isOpen) => {
+        setshowModalSpeechRecognition(isOpen);
+    }
 
     return (
         <div className='header-wrapper'>
@@ -167,7 +280,14 @@ function Header(props) {
                         <form className='form-search'>
                             <input
                                 onBlur={() => dispatch(switch_suggestionModal(false))}
-                                onFocus={() => dispatch(switch_suggestionModal(true))} onChange={handleChange} className='search-input' name='searchValue' type="text" placeholder="Tìm kiếm ..." />
+                                onFocus={() => dispatch(switch_suggestionModal(true))}
+                                onChange={handleChange} className='search-input'
+                                name='searchValue'
+                                type="text"
+                                placeholder="Tìm kiếm sản phẩm..." />
+                            <div className='voice-container'>
+                                <AudioOutlined onClick={handleSearchVoice} className="audio-icon" />
+                            </div>
                             <button className='btn-search' type='submit' onClick={handleSearch}>
                                 <SearchOutlined />
                             </button>
@@ -178,7 +298,7 @@ function Header(props) {
                                 {
                                     loading ? new Array(4).fill(0).map((_, idx) =>
                                         <li
-                                            key={idx} className='suggestions-wrapper__item'>
+                                            key={'skeleton' + idx} className='suggestions-wrapper__item'>
                                             <Row>
                                                 <Col xs={24} sm={12} md={5}>
                                                     <Skeleton.Image style={{ width: 50, height: 40 }} size="small" active={true} />
@@ -191,7 +311,7 @@ function Header(props) {
                                     )
                                         :
                                         productSuggestions?.map((product, idx) =>
-                                            <li key={idx} className='suggestions-wrapper__item'>
+                                            <li key={'suggestion' + idx} className='suggestions-wrapper__item'>
                                                 <Link
                                                     onMouseDown={() => {
                                                         setSearchValue("")
@@ -203,8 +323,8 @@ function Header(props) {
                                                     to="" className='suggestions-wrapper__item__content'>
                                                     <img width={40} height={50} src={product.HINH_ANH} alt='product-img' />
                                                     <div className='info'>
-                                                        <div>{reactStringReplace(product.TEN_SP, searchValue, (match, i) => <span style={{ color: 'red' }}>{match}</span>)}</div>
-                                                        <div><span className='category'>{reactStringReplace(product.TEN_LOAI_SP, searchValue, (match, i) => <span style={{ color: 'red' }}>{match}</span>)}</span><Divider type="vertical" /><strong className='price'>{numberWithCommas(product.GIA_BAN || 0)}&nbsp;₫</strong></div>
+                                                        <div className='product-name'>{reactStringReplace(product.TEN_SP, searchValue, (match, i) => <span style={{ color: 'red' }}>{match}</span>)}</div>
+                                                        <div className='info-bottom'><span className='category'>{reactStringReplace(product.TEN_LOAI_SP, searchValue, (match, i) => <span style={{ color: 'red' }}>{match}</span>)}</span><Divider type="vertical" /><strong className='price'>{numberWithCommas(product.GIA_BAN || 0)}&nbsp;₫</strong></div>
                                                     </div>
                                                 </Link>
                                             </li>
@@ -245,7 +365,7 @@ function Header(props) {
                         </li>
                         {
                             productTypeList?.map((category, idx) =>
-                                <li key={idx} className="navbar-item">
+                                <li key={'category' + idx} className="navbar-item">
                                     <Link className={pathname?.includes(category.MA_LOAI_SP) ? 'active' : ''} to={`/category/${category.MA_LOAI_SP}`}>{category.TEN_LOAI_SP}</Link>
                                 </li>
                             )
@@ -267,6 +387,14 @@ function Header(props) {
             <div className="hide-bg">
                 <Button className='btn-close' onClick={handleCloseNavbar} icon={<CloseOutlined />} shape="circle"></Button>
             </div>
+            <SpeechReconigtion
+                isListening={isListening}
+                onSearchVoice={handleSearchVoice}
+                isError={isErrorReconigtion}
+                contentListened={contentListened}
+                visible={showModalSpeechRecognition}
+                onSwitchModal={handleSwitchSpeechRecognition} />
+            <audio id='audioSearch' src=''></audio>
         </div>
 
     );

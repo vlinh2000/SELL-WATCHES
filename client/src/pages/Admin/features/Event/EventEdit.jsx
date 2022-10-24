@@ -1,16 +1,21 @@
 
-import { Button, Checkbox, DatePicker, Form } from 'antd';
+import { Button, Checkbox, Col, DatePicker, Form, Radio, Row, Space } from 'antd';
 import { chucvuApi } from 'api/chucvuApi';
 import { sukienApi } from 'api/sukienApi';
 import { uudaiApi } from 'api/uudaiApi';
+import ButtonCustom from 'components/ButtonCustom';
+import CheckField from 'custom-fields/CheckField';
 import InputField from 'custom-fields/InputField';
+import PickDateField from 'custom-fields/PickDateField';
 import moment from 'moment';
 import { fetch_events } from 'pages/Admin/adminSlice';
+import Voucher from 'pages/User/components/Voucher';
 import React from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
+import './EventEdit.scss';
 
 EventEdit.propTypes = {
 
@@ -40,6 +45,9 @@ function EventEdit(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch()
 
+
+
+    console.log({ options_vouchers })
     const initialValues = {
         TEN_SK: currentSelected?.TEN_SK || '',
         TG_BAT_DAU: moment(currentSelected?.TG_BAT_DAU),
@@ -50,7 +58,6 @@ function EventEdit(props) {
     }
 
     const handleSave = async (values) => {
-        console.log(values.TG_BAT_DAU._d)
         try {
             const data = {
                 TEN_SK: values.TEN_SK,
@@ -81,7 +88,7 @@ function EventEdit(props) {
         const fetchData = async () => {
             try {
                 const { result } = await uudaiApi.getAll();
-                setOptions_vouchers(result.map(v => ({ label: v.TEN_UU_DAI, value: v.MA_UU_DAI })));
+                setOptions_vouchers(result);
             } catch (error) {
                 console.log({ error })
             }
@@ -91,42 +98,70 @@ function EventEdit(props) {
 
 
     return (
-        <div className='employee-edit box'>
+        <div className='event-edit box'>
 
             <Form
                 onFinish={handleSave}
                 form={form}
                 initialValues={initialValues}
                 layout='vertical'>
-                <InputField name='TEN_SK' label='Tên sự kiện' rules={[yupSync]} />
-                <Form.Item
-                    name='TG_BAT_DAU' label='Thời gian bắt đầu' rules={[yupSync]}>
-                    <DatePicker style={{ width: '100%' }} showTime placeholder='' />
-                </Form.Item>
-                <Form.Item
-                    name='TG_KET_THUC' label='Thời gian kết thúc' rules={[yupSync]}>
-                    <DatePicker style={{ width: '100%' }} showTime placeholder='' />
-                </Form.Item>
-                <Form.Item
-                    name='KHUNG_GIO_TU' label='Khung giờ từ' rules={[yupSync]}>
-                    <DatePicker picker='time' style={{ width: '100%' }} placeholder='' />
-                </Form.Item>
-                <Form.Item
-                    name='KHUNG_GIO_DEN' label='Khung giờ đến' rules={[yupSync]}>
-                    <DatePicker picker='time' style={{ width: '100%' }} placeholder='' />
-                </Form.Item>
-                <Form.Item
-                    name='VOUCHERS' label='Danh sách mã ưu đãi' rules={[yupSync]}>
-                    <Checkbox.Group
-                        options={options_vouchers}
-                    />
-                </Form.Item>
+                <Row gutter={[50, 0]}>
+                    <Col xs={24} sm={12} md={10} lg={8}>
+                        <InputField name='TEN_SK' label='Tên sự kiện' placeHolder='-- Nhập tên sự kiện --' rules={[yupSync]} />
+                        <PickDateField
+                            showTime
+                            name='TG_BAT_DAU' label='Thời gian bắt đầu' placeHolder='-- Chọn thời gian bắt đầu --' rules={[yupSync]}
+                        />
+                        <PickDateField
+                            showTime
+                            name='TG_KET_THUC' label='Thời gian kết thúc' placeHolder='-- Chọn thời gian kết thúc --' rules={[yupSync]} />
+
+                        <PickDateField
+                            picker='time'
+                            name='KHUNG_GIO_TU' label='Khung giờ từ' rules={[yupSync]} placeHolder='-- Chọn khung giờ từ --'
+                        />
+                        <PickDateField
+                            picker='time'
+                            name='KHUNG_GIO_DEN' label='Khung giờ đến' rules={[yupSync]} placeHolder='-- Chọn khung giờ đến --'
+                        />
+                    </Col>
+                    <Col xs={24} sm={12} md={14} lg={16}>
+                        {/* <CheckField
+                            name='VOUCHERS' label='Danh sách mã ưu đãi' rules={[yupSync]}
+                            options={options_vouchers}
+                        /> */}
+                        <p style={{
+                            fontSize: '11px',
+                            letterSpacing: '0.5px',
+                            fontWeight: 500,
+                            textTransform: 'uppercase'
+                        }}>Danh sách ưu đãi trong sự kiện:</p>
+                        <Form.Item name='VOUCHERS'>
+                            <Checkbox.Group className='checkbox-custom'>
+                                <Row className='voucher-list-choosen'>
+                                    {
+                                        options_vouchers?.map((voucher, idx) =>
+                                            <Col xs={24} sm={24} md={24} lg={24} xl={12}>
+                                                <Checkbox style={{ width: '100%' }} disabled={voucher.SU_DUNG} key={idx} value={voucher.MA_UU_DAI}>
+                                                    <Voucher quantity={voucher.SO_LUONG_BAN_DAU} name={voucher.TEN_UU_DAI} used={voucher.SU_DUNG} id={voucher.MA_UU_DAI} expire={voucher.HSD} />
+                                                </Checkbox>
+                                            </Col>
+                                        )
+                                    }
+                                </Row>
+                            </Checkbox.Group>
+                        </Form.Item>
+                        {/* {
+                            options_vouchers?.map(voucher => <Col md={12}> <Voucher id={voucher.MA_UU_DAI} name={voucher.TEN_UU_DAI} /></Col>)
+                        } */}
+                    </Col>
+                </Row>
 
                 {/* VOUCHER */}
                 <br />
-                <Button htmlType='submit' className='admin-custom-btn bottom-btn' loading={isLoading}>Lưu</Button>
+                <ButtonCustom type='submit' isLoading={isLoading}>Lưu</ButtonCustom>
             </Form>
-        </div>
+        </div >
     );
 }
 

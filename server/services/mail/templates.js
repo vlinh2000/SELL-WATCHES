@@ -54,56 +54,76 @@ module.exports = {
         return `
                 <head>
                     <style>
-                        body {
-                            margin: 0;
-                        }
+                    .container {
+                        width: 60%;
+                        margin: 0 auto;
+                    }
+                    
+                    .wrapper-mail {
+                        background: #FFF;
+                        font-size: 12px;
+                    }
+        
+                    .header {
+                        display: block;
+                        background-color: #75c9b7;
+                        padding: 5px 10px;
+                    }
 
-                        .wrapper {
-                            width: 100vw;
-                        }
-
-                        .header {
-                            display: block;
-                            background-color: #333333;
-                            padding: 5px 10px;
-                        }
-
-                        .logo {
-                            width: 100px;
-                            height: 30px;
-
-                        }
-
-                        .main {
-                            padding: 10px;
-                        }
-
-                        ul,
-                        ol {
-                            margin-top: 5px;
-                            padding-left: 20px;
-                        }
+                    h4{
+                        margin: 5px 0;
+                    }
+        
+                    .main-image{
+                        height: 200px;    
+                    }
+                    
+                    .main-image img{
+                        width: 100%;
+                        height: 100%;
+                        object-fit: contain;
+                    }
+        
+                    .logo {
+                        width: 100px;
+                        height: 30px;
+                    }
+        
+                    .main {
+                        padding: 10px;
+                    }
+        
+                    .main-content{
+                        margin-bottom: 5px;
+                    }
+        
+                    ul,
+                    ol {
+                        margin-top: 5px;
+                        padding-left: 20px;
+                    }
                     </style>
                 </head>
 
-                <body>
-                    <div class="wrapper">
+                <div class="container">
+                    <div class="wrapper-mail">
                         <div class="header">
                             <img class="logo"
                                 src="https://res.cloudinary.com/vlinh/image/upload/v1664697926/images-tieuluan/logo_qezu3u.png" />
                         </div>
                         <div class="main">
-                            <p>Mona Store xin chào,</p>
-                            <div>
+                            <h4>Mona Store xin chào,</h4>
+                            <div class="main-content">
                                 Hiện tại cửa hàng đang có chương trình tặng voucher khuyến mãi để tri ân khách hàng Quý khách là một
                                 trong những khách hàng thân thiết đặc biệt của chúng tôi.<br />
                                 Cửa hàng của chúng tôi được thành công như ngày hôm nay đều là nhờ vào sự tin tưởng và ủng hộ của Quý khách.
                             </div>
-                            ${moreContent ? `<div>${moreContent}.</div>` : ''
-            }
+                            <div>${moreContent}.</div>
                             <br />
-                            <img
-                                src="https://res.cloudinary.com/vlinh/image/upload/v1664806783/images-tieuluan/tri-an-khach-hang_wgyzh2.png" />
+                            <div class="main-image">
+                                <img
+                                    src="https://res.cloudinary.com/vlinh/image/upload/v1666423702/images-tieuluan/giftvoucher-600x533_bszoin.jpg" />
+                            </div>
                             <br />
                             <br />
                             Danh sách voucher bao gồm:
@@ -113,7 +133,7 @@ module.exports = {
                             <p><i>Lưu ý</i>: Chương trình chỉ áp dụng đối với khách hàng nhận được mail này của chúng tôi.</p>
                         </div>
                     </div>
-                </body>`
+                </div>`
     }
 
 }

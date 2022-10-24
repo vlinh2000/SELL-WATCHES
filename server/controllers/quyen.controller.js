@@ -10,7 +10,7 @@ module.exports = {
                 let { NV_ID } = req.query;
                 const sql_all_user_rules = `SELECT MA_QUYEN FROM QUYEN_NHAN_VIEN WHERE NV_ID='${NV_ID || req.user?.data.NV_ID}'`;
                 const quyens = await executeQuery(sql_all_user_rules);
-                console.log({ sql_all_user_rules })
+                // console.log({ sql_all_user_rules })
                 return res.json({
                     result: quyens,
                     message: 'Thành công'
@@ -49,6 +49,41 @@ module.exports = {
     post_quyens: async (req, res) => {
         try {
             const { TEN_QUYEN, MA_QUYEN } = req.body;
+            let { action, NHAN_VIENS } = req.body;
+            console.log({ action })
+            if (action === 'employee_rules') {
+                NHAN_VIENS = JSON.parse(NHAN_VIENS);
+                const processes = Object.keys(NHAN_VIENS).map(NV_ID => {
+                    return new Promise(async (resolve, reject) => {
+                        try {
+                            const sql_resetRules = `DELETE FROM QUYEN_NHAN_VIEN WHERE NV_ID='${NV_ID}'`
+                            await executeQuery(sql_resetRules);
+                            console.log(sql_resetRules)
+
+                            const processes_sub = NHAN_VIENS[NV_ID].map(MA_QUYEN => {
+                                return new Promise(async (resolveSub, rejectSub) => {
+                                    try {
+                                        const sql_newRule = `INSERT INTO QUYEN_NHAN_VIEN(MA_QUYEN,NV_ID) VALUES ('${MA_QUYEN}','${NV_ID}')`
+                                        await executeQuery(sql_newRule);
+                                        resolveSub(true);
+                                    } catch (error) {
+                                        rejectSub(error);
+                                    }
+                                })
+                            })
+                            await Promise.all(processes_sub);
+                            console.log("DONE: " + NV_ID);
+                            resolve(true);
+                        } catch (error) {
+                            reject(error);
+                        }
+                    })
+
+                })
+
+                await Promise.all(processes);
+                return res.json({ message: 'Lưu thành công .' });
+            }
 
             const isExist = await checkIsExist('QUYEN', 'MA_QUYEN', MA_QUYEN);
             if (isExist) return res.status(400).json({ message: `Quyền [${MA_QUYEN}] đã tồn tại.` });

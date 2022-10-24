@@ -6,4 +6,22 @@
     &__list{
         font-size: 13px;
     }
+
+
+}
+.voucher-list-choosen{
+    margin-top: 5px;
+    .voucher {
+        height: 70px;
+        font-size: 12px;
+        
+        .voucher-body{
+            font-size: 11px;
+
+            .name{
+                font-size: 12px;
+                text-transform: uppercase;
+            }
+        }
+    }
 }

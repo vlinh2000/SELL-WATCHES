@@ -18,7 +18,8 @@ InputField.propTypes = {
     rules: PropTypes.array,
     onChange: PropTypes.func,
     min: PropTypes.number,
-    dependencies: array,
+    dependencies: PropTypes.array,
+    style: PropTypes.object,
 };
 
 InputField.defaultProps = {
@@ -35,11 +36,12 @@ InputField.defaultProps = {
     onChange: null,
     min: 1,
     dependencies: [],
+    style: {},
 };
 
 function InputField(props) {
 
-    const { name, disabled, placeHolder, label, type, rows, required, rules, readOnly, onChange, shouldUpdate, min, dependencies } = props;
+    const { style, name, disabled, placeHolder, label, type, rows, required, rules, readOnly, onChange, shouldUpdate, min, dependencies } = props;
 
     const handleChange = ({ target }) => {
         if (!onChange) return;
@@ -57,9 +59,9 @@ function InputField(props) {
             name={name}>
             {
                 type !== 'textarea' ?
-                    type != 'number' ? <Input onChange={handleChange} readOnly={readOnly} type={type} placeholder={placeHolder} disabled={disabled} />
-                        : <InputNumber min={min} readOnly={readOnly} type={type} placeholder={placeHolder} disabled={disabled} />
-                    : <TextArea placeholder={placeHolder} disabled={disabled} rows={rows} />
+                    type != 'number' ? <Input style={style} onChange={handleChange} readOnly={readOnly} type={type} placeholder={placeHolder} disabled={disabled} />
+                        : <InputNumber style={style} min={min} readOnly={readOnly} type={type} placeholder={placeHolder} disabled={disabled} />
+                    : <TextArea onChange={handleChange} placeholder={placeHolder} disabled={disabled} rows={rows} />
             }
 
         </Form.Item>

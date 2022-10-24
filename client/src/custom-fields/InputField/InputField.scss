@@ -1,6 +1,8 @@
 .input-field{
+    margin-bottom: 15px;
 
     .ant-input{
+        font-size: 13px;
         color: #333;
         box-shadow: inset 0 1px 2px rgb(0 0 0 / 10%);
         transition: color .3s, border .3s, background .3s, opacity .3s;
@@ -12,6 +14,7 @@
     }
 
     .ant-input-number{
+        font-size: 13px;
         color: #333;
         box-shadow: inset 0 1px 2px rgb(0 0 0 / 10%);
         transition: color .3s, border .3s, background .3s, opacity .3s;
@@ -23,9 +26,14 @@
         border-color: var(--mainColor);
     }
 
+    .ant-form-item-label{
+        padding-bottom: 2px;
+    }
     .ant-form-item-label label{
-        font-size: 14px;
+        font-size: 10px;
+        letter-spacing: 0.5px;
         font-weight: 500;
+        text-transform: uppercase;
     }
 
     textarea{
