@@ -1,6 +1,8 @@
 const moment = require("moment/moment");
 const { executeQuery, checkExist, checkIsExist, executeUpdateQuery } = require("../mysql");
-const { randomString, getNow, handleMomoPayment } = require("../utils/global");
+const { sendMail } = require("../services/mail/mail");
+const { TEMPLATE_ORDER_SUCCESS } = require("../services/mail/templates");
+const { randomString, getNow, handleMomoPayment, numberWithCommas } = require("../utils/global");
 
 module.exports = {
     get_donhangs: async (req, res) => {
@@ -13,7 +15,7 @@ module.exports = {
             if (action === 'check_had_order') {
                 const sql = `SELECT COUNT(a.MA_DH) as total
                              FROM DON_HANG a, CHI_TIET_DON_HANG b 
-                             WHERE a.USER_ID='${user?.USER_ID}' AND a.MA_DH=b.MA_DH AND b.MA_SP='${MA_SP}'`;
+                             WHERE a.USER_ID='${user?.USER_ID}' AND a.TRANG_THAI=2 AND a.MA_DH=b.MA_DH AND b.MA_SP='${MA_SP}'`;
                 let data = await executeQuery(sql);
                 return res.json({
                     // result: data,
@@ -177,7 +179,7 @@ module.exports = {
                 // get top bought
                 const sqls_moreData = [
                     `
-                    SELECT b.MA_SP,c.TEN_SP,d.HINH_ANH,e.TEN_LOAI_SP,COUNT(c.MA_SP) AS TONG_SO
+                    SELECT b.MA_SP,c.TEN_SP,d.HINH_ANH,e.TEN_LOAI_SP,SUM(b.SO_LUONG) AS TONG_SO
                     FROM DON_HANG a,CHI_TIET_DON_HANG b,SAN_PHAM c
                     LEFT JOIN ANH_SAN_PHAM d ON c.MA_SP =d.MA_SP
                     LEFT JOIN LOAI_SAN_PHAM e ON c.MA_LOAI_SP =e.MA_LOAI_SP
@@ -254,8 +256,17 @@ module.exports = {
             console.log("ok")
             const sql_delete = `UPDATE USER_UU_DAI SET SU_DUNG=1 WHERE USER_ID='${USER_ID}' AND MA_UU_DAI='${MA_UU_DAI}'`;
             MA_UU_DAI && USER_ID && await executeQuery(sql_delete);
-            console.log(sql_delete)
-
+            // console.log(sql_delete)
+            // send mail
+            const dataMail = {
+                MA_DH,
+                DIA_CHI: DIA_CHI_GH,
+                HINH_THUC_THANH_TOAN,
+                TONG_TIEN: numberWithCommas(TONG_TIEN),
+                PHI_SHIP: PHI_SHIP === GIAM_GIA ? 0 : numberWithCommas(PHI_SHIP),
+                DS_SP: SAN_PHAM
+            }
+            await sendMail(EMAIL_NGUOI_DAT, 'Thông báo đặt hàng thành công', TEMPLATE_ORDER_SUCCESS(dataMail));
             res.json({ message: 'Đặt hàng thành công.' });
         } catch (error) {
             console.log({ error: error.message });
@@ -322,7 +333,8 @@ module.exports = {
             console.log({ error: error.message });
             res.status(500).json({ message: "Đã xảy ra lỗi! Hãy thử lại sau." })
         }
-    }, get_payUrl: async (req, res) => {
+    },
+    get_payUrl: async (req, res) => {
         try {
             let { wallet, data } = req.query;
             data = JSON.parse(data)

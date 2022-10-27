@@ -84,7 +84,7 @@ function WishList(props) {
                                                             dispatch(addToCart({ product }));
                                                             toast.success("Đã thêm sản phẩm vào giỏ hàng");
                                                         }}
-                                                            text="Thêm vào giỏ"></ButtonCustom>
+                                                        >Thêm vào giỏ</ButtonCustom>
                                                         : ''
                                                 }
                                             </td>

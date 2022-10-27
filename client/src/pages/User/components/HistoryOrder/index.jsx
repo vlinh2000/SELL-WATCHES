@@ -32,6 +32,11 @@ function HistoryOrder(props) {
         }
     }
 
+    const getOriginalPrice = (order) => {
+        console.log({ order })
+        return order.MPVC ? order.TONG_TIEN : order.TONG_TIEN + order.GIAM_GIA
+    }
+
     return (
         <div>
             <Row justify='center'>
@@ -114,16 +119,16 @@ function HistoryOrder(props) {
                                                             <span className='category-label-key'>Phí vận chuyển </span><span className='category-label-value'>{numberWithCommas(order.PHI_SHIP)} ₫</span>
                                                         </div>
                                                         <div className='category-label'>
-                                                            <span className='category-label-key'>Tổng tiền hàng</span><span className='category-label-value'>{numberWithCommas(order.TONG_TIEN)} ₫</span>
+                                                            <span className='category-label-key'>Tổng tiền hàng</span><span className='category-label-value'>{numberWithCommas(getOriginalPrice(order))} ₫</span>
                                                         </div>
                                                         <div className='category-label'>
-                                                            <span className='category-label-key'>Tổng tiền</span><span className='category-label-value'>{numberWithCommas(order.TONG_TIEN + order.PHI_SHIP)} ₫</span>
+                                                            <span className='category-label-key'>Tổng tiền</span><span className='category-label-value'>{numberWithCommas((getOriginalPrice(order)) + order.PHI_SHIP)} ₫</span>
                                                         </div>
                                                         <div className='category-label'>
                                                             <span className='category-label-key'>Giảm giá </span><span className='category-label-value'>{numberWithCommas(order.GIAM_GIA)}&nbsp;₫</span>
                                                         </div>
                                                         <div className='category-label'>
-                                                            <span className='category-label-key'>Tổng cộng </span><strong className='category-label-value' style={{ fontSize: 20 }}>{numberWithCommas(order.TONG_TIEN + order.PHI_SHIP - order.GIAM_GIA)} ₫</strong>
+                                                            <span className='category-label-key'>Tổng cộng </span><strong className='category-label-value' style={{ fontSize: 20 }}>{numberWithCommas((getOriginalPrice(order)) + order.PHI_SHIP - order.GIAM_GIA)} ₫</strong>
                                                         </div>
                                                     </Col>
                                                 </Row>
@@ -135,11 +140,11 @@ function HistoryOrder(props) {
                                                                 order.SAN_PHAM?.map((sp, idx) =>
                                                                     <li key={sp.MA_SP}>
                                                                         <img src={sp.HINH_ANH} />
-                                                                        <a href='' className='name'>{sp.TEN_SP}</a>
+                                                                        <Link to={`/products/${sp.MA_SP}`} className='name'>{sp.TEN_SP}</Link>
                                                                         <span>x {sp.SO_LUONG}</span>
                                                                         <span>{numberWithCommas(sp.GIA)}&nbsp;₫</span>
                                                                         {
-                                                                            order.TRANG_THAI === 3 &&
+                                                                            order.TRANG_THAI === 2 &&
                                                                             <Link to={`/products/${sp.MA_SP}`} state={{ feedbackFromOrder: true }}>
                                                                                 <Tooltip title="Đánh giá sản phẩm này.">
                                                                                     <MessageOutlined />

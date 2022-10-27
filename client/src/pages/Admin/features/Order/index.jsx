@@ -317,7 +317,7 @@ function Order(props) {
                                                                                 <span className='category-label-key'>Địa chỉ</span><span className='category-label-value'>{order.DIA_CHI}</span>
                                                                             </div>
                                                                             <div className='category-label'>
-                                                                                <span className='category-label-key'>Tổng cộng </span><strong className='category-label-value' style={{ fontSize: 20 }}>{numberWithCommas(order.TONG_TIEN + order.PHI_SHIP)}&nbsp;₫</strong>
+                                                                                <span className='category-label-key'>Tổng cộng </span><strong className='category-label-value' style={{ fontSize: 20 }}>{numberWithCommas(order.MPVC ? order.TONG_TIEN : order.TONG_TIEN + order.PHI_SHIP)}&nbsp;₫</strong>
                                                                             </div>
                                                                             <br />
                                                                         </div>

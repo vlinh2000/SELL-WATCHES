@@ -194,7 +194,7 @@ function Auth(props) {
             setLoading(true);
             const data = isSendMail ? { SEND_MAIL_FLAG: isSendMail, EMAIL: values.EMAIL } : { SEND_MAIL_FLAG: isSendMail, TOKEN: resetPassInfo.TOKEN, MAT_KHAU: values.MAT_KHAU };
             const { message, result } = await nguoidungApi.forgetPassword(data);
-            toast.success(message);
+            // toast.success(message);
             if (isSendMail) {
                 setStepToResetPass(1)
             } else {

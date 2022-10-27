@@ -71,12 +71,12 @@ function Product(props) {
         {
             title: 'Giá gốc',
             dataIndex: 'GIA_GOC',
-            render: (text) => <div style={{ width: 50 }}>{numberWithCommas(text) + ' ₫'}</div>
+            render: (text) => <div style={{ width: 100 }}>{numberWithCommas(text) + ' ₫'}</div>
         },
         {
             title: 'Giá bán',
             dataIndex: 'GIA_BAN',
-            render: (text) => <div style={{ width: 50 }}>{numberWithCommas(text) + ' ₫'}</div>
+            render: (text) => <div style={{ width: 100 }}>{numberWithCommas(text) + ' ₫'}</div>
         },
         {
             title: 'Số lượng kho',

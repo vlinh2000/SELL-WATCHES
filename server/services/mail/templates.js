@@ -2,17 +2,19 @@ module.exports = {
     TEMPLATE_FORGET_PASSWORD: (text) => {
         return `<head>
                     <style>
-                        body {
-                            margin: 0;
+                        .container {
+                            width: 60%;
+                            margin: 0 auto;
                         }
                 
                         .wrapper {
-                            width: 100vw;
+                            background: #FFF;
+                            font-size: 13px;
                         }
                 
                         .header {
                             display: block;
-                            background-color: #333333;
+                            background-color: #75c9b7;
                             padding: 5px 10px;
                         }
                 
@@ -32,7 +34,7 @@ module.exports = {
                     </style>
                 </head>
                 
-                <body>
+                <div class="container">
                     <div class="wrapper">
                         <div class="header">
                             <img class="logo"
@@ -48,7 +50,7 @@ module.exports = {
                             <p><i>Lưu ý</i>: link khôi phục mật khẩu chỉ có hiệu lực trong 5 phút.</p>
                         </div>
                     </div>
-                </body>`
+                </div>`
     },
     TEMPLATE_GIVE_VOUCHER: (voucherList, moreContent) => {
         return `
@@ -134,6 +136,103 @@ module.exports = {
                         </div>
                     </div>
                 </div>`
+    },
+
+    TEMPLATE_ORDER_SUCCESS: (order) => {
+
+        return `
+                <head>
+                    <style>
+                        .container {
+                            width: 60%;
+                            margin: 0 auto;
+                        }
+
+                        .wrapper-mail {
+                            background: #FFF;
+                            font-size: 12px;
+                        }
+
+                        .header {
+                            display: block;
+                            background-color: #75c9b7;
+                            padding: 5px 10px;
+                        }
+
+                        h4 {
+                            margin: 5px 0;
+                        }
+
+                        .main-image {
+                            height: 100px;
+                        }
+
+                        .main-image img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: contain;
+                        }
+
+                        .logo {
+                            width: 100px;
+                            height: 30px;
+                        }
+
+                        .main {
+                            padding: 10px;
+                        }
+
+                        .main-content {
+                            margin-top:10px;
+                            margin-bottom: 5px;
+                            line-height: 20px;
+                        }
+
+                        .total-price {
+                            font-size: 14px;
+                        }
+
+                        .detail-list {
+                            margin-top: 5px;
+                        }
+
+                        ul,
+                        ol {
+                            margin-top: 5px;
+                            padding-left: 20px;
+                        }
+                    </style>
+                </head>
+
+                <div class="container">
+                    <div class="wrapper-mail">
+                        <div class="header">
+                            <img class="logo"
+                                src="https://res.cloudinary.com/vlinh/image/upload/v1664697926/images-tieuluan/logo_qezu3u.png" />
+                        </div>
+                        <div class="main">
+                            <div class="main-content">
+                                Bạn đã đặt thành công đơn hàng mã ${order.MA_DH}, trị giá <strong
+                                    class="total-price">${order.TONG_TIEN}</strong>đ + phí ship <strong>${order.PHI_SHIP}</strong>đ
+                                ${order.HINH_THUC_THANH_TOAN === 'cod' ? ' thanh toán khi nhận hàng' : ` đã thanh toán qua ${order.HINH_THUC_THANH_TOAN}`}.
+                                Sau khi Shop xác nhận đơn hàng, sản phẩm sẽ được giao đến địa chỉ ${order.DIA_CHI}. <br />
+                                <div class="detail-list">
+                                    Chi tiết đơn hàng bao gồm:
+                                    <ul>
+                                     ${order.DS_SP?.map(sp => `<li>x${sp.SO_LUONG} ~ ${sp.TEN_SP}</li>`).join("")}
+                                    </ul>
+                                </div>
+                                Mona Store rất hân hạnh được phục vụ bạn !<br />
+                            </div>
+                            <br />
+                            <div class="main-image">
+                                <img
+                                    src="https://res.cloudinary.com/vlinh/image/upload/v1666610884/images-tieuluan/dat-hang-thanh-cong_zpriyo.jpg" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        `
     }
 
 }

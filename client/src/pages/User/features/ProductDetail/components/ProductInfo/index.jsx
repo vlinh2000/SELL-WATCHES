@@ -37,7 +37,7 @@ function ProductInfo(props) {
                     <Button className='btn-decrease' disabled={quantity < 2} onClick={() => setQuantity(prev => prev - 1)}>-</Button>
                     <div className='current-quantity'>{quantity}</div>
                     <Button className='btn-increase' disabled={quantity === product.SO_LUONG} onClick={() => setQuantity(prev => prev + 1)}>+</Button>
-                    <ButtonCustom onClick={handleAddToCart} className="btn-add-to-cart" text="Thêm vào giỏ"></ButtonCustom>
+                    <ButtonCustom onClick={handleAddToCart}>Thêm vào giỏ</ButtonCustom>
                 </div>
             }
 

@@ -135,9 +135,7 @@ function Header(props) {
                 setLoading(false);
 
                 const searchInput = document.querySelector('input[name="searchValue"');
-                // searchInput.value = contentListened;
-                // setContentListened('');
-                searchInput.focus();
+                searchValue && searchInput.focus();
             } catch (error) {
                 console.log({ error })
                 setLoading(false);

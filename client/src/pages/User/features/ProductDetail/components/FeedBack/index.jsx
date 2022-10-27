@@ -3,6 +3,7 @@ import { Avatar, Button, Collapse, Comment, Divider, Form, Popconfirm, Rate, Too
 import { phanhoiApi } from 'api/phanhoiApi';
 import ButtonCustom from 'components/ButtonCustom';
 import InputEmoijField from 'custom-fields/InputEmoijField';
+import InputField from 'custom-fields/InputField';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -164,10 +165,11 @@ function FeedBack(props) {
                     <>
                         <br />
                         <Form form={form} onFinish={handleSendResponse} initialValues={initialValues}>
-                            <InputEmoijField rules={[yupSync]} name="NOI_DUNG" placeHolder="Nhập nội dung phản hồi ..." />
-                            {/* <InputField name='NOI_DUNG' type='textarea' rows={3} /> */}
-                            <ButtonCustom style={{ display: 'inline', marginRight: 10 }} isLoading={loading} type='submit' text='Gửi phản hồi' />
-                            <Button danger onClick={() => setSendResponse(prev => ({ ...prev, isSend: false }))}>Đóng</Button>
+                            {/* <InputEmoijField rules={[yupSync]} name="NOI_DUNG" placeHolder="-- Nhập nội dung phản hồi --" /> */}
+                            <InputField name='NOI_DUNG' type='textarea' rows={3} placeHolder="-- Nhập nội dung phản hồi --" />
+                            {/* <br /> */}
+                            <ButtonCustom style={{ display: 'inline', marginRight: 10 }} isLoading={loading} type='submit' >Gửi phản hồi</ButtonCustom>
+                            <button className='button-1' onClick={() => setSendResponse(prev => ({ ...prev, isSend: false }))}>Đóng</button>
                         </Form>
                         <Divider />
                     </>

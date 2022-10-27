@@ -16,6 +16,10 @@ function getNow() {
     return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
 }
 
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
 function hashString(string) {
     return new Promise((resolve, reject) => {
         bcrypt.hash(string, 10, async (error, result) => {
@@ -89,12 +93,12 @@ async function handleMomoPayment(data) {
     var requestId = partnerCode + new Date().getTime();
     var orderId = 'DH_' + randomString();
     var orderInfo = "Thanh toán với Momo";
-    var redirectUrl = "http://localhost:3000?redirect=profile";
+    var redirectUrl = "http://localhost:3000?redirect=payments";
     var ipnUrl = "http://localhost:8000/api/donhangs";
     var amount = data.TONG_TIEN + data.PHI_SHIP - data.GIAM_GIA;
     // var requestType = "captureWallet"
-    var requestType = "payWithATM"
     // var requestType = "payWithATM"
+    var requestType = "payWithMethod"
     var extraData = Buffer.from(JSON.stringify({ ...data, orderId })).toString('base64');
     var rawSignature = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData + "&ipnUrl=" + ipnUrl + "&orderId=" + orderId + "&orderInfo=" + orderInfo + "&partnerCode=" + partnerCode + "&redirectUrl=" + redirectUrl + "&requestId=" + requestId + "&requestType=" + requestType
     // var items = data.items;
@@ -140,4 +144,4 @@ async function handleMomoPayment(data) {
     return response.data;
 }
 
-module.exports = { randomString, getNow, hashString, compareString, generateToken, generateRefreshToken, verifyToken, handleMomoPayment }
+module.exports = { randomString, getNow, hashString, compareString, generateToken, generateRefreshToken, verifyToken, handleMomoPayment, numberWithCommas }

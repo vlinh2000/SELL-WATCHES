@@ -97,7 +97,7 @@ function Dashboard(props) {
                             <div className="content-num">{isLoading ? <Spin size='small' /> : statistical?.DH_CHO_XU_LY}</div>
                         </div>
                         <p className="small-info">
-                            Danh sách đơn cần xử lý <Link className='view-btn' to="/admin/orders/confirm">View</Link>
+                            Danh sách đơn chờ xử lý <Link className='view-btn' to="/admin/orders/view">View</Link>
                         </p>
                     </div>
                 </Col>

@@ -38,7 +38,7 @@ function GroupInfoAndFeedBack(props) {
 
     const [form] = Form.useForm();
     const initialValues = {
-        ...user, SO_SAO: 0, NOI_DUNG: ''
+        SO_SAO: null, NOI_DUNG: ''
     }
 
     const [feedBackList, setFeedBackList] = React.useState();
@@ -253,7 +253,7 @@ function GroupInfoAndFeedBack(props) {
                                                     onFinish={handleFeedBack}
                                                     form={form} initialValues={initialValues} className="form-feedback" layout='vertical'>
                                                     <div className="vote">
-                                                        <div className='label'>Đánh giá của bạn</div>
+                                                        <label className='label'>Đánh giá của bạn</label>
                                                         <Form.Item
                                                             rules={[{ required: true, message: "Số sao không được để trống." }]}
                                                             name="SO_SAO">
@@ -261,19 +261,17 @@ function GroupInfoAndFeedBack(props) {
                                                         </Form.Item>
                                                     </div>
                                                     <div className="comments">
-                                                        <InputEmoijField
-                                                            rules={[{ required: true, message: "Nội dung không được để trống." }]} name="NOI_DUNG" label="Nhận xét của bạn"
+                                                        {/* <InputEmoijField
+                                                            rules={[{ required: true, message: "Nội dung không được để trống." }]} name="NOI_DUNG" label="Nhận xét của bạn" placeHolder='-- Nhập nhận xét của bạn --'
+                                                        /> */}
+                                                        <InputField
+                                                            type='textarea'
+                                                            rows={5}
+                                                            rules={[{ required: true, message: "Nội dung không được để trống." }]} name="NOI_DUNG" label="Nhận xét của bạn" placeHolder='-- Nhập nhận xét của bạn --'
                                                         />
                                                     </div>
-                                                    <Row gutter={[20, 0]}>
-                                                        <Col xs={24} sm={12} md={12} lg={12}>
-                                                            <InputField disabled name="HO_TEN" label="Tên" />
-                                                        </Col>
-                                                        <Col xs={24} sm={12} md={12} lg={12}>
-                                                            <InputField disabled name="EMAIL" label="Email" />
-                                                        </Col>
-                                                    </Row>
-                                                    <ButtonCustom type='submit' text="Gửi" isLoading={loading?.sendFeedBack} />
+                                                    <br />
+                                                    <ButtonCustom type='submit' isLoading={loading?.sendFeedBack} >Gửi đánh giá</ButtonCustom>
                                                 </Form>
                                                 :
                                                 <i>Chỉ những khách hàng đã mua sản phẩm mới có thể đánh giá.</i>

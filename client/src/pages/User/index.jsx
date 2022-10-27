@@ -72,14 +72,14 @@ function UserPage(props) {
         const resultCode = searchParams.get('resultCode');
         const action = searchParams.get('action');
         const message = searchParams.get('message');
-        setSearchParams({});
+        // setSearchParams({});
         if (resultCode && resultCode == 0) {
             (async () => {
                 const data = { isCompleteOrder: true, data: extraData };
                 await onCompleteOrder(data);
                 dispatch(fetch_my_orders({ action: 'get_my_orders', _limit: pagination._limit, _page: pagination._page }));
-                toast.success('Đặt hàng thành công.');
-                navigate(redirect, { state: { historyOrder: true } });
+                // toast.success('Đặt hàng thành công.');
+                navigate(redirect, { state: { isOrderSuccess: true } });
             })();
         } else if (resultCode && resultCode !== 0) {
             const msg = `Đặt hàng thất bại (${message})`;

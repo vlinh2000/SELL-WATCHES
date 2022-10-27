@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { CodeOutlined, ConsoleSqlOutlined, DeleteOutlined, EditOutlined, PlusOutlined, QuestionOutlined, SaveOutlined, SearchOutlined, SettingFilled } from '@ant-design/icons';
+import { CheckCircleOutlined, CodeOutlined, ConsoleSqlOutlined, DeleteOutlined, EditOutlined, PlusOutlined, QuestionOutlined, SaveOutlined, SearchOutlined, SettingFilled } from '@ant-design/icons';
 import { Button, Col, Collapse, Drawer, Form, Input, Modal, Popconfirm, Radio, Row, Space, Table, Tag, Tooltip } from 'antd';
 import InputField from 'custom-fields/InputField';
 import SelectField from 'custom-fields/SelectField';
@@ -15,7 +15,7 @@ import axios from 'axios';
 import ChooseAddressModal from 'pages/User/components/ChooseAddressModal';
 import { diachighApi } from 'api/diachighApi';
 import { FROM_DESTRICT_ID } from 'constants/commonContants';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import VoucherModal from 'pages/User/components/VoucherModal';
 import toast from 'react-hot-toast';
 import { donhangApi } from 'api/donhangApi';
@@ -70,6 +70,9 @@ function Payments(props) {
     const [voucherValue, setVoucherValue] = React.useState(0)
     const [totalPriceOrder, setTotalPriceOrder] = React.useState(() => getTotalPrice(cart, 'GIA_BAN', 'SL_TRONG_GIO'));
 
+    const [isOrderSuccess, setIsOrderSuccess] = React.useState(false);
+
+    const location = useLocation();
 
     const navigate = useNavigate();
 
@@ -88,6 +91,11 @@ function Payments(props) {
     React.useEffect(() => {
         form.setFieldsValue(user)
     }, [user])
+
+
+    React.useEffect(() => {
+        location.state?.isOrderSuccess && setIsOrderSuccess(true);
+    }, [location.state])
 
     React.useEffect(() => {
         const fetchDeliveryAddress = async () => {
@@ -195,11 +203,6 @@ function Payments(props) {
         cart.length < 1 ? navigate('/', { replace: true }) : fetchFeeShip();
     }, [deliveryAddressList, reloadFeeShip, cart])
 
-    React.useEffect(() => {
-        console.log({ feeShip })
-    }, [feeShip])
-
-
     const handleOrder = async (values) => {
         try {
             setIsLoading(true);
@@ -213,7 +216,7 @@ function Payments(props) {
                 GIAM_GIA: voucherValue, TONG_TIEN: voucher?.MPVC ? totalPriceOrder : totalPriceOrder - feeShip,
                 DA_THANH_TOAN: 0,
                 PHI_SHIP: feeShip,
-                SAN_PHAM: JSON.stringify(cart?.map((sp) => ({ MA_SP: sp.MA_SP, SO_LUONG: sp.SL_TRONG_GIO, DON_GIA: sp.GIA_BAN, GIA: sp.GIA_BAN * sp.SL_TRONG_GIO, GIA_GOC: sp.GIA_GOC })))
+                SAN_PHAM: JSON.stringify(cart?.map((sp) => ({ MA_SP: sp.MA_SP, TEN_SP: sp.TEN_SP, SO_LUONG: sp.SL_TRONG_GIO, DON_GIA: sp.GIA_BAN, GIA: sp.GIA_BAN * sp.SL_TRONG_GIO, GIA_GOC: sp.GIA_GOC })))
             }
 
             switch (values.HINH_THUC_THANH_TOAN) {
@@ -228,15 +231,11 @@ function Payments(props) {
                 default:
                     const { message } = await donhangApi.post(data);
                     setIsLoading(false);
-                    toast.success(message);
+                    // toast.success(message);
                     dispatch(fetch_my_orders({ action: 'get_my_orders', _limit: pagination._limit, _page: pagination._page }));
                     dispatch(fetch_my_vouchers());
                     dispatch(selectVoucher(null))
-                    if (isAuth) {
-                        navigate('/profile', { replace: true, state: { historyOrder: true } })
-                    } else {
-                        navigate('/', { replace: true });
-                    }
+                    setIsOrderSuccess(true);
             }
 
         } catch (error) {
@@ -249,12 +248,12 @@ function Payments(props) {
     React.useEffect(() => {
         if (!voucher) return;
         // apply voucher
-        const totalPriceWithShip = getTotalPrice(cart, 'GIA_BAN', 'SL_TRONG_GIO') + feeShip;
+        const totalPriceWithOutShip = getTotalPrice(cart, 'GIA_BAN', 'SL_TRONG_GIO');
         if (voucher.MPVC) {
             setVoucherValue(feeShip);
         } else {
             if (voucher.DON_VI_GIAM === '%') {
-                const value = totalPriceWithShip * (voucher.GIA_TRI / 100);
+                const value = totalPriceWithOutShip * (voucher.GIA_TRI / 100);
                 setVoucherValue(value);
             } else {
                 setVoucherValue(voucher.GIA_TRI);
@@ -271,15 +270,36 @@ function Payments(props) {
     return (
         <div className='wrapper-content'>
             <div className="payments">
-                <Form
-                    onValuesChange={(values) => {
-                        values.DIA_CHI_GH && setReloadFeeShip(prev => !prev)
-                    }}
-                    form={form}
-                    initialValues={initialValues}
-                    onFinish={handleOrder}
-                    layout='vertical'>
-                    {/* <div className='note'>
+                {
+                    isOrderSuccess ?
+                        <Row className='order-success-notification-wrapper' justify='center'>
+                            <Col xs={22} sm={16} md={12} lg={10}>
+                                <div className='order-success-notification'>
+                                    <CheckCircleOutlined className="order-success-notification__success-icon" />
+                                    <div className='order-success-notification__title'>Đặt hàng thành công</div>
+                                    <p className='order-success-notification__description'>
+                                        Cảm ơn bạn đã mua sắm tại MONA STORE
+                                        Đơn hàng của bạn sẽ được nhân viên xác nhận sau ít phút.
+                                        Thời gian nhận hàng sẽ từ 3-5 ngày nếu ở khu vực ngoại thành (trừ thứ 7, CN).
+                                        Riêng Khu vực TP Cần Thơ sẽ được giao hàng trong ngày (khi đặt hàng trước 14h mỗi ngày trừ thứ 7, CN)
+                                    </p>
+                                    <div className='order-success-notification__action'>
+                                        <Link to="/" replace style={{ marginRight: 20 }} className='button-1'>Tiếp tục mua sắm</Link>
+                                        <Link to="/profile" replace state={{ historyOrder: true }} className='button-3'>Đơn mua</Link>
+                                    </div>
+                                </div>
+                            </Col>
+                        </Row>
+                        :
+                        <Form
+                            onValuesChange={(values) => {
+                                values.DIA_CHI_GH && setReloadFeeShip(prev => !prev)
+                            }}
+                            form={form}
+                            initialValues={initialValues}
+                            onFinish={handleOrder}
+                            layout='vertical'>
+                            {/* <div className='note'>
                         <CodeOutlined />  Có mã ưu đãi? <a onClick={(e) => {
                             e.preventDefault();
                             setShowUseVoucherForm(prev => !prev);
@@ -298,122 +318,123 @@ function Payments(props) {
                             </Collapse.Panel>
                         </Collapse>
                     </div> */}
-                    <div className="main-content">
-                        <Row gutter={[30, 0]}>
-                            <Col xs={24} sm={24} md={24} lg={10} xl={12}>
-                                <div className="left-side">
-                                    <h1>Thông tin thanh toán</h1>
+                            <div className="main-content">
+                                <Row gutter={[30, 0]}>
+                                    <Col xs={24} sm={24} md={24} lg={10} xl={12}>
+                                        <div className="left-side">
+                                            <h1>Thông tin thanh toán</h1>
 
-                                    <InputField name='HO_TEN' label='Họ tên' required rules={[yupSync]} placeHolder="-- Nhập họ tên --" />
-                                    <InputField name='SO_DIEN_THOAI' label='Số điện thoại' required rules={[yupSync]} placeHolder="-- Nhập số điện thoại --" />
-                                    <InputField name='EMAIL' label='Email' required rules={[yupSync]} placeHolder="-- Nhập email --" />
-                                    <InputField
-                                        name='GHI_CHU'
-                                        label='Ghi chú đơn hàng'
-                                        type='textarea'
-                                        rows={10}
-                                        placeHolder='Ghi chú về đơn hàng, ví dụ: thời gian hay chỉ dẫn địa điểm giao hàng chi tiết hơn.'
-                                    // rules={[yupSync]}
-                                    />
-                                </div>
-                            </Col>
-
-                            <Col xs={24} sm={24} md={24} lg={14} xl={12}>
-                                <div className="right-side">
-                                    <h1>Đơn hàng của bạn</h1>
-                                    <div className='title-custom'>
-                                        <span>Sản phẩm</span>
-                                        <span>Tổng cộng</span>
-                                    </div>
-                                    <div>
-                                        {
-                                            cart?.map((product, idx) =>
-                                                <div key={idx} className='category-label'>
-                                                    <span className='category-label-key' style={{ whiteSpace: 'nowrap' }}>
-                                                        <span className='name'>{product?.TEN_SP}</span>&nbsp;
-                                                        <span > ~ x{product?.SL_TRONG_GIO}</span>
-                                                    </span>
-                                                    <span className='category-label-value'>{numberWithCommas(product.SL_TRONG_GIO * product.GIA_BAN)} ₫</span>
-                                                </div>
-                                            )
-                                        }
-
-                                        <div className='category-label'>
-                                            <span className='category-label-key'>Đơn vị vận chuyển </span><span className='category-label-value'>Giao hàng nhanh (GHN)</span>
-                                        </div>
-                                        <div className='category-label'>
-                                            <span className='category-label-key'>Phí vận chuyển </span><span className='category-label-value'>{feeShip ? numberWithCommas(feeShip) + ' ₫' : <NotFoundAddress />}</span>
-                                        </div>
-                                        <div className='category-label'>
-                                            <span className='category-label-key'>Mã ưu đãi <a onClick={() => dispatch(switch_voucherModal(true))}><Tag color='#55acee'><SearchOutlined /></Tag></a>  </span><span className='category-label-value'>{isVoucherValid ? `${voucher.MA_UU_DAI} (${voucher.MPVC ? 'Miễn phí vận chuyển' : `Giảm ${numberWithCommas(voucher.GIA_TRI)} ${voucher.DON_VI_GIAM}`}) ` : 'không áp dụng'} </span>
-                                        </div>
-                                        <div className='category-label'>
-                                            <span className='category-label-key'>Tổng tiền </span><span className='category-label-value'>{numberWithCommas(getTotalPrice(cart, 'GIA_BAN', 'SL_TRONG_GIO') + feeShip)} ₫</span>
-                                        </div>
-                                        <div className='category-label'>
-                                            <span className='category-label-key'>Giảm giá </span><span className='category-label-value'> {voucherValue ? '- ' + numberWithCommas(voucherValue) : 0} ₫</span>
-                                        </div>
-                                        <div className='category-label'>
-                                            <span className='category-label-key'>Tổng cộng </span><strong style={{ fontSize: 20 }} className='category-label-value'>{numberWithCommas(totalPriceOrder)} ₫</strong>
-                                        </div>
-                                        <br />
-
-                                        <div>
-                                            <div className='title-custom'>Phương thức thanh toán</div>
-                                            <CheckField
-                                                direction='vertical'
-                                                name="HINH_THUC_THANH_TOAN"
-                                                type='radio-box'
-                                                options={[
-                                                    { label: 'Thanh toán khi nhận hàng (COD)', value: 'cod' },
-                                                    { label: 'Thanh toán Momo (MOMO_WALLET)', value: 'momo_wallet' },
-                                                ]}
+                                            <InputField name='HO_TEN' label='Họ tên' required rules={[yupSync]} placeHolder="-- Nhập họ tên --" />
+                                            <InputField name='SO_DIEN_THOAI' label='Số điện thoại' required rules={[yupSync]} placeHolder="-- Nhập số điện thoại --" />
+                                            <InputField name='EMAIL' label='Email' required rules={[yupSync]} placeHolder="-- Nhập email --" />
+                                            <InputField
+                                                name='GHI_CHU'
+                                                label='Ghi chú đơn hàng'
+                                                type='textarea'
+                                                rows={10}
+                                                placeHolder='Ghi chú về đơn hàng, ví dụ: thời gian hay chỉ dẫn địa điểm giao hàng chi tiết hơn.'
+                                            // rules={[yupSync]}
                                             />
                                         </div>
-                                        {
-                                            isAuth &&
+                                    </Col>
+
+                                    <Col xs={24} sm={24} md={24} lg={14} xl={12}>
+                                        <div className="right-side">
+                                            <h1>Đơn hàng của bạn</h1>
+                                            <div className='title-custom'>
+                                                <span>Sản phẩm</span>
+                                                <span>Tổng cộng</span>
+                                            </div>
                                             <div>
-                                                <div className='category-label title-custom' style={{ border: 0 }}>
-                                                    <span className='category-label-key'>
-                                                        <div >Địa chỉ giao hàng </div>
-                                                    </span>
-                                                    <strong className='category-label-value'>
-                                                        <a onClick={() => dispatch(switch_chooseAddressModal(true))}>
-                                                            <SettingFilled />
-                                                        </a></strong>
-                                                </div>
-                                                <ChooseAddressModal onReload={handleReloadDeliveryAddress} addressList={deliveryAddressList} />
                                                 {
-                                                    deliveryAddressList.length < 1 &&
-                                                    <p className='alert-not-address-choosen'>Vui lòng chọn địa chỉ giao hàng</p>
+                                                    cart?.map((product, idx) =>
+                                                        <div key={idx} className='category-label'>
+                                                            <span className='category-label-key' style={{ whiteSpace: 'nowrap' }}>
+                                                                <span className='name'>{product?.TEN_SP}</span>&nbsp;
+                                                                <span > ~ x{product?.SL_TRONG_GIO}</span>
+                                                            </span>
+                                                            <span className='category-label-value'>{numberWithCommas(product.SL_TRONG_GIO * product.GIA_BAN)} ₫</span>
+                                                        </div>
+                                                    )
                                                 }
 
-                                                <Form.Item name="DIA_CHI_GH" rules={[yupSync]}>
-                                                    <Radio.Group>
-                                                        <Space direction="vertical" >
-                                                            {
-                                                                deliveryAddressList?.map((address, idx) =>
-                                                                    <Radio key={idx} value={address.DIA_CHI}>{address.DIA_CHI?.replace(/[(0-9)]/g, '')}</Radio >
-                                                                )
-                                                            }
-                                                        </Space>
-                                                    </Radio.Group>
-                                                </Form.Item>
-                                            </div>
+                                                <div className='category-label'>
+                                                    <span className='category-label-key'>Đơn vị vận chuyển </span><span className='category-label-value'>Giao hàng nhanh (GHN)</span>
+                                                </div>
+                                                <div className='category-label'>
+                                                    <span className='category-label-key'>Phí vận chuyển </span><span className='category-label-value'>{feeShip ? numberWithCommas(feeShip) + ' ₫' : <NotFoundAddress />}</span>
+                                                </div>
+                                                <div className='category-label'>
+                                                    <span className='category-label-key'>Mã ưu đãi <a onClick={() => dispatch(switch_voucherModal(true))}><Tag color='#55acee'><SearchOutlined /></Tag></a>  </span><span className='category-label-value'>{isVoucherValid ? `${voucher.MA_UU_DAI} (${voucher.MPVC ? 'Miễn phí vận chuyển' : `Giảm ${numberWithCommas(voucher.GIA_TRI)} ${voucher.DON_VI_GIAM}`}) ` : 'không áp dụng'} </span>
+                                                </div>
+                                                <div className='category-label'>
+                                                    <span className='category-label-key'>Tổng tiền </span><span className='category-label-value'>{numberWithCommas(getTotalPrice(cart, 'GIA_BAN', 'SL_TRONG_GIO') + feeShip)} ₫</span>
+                                                </div>
+                                                <div className='category-label'>
+                                                    <span className='category-label-key'>Giảm giá </span><span className='category-label-value'> {voucherValue ? '- ' + numberWithCommas(voucherValue) : 0} ₫</span>
+                                                </div>
+                                                <div className='category-label'>
+                                                    <span className='category-label-key'>Tổng cộng </span><strong style={{ fontSize: 20 }} className='category-label-value'>{numberWithCommas(totalPriceOrder)} ₫</strong>
+                                                </div>
+                                                <br />
 
-                                        }
-                                        {/* </Form>  */}
-                                        <ButtonCustom isLoading={isLoading} type='submit' style={{ width: '100%', justifyContent: 'center' }} >Đặt hàng</ButtonCustom>
-                                        {/* {
+                                                <div>
+                                                    <div className='title-custom'>Phương thức thanh toán</div>
+                                                    <CheckField
+                                                        direction='vertical'
+                                                        name="HINH_THUC_THANH_TOAN"
+                                                        type='radio-box'
+                                                        options={[
+                                                            { label: 'Thanh toán khi nhận hàng (COD)', value: 'cod' },
+                                                            { label: 'Thanh toán Momo (MOMO_WALLET)', value: 'momo_wallet' },
+                                                        ]}
+                                                    />
+                                                </div>
+                                                {
+                                                    isAuth &&
+                                                    <div>
+                                                        <div className='category-label title-custom' style={{ border: 0 }}>
+                                                            <span className='category-label-key'>
+                                                                <div >Địa chỉ giao hàng </div>
+                                                            </span>
+                                                            <strong className='category-label-value'>
+                                                                <a onClick={() => dispatch(switch_chooseAddressModal(true))}>
+                                                                    <SettingFilled />
+                                                                </a></strong>
+                                                        </div>
+                                                        <ChooseAddressModal onReload={handleReloadDeliveryAddress} addressList={deliveryAddressList} />
+                                                        {
+                                                            deliveryAddressList.length < 1 &&
+                                                            <p className='alert-not-address-choosen'>Vui lòng chọn địa chỉ giao hàng</p>
+                                                        }
+
+                                                        <Form.Item name="DIA_CHI_GH" rules={[yupSync]}>
+                                                            <Radio.Group>
+                                                                <Space direction="vertical" >
+                                                                    {
+                                                                        deliveryAddressList?.map((address, idx) =>
+                                                                            <Radio key={idx} value={address.DIA_CHI}>{address.DIA_CHI?.replace(/[(0-9)]/g, '')}</Radio >
+                                                                        )
+                                                                    }
+                                                                </Space>
+                                                            </Radio.Group>
+                                                        </Form.Item>
+                                                    </div>
+
+                                                }
+                                                {/* </Form>  */}
+                                                <ButtonCustom isLoading={isLoading} type='submit' style={{ width: '100%', justifyContent: 'center' }} >Đặt hàng</ButtonCustom>
+                                                {/* {
                                             !isAuth && <InputField name='DIA_CHI_GH' type='hidden' />
                                         } */}
-                                    </div>
-                                </div>
+                                            </div>
+                                        </div>
 
-                            </Col>
-                        </Row>
-                    </div>
-                </Form>
+                                    </Col>
+                                </Row>
+                            </div>
+                        </Form>
+                }
             </div >
             <VoucherModal />
         </div >

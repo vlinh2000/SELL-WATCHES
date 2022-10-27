@@ -1,5 +1,5 @@
 .payments{
-
+    min-height: 80vh;
     .main-content{
         margin-top: 1rem;
 
@@ -89,6 +89,48 @@
 
     .ant-radio-wrapper{
         font-size: 13px;
+    }
+
+
+    .order-success-notification{
+        position: relative;
+        // min-height: 60vh;
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        padding: 40px;
+        // width: 40vw;
+        margin:  0 auto;
+        display: flex;
+        flex-direction: column;
+        // justify-content: center;
+        align-items: center;
+
+        &__success-icon{
+            margin-top: 20px;
+            font-size: 40px;
+            color: #3cb878;
+        }
+        
+        &__title{
+            color: #3cb878;
+            font-size: 20px;
+            margin-top: 5px;
+        }
+
+        &__description{
+            margin-top: 20px;
+            line-height: 20px;
+        }
+
+        &__action{
+            // position: absolute;
+            display: flex;
+            // bottom: 50px;
+            margin-top: 50px;
+
+            a:hover{
+                color: unset!important;
+            }
+        }
     }
    
 }
