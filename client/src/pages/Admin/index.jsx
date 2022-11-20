@@ -51,6 +51,8 @@ function AdminPage(props) {
         user?.NV_ID && dispatch(fetch_myRoles());
     }, [user])
 
+    console.log({ pagination: pagination.users })
+
     React.useEffect(() => {
         dispatch(fetch_positions({ _limit: pagination.positions._limit, _page: pagination.positions._page }));
     }, [pagination.positions])

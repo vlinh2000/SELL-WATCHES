@@ -2,17 +2,17 @@ import axios from "axios"
 import axiosClient from "./axiosClient"
 
 export const nguoidungApi = {
-    getAll: () => {
+    getAll: (params) => {
         return new Promise((resolve, reject) => {
             const url = `/nguoidungs`
             setTimeout(async () => {
                 try {
-                    const response = await axiosClient.get(url);;
+                    const response = await axiosClient.get(url, { params });
                     resolve(response);
                 } catch (error) {
                     reject(error)
                 }
-            }, 2000)
+            }, 200)
         })
 
     },

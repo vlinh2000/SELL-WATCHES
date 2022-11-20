@@ -73,7 +73,7 @@ function Receipt(props) {
         {
             title: 'Tổng tiền',
             dataIndex: 'TONG_TIEN',
-            render: (text) => numberWithCommas(text)
+            render: (text) => numberWithCommas(text) + '₫'
         },
         {
             title: 'Ngày nhập',
@@ -113,12 +113,12 @@ function Receipt(props) {
         {
             title: 'Đơn giá',
             dataIndex: 'DON_GIA',
-            render: (text) => numberWithCommas(text)
+            render: (text) => numberWithCommas(text) + '₫'
         },
         {
             title: 'Thành tiền',
             dataIndex: 'GIA',
-            render: (text) => numberWithCommas(text)
+            render: (text) => numberWithCommas(text) + '₫'
         },
     ];
 
@@ -137,13 +137,17 @@ function Receipt(props) {
                             pagination={false}
                             expandable={{
                                 expandedRowRender: (record) => (
-                                    <Table
-                                        className='table-detail'
-                                        pagination={false}
-                                        size='small'
-                                        columns={columnsExtend}
-                                        dataSource={record.SAN_PHAM}>
-                                    </Table>
+                                    <>
+                                        <Table
+                                            className='table-detail'
+                                            pagination={false}
+                                            size='small'
+                                            columns={columnsExtend}
+                                            dataSource={record.SAN_PHAM}>
+                                        </Table>
+                                        <p style={{ textAlign: 'left;' }}><i>Ghi chú:</i> {record.GHI_CHU || 'không'}</p>
+                                        <Divider />
+                                    </>
                                 ),
                             }}
                         />

@@ -65,7 +65,7 @@ function User(props) {
         {
             title: 'Avatar',
             dataIndex: 'ANH_DAI_DIEN',
-            render: (text) => text ? <Avatar src={text} ></Avatar> : <Avatar style={{ backgroundColor: colorList[Math.ceil(Math.random() * colorList.length) % colorList.length], verticalAlign: 'middle' }}>{text || '-'}</Avatar>
+            render: (text, row) => text ? <Avatar src={text} ></Avatar> : <Avatar style={{ backgroundColor: colorList[Math.ceil(Math.random() * colorList.length) % colorList.length], verticalAlign: 'middle' }}>{text || row.HO_TEN.charAt(0)?.toUpperCase()}</Avatar>
         },
         {
             title: 'Họ tên',
@@ -74,15 +74,18 @@ function User(props) {
         {
             title: 'SĐT',
             dataIndex: 'SO_DIEN_THOAI',
+            render: (text) => text || '-----'
         },
 
         {
             title: 'Địa chỉ',
             dataIndex: 'DIA_CHI',
+            render: (text) => text || '-----'
         },
         {
             title: 'Giới tính',
             dataIndex: 'GIOI_TINH',
+            render: (text) => text || '-----'
         },
         {
             title: 'Loại tài khoản',

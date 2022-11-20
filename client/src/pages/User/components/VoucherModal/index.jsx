@@ -72,7 +72,7 @@ function VoucherModal(props) {
                     <ol className='tips-get-voucher-wrapper__list'>
                         <li>Tham gia sự kiện săn voucher hàng tháng.</li>
                         <li>Mua hàng ủng hộ shop để có cơ hội được tặng ngẫu nhiên qua email.</li>
-                        <li>Nhắn anh Linh bên facebook để được trao tận tay.</li>
+                        {/* <li>Nhắn anh Linh bên facebook để được trao tận tay.</li> */}
                     </ol>
                 </div>
             </Modal>

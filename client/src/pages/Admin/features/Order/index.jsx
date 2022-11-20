@@ -305,7 +305,7 @@ function Order(props) {
                                                                     <Col xs={24} sm={24} md={24} lg={8}>
                                                                         <div>
                                                                             <div className='category-label'>
-                                                                                <span className='category-label-key'>Ngày đặt hàng</span><span className='category-label-value'>{moment(order.NGAY_DAT_HANG).format('DD-MM-YYYY HH:mm:ss')}</span>
+                                                                                <span className='category-label-key'>Ngày đặt hàng</span><span className='category-label-value'>{moment(order.TG_DAT_HANG).format('DD-MM-YYYY HH:mm:ss')}</span>
                                                                             </div>
                                                                             <div className='category-label'>
                                                                                 <span className='category-label-key'>  {order.TRANG_THAI === 3 ? 'Thời gian hủy đơn ' : 'Ngày giao hàng'} {order.TRANG_THAI == 1 ? '(dự kiến)' : ''}</span><span className='category-label-value'> {order.TRANG_THAI === 3 ? moment(order.CAP_NHAT).format('DD-MM-YYYY HH:mm:ss') : order.TG_GIAO_HANG ? moment(order.TG_GIAO_HANG).format('DD-MM-YYYY HH:mm:ss') : 'Chưa xác định'} </span>

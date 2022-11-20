@@ -53,8 +53,8 @@ function OrderEdit(props) {
 
     const handleUpdate = async (values) => {
         try {
-            setIsLoading(true);
             if (values.TRANG_THAI === 1 && moment().isAfter(values?.TG_GIAO_HANG)) return toast.error("Thời gian giao hàng không hợp lệ.")
+            setIsLoading(true);
             const data = { action: values.TRANG_THAI === 1 ? 'confirm' : values.TRANG_THAI === 2 ? 'received' : 'cancle', ...values }
             console.log({ values });
             const { message } = await donhangApi.update(order.MA_DH, data);

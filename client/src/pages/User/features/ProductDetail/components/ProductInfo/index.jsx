@@ -8,6 +8,7 @@ import { Button } from 'antd';
 import { useDispatch } from 'react-redux';
 import { addToCart } from 'pages/User/userSlice';
 import toast from 'react-hot-toast';
+import { numberWithCommas } from 'assets/admin';
 
 ProductInfo.propTypes = {
     product: PropTypes.object
@@ -33,11 +34,14 @@ function ProductInfo(props) {
             <div className='product-info__description'>{product.MO_TA}</div>
             {product.SO_LUONG < 1 ? <div className="product-info__status-stock">Sản phẩm này đã hết hàng hoặc không có sẵn.</div>
                 :
-                <div className="product-info__group-quantity">
-                    <Button className='btn-decrease' disabled={quantity < 2} onClick={() => setQuantity(prev => prev - 1)}>-</Button>
-                    <div className='current-quantity'>{quantity}</div>
-                    <Button className='btn-increase' disabled={quantity === product.SO_LUONG} onClick={() => setQuantity(prev => prev + 1)}>+</Button>
-                    <ButtonCustom onClick={handleAddToCart}>Thêm vào giỏ</ButtonCustom>
+                <div>
+                    <div className="product-info__group-quantity">
+                        <Button className='btn-decrease' disabled={quantity < 2} onClick={() => setQuantity(prev => prev - 1)}>-</Button>
+                        <div className='current-quantity'>{quantity}</div>
+                        <Button className='btn-increase' disabled={quantity === product.SO_LUONG} onClick={() => setQuantity(prev => prev + 1)}>+</Button>
+                        <ButtonCustom onClick={handleAddToCart}>Thêm vào giỏ</ButtonCustom>
+                    </div>
+                    <p style={{ marginTop: 10 }}>Còn {numberWithCommas(product?.SO_LUONG || 0)} sản phẩm trong kho</p>
                 </div>
             }
 

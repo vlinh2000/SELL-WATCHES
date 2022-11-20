@@ -1,5 +1,5 @@
 import { AudioOutlined, BarsOutlined, CloseOutlined, ConsoleSqlOutlined, EnvironmentOutlined, FacebookFilled, HeartOutlined, InstagramOutlined, PhoneOutlined, SearchOutlined, ShoppingOutlined, TwitterOutlined } from '@ant-design/icons';
-import { Button, Col, Divider, Popover, Row, Skeleton, Tooltip } from 'antd';
+import { Affix, Button, Col, Divider, Popover, Row, Skeleton, Tooltip } from 'antd';
 import { sanphamApi } from 'api/sanphamApi';
 import { numberWithCommas } from 'assets/admin';
 import { getTotalPrice } from 'assets/common';
@@ -234,6 +234,7 @@ function Header(props) {
     }
 
     const handleSwitchSpeechRecognition = (isOpen) => {
+        isListening && speechToText.stop();
         setshowModalSpeechRecognition(isOpen);
     }
 
@@ -356,6 +357,8 @@ function Header(props) {
                         <BarsOutlined className="menu-custom" onClick={handleShowNavbar} />
                     </div>
                 </div>
+            </div>
+            <Affix offsetTop={0} >
                 <div className="header-wrapper__header__navbar">
                     <ul className='navbar-list'>
                         <li className="navbar-item">
@@ -380,7 +383,7 @@ function Header(props) {
                         </li>
                     </ul>
                 </div>
-            </div>
+            </Affix>
 
             <div className="hide-bg">
                 <Button className='btn-close' onClick={handleCloseNavbar} icon={<CloseOutlined />} shape="circle"></Button>

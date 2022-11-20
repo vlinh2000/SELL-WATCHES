@@ -527,6 +527,7 @@ const adminPage = createSlice({
         // my rules
         [fetch_myRoles.fulfilled]: (state, action) => {
             state.data.myRoles = action.payload.result.map((e, idx) => ({ ...e, key: idx }));
+            state.data.myRolesID = action.payload.result.map((e, idx) => e.MA_QUYEN);
         },
         // statistical
         [fetch_statistical.pending]: (state, action) => {

@@ -51,6 +51,7 @@ function ReceiptEdit(props) {
     const [isLoading, setIsLoading] = React.useState(false);
     const [options_Supplier, setOptions_Supplier] = React.useState([]);
     const [options_Product, setOptions_Product] = React.useState([]);
+    const [allOptions_Product, setAllOptions_Product] = React.useState([]);
     const [formClone, setFormClone] = React.useState([]);
     const [listProduct, setListProduct] = React.useState(() => new Array(currentSelected?.SAN_PHAM?.length || 1).fill(true));
     const [form] = Form.useForm();
@@ -74,9 +75,8 @@ function ReceiptEdit(props) {
             await dispatch(fetch_receipts({ _limit: pagination._limit, _page: pagination._page }));
             if (mode === 'ADD') {
                 form.resetFields()
-            } else {
-                navigate('/admin/receipts/view');
             }
+            navigate('/admin/receipts/view');
             setIsLoading(false);
             toast.success(message);
         } catch (error) {
@@ -106,6 +106,7 @@ function ReceiptEdit(props) {
                 const { result } = await sanphamApi.getAll();
                 const options = result.map((e) => ({ label: e.TEN_SP, value: e.MA_SP }));
                 setOptions_Product(options);
+                setAllOptions_Product(options);
             } catch (error) {
                 console.log({ error });
             }
@@ -137,9 +138,8 @@ function ReceiptEdit(props) {
 
     const handleChangeOptions = () => {
         let SAN_PHAM = form.getFieldValue('SAN_PHAM');
-        console.log({ SAN_PHAM })
         const currentOptions = SAN_PHAM.map(sp => sp.MA_SP);
-        const new_options = options_Product.map(p => currentOptions.includes(p.value) ? { ...p, disabled: true } : p);
+        const new_options = allOptions_Product.map(p => currentOptions.includes(p.value) ? { ...p, disabled: true } : p);
         setOptions_Product(new_options);
     }
 
@@ -159,12 +159,12 @@ function ReceiptEdit(props) {
         {
             title: 'Số lượng',
             dataIndex: 'SO_LUONG',
-            render: (text, row) => <InputField placeHolder='-- Nhập số lượng --' type='number' style={{ minWidth: 150 }} name={['SAN_PHAM', row.IDX, 'DON_GIA']} required rules={[{ required: true, message: '...' }]} />
+            render: (text, row) => <InputField placeHolder='-- Nhập số lượng --' type='number' style={{ minWidth: 150 }} name={['SAN_PHAM', row.IDX, 'SO_LUONG']} required rules={[{ required: true, message: '...' }]} />
         },
         {
             title: 'Đơn giá',
             dataIndex: 'DON_GIA',
-            render: (text, row) => <InputField placeHolder='-- Nhập đơn giá --' type='number' style={{ minWidth: 150 }} name={['SAN_PHAM', row.IDX, 'SO_LUONG']} required rules={[{ required: true, message: '...' }]} />
+            render: (text, row) => <InputField placeHolder='-- Nhập đơn giá --' type='number' style={{ minWidth: 150 }} name={['SAN_PHAM', row.IDX, 'DON_GIA']} required rules={[{ required: true, message: '...' }]} />
         },
         {
             title: 'Thành tiền',

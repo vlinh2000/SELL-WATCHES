@@ -11,7 +11,7 @@ export const sanphamApi = {
                 } catch (error) {
                     reject(error)
                 }
-            }, 500)
+            }, 200)
         })
 
     },

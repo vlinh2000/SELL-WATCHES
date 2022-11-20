@@ -61,7 +61,7 @@ module.exports = {
                         const sql_detail = `SELECT a.MA_DH, a.SO_LUONG, a.DON_GIA, a.GIA,b.MA_SP, b.TEN_SP, c.HINH_ANH
                                             FROM CHI_TIET_DON_HANG a , SAN_PHAM b 
                                             LEFT JOIN ANH_SAN_PHAM c ON b.MA_SP= c.MA_SP 
-                                            WHERE a.MA_SP = b.MA_SP AND a.MA_DH='${dh.MA_DH}'`;
+                                            WHERE a.MA_SP = b.MA_SP AND a.MA_DH='${dh.MA_DH}' GROUP BY a.MA_SP`;
                         donhangs[idx].SAN_PHAM = await executeQuery(sql_detail);
                         resolve(true);
                     } catch (error) {

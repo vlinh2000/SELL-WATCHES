@@ -168,7 +168,7 @@ function Auth(props) {
         const HO_TEN = (data.family_name && data.given_name) ? data.family_name + ' ' + data.given_name : '';
         const user = {
             USER_ID: data.id,
-            HO_TEN: data.name || HO_TEN,
+            HO_TEN: data.name || HO_TEN || data.email.split('@')[0],
             SO_DIEN_THOAI: data.phone || '',
             EMAIL: data.email,
             ANH_DAI_DIEN: data.picture?.data?.url || data.picture,
@@ -266,7 +266,7 @@ function Auth(props) {
 
                                     <LoginSocialGoogle
                                         client_id={process.env.REACT_APP_GG_CLIENT_ID || ''}
-                                        scope='https://www.googleapis.com/auth/userinfo.email'
+                                        // scope='https://www.googleapis.com/auth/userinfo.email'
                                         onResolve={onLoginSuccess}
                                         onReject={onLoginError}>
                                         <GoogleLoginButton className='btn-social-media' />

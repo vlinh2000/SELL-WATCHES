@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { Badge, Button, Popconfirm } from 'antd';
+import { Badge, Button, Empty, Popconfirm } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import './WishList.scss';
@@ -42,7 +42,10 @@ function WishList(props) {
             <Title style={{ fontSize: 20 }}>Sản phẩm yêu thích</Title>
             <div className="wishlist">
                 {
-                    favouriteList?.length < 1 ? <p>Bạn chưa thêm sản phẩm nào vào giỏ hàng.&nbsp;<Link to="/">Về trang chủ</Link></p>
+                    favouriteList?.length < 1 ? <>
+                        <p>Bạn chưa thêm sản phẩm nào vào giỏ hàng.&nbsp;<Link to="/">Về trang chủ</Link></p>
+                        <Empty />
+                    </>
                         :
                         <table >
                             <thead>

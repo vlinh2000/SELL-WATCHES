@@ -66,7 +66,7 @@ function UserPage(props) {
     }
 
     React.useEffect(() => {
-        // if(!isAuth)
+        if (!isAuth) return;
         const redirect = searchParams.get('redirect');
         const extraData = searchParams.get('extraData');
         const resultCode = searchParams.get('resultCode');
@@ -88,7 +88,7 @@ function UserPage(props) {
                 clearTimeout(idTimeout);
             }, 1000);
         }
-    }, [searchParams])
+    }, [searchParams, isAuth])
 
     return (
         <div className='user-page'>

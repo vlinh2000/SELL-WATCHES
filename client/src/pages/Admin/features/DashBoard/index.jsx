@@ -20,7 +20,7 @@ function Dashboard(props) {
 
     const {
         loading: { statistical: isLoading },
-        data: { statistical, ordersConfirm } } = useSelector(state => state.adminInfo);
+        data: { statistical, ordersConfirm, myRolesID } } = useSelector(state => state.adminInfo);
 
     const [loading, setLoading] = React.useState(false);
     const [date, setDate] = React.useState(() => ([moment().startOf('month'), moment().endOf('month')]))
@@ -152,7 +152,7 @@ function Dashboard(props) {
                 </Col>
             </Row>
             <div className="box">
-                <div className='sub-title'>Doanh thu tháng này ({date[0]?.format('MM-YYYY')}) <Link to="/admin/revenues/view">Xem chi tiết</Link></div>
+                <div className='sub-title'>Doanh thu tháng này ({date[0]?.format('MM-YYYY')}) {myRolesID?.includes('ROLE_QLDT') && <Link to="/admin/revenues/view">Xem chi tiết</Link>} </div>
                 <br />
                 <Chart isLoading={loading} data={chartInfo} />
             </div>

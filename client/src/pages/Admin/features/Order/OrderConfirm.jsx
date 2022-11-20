@@ -45,15 +45,20 @@ function OrderConfirm(props) {
 
     const handleConfirm = async (values, MA_DH) => {
         try {
-            if (moment().isAfter(values.TG_GIAO_HANG)) return toast.error("Thời gian giao hàng không hợp lệ.")
-            const data = { action: 'confirm', ...values }
-            setLoading(true);
-            const { message } = await donhangApi.update(MA_DH, data);
-            await dispatch(fetch_orders_pending({ _limit: pagination._limit, _page: pagination._page, status: JSON.stringify('[0]') }));
-            dispatch(fetch_orders({ _limit: pagination_order._limit, _page: pagination_order._page }));
-            dispatch(fetch_statistical())
-            setLoading(false);
-            toast.success(message);
+            if (moment().isAfter(values.TG_GIAO_HANG)) {
+                toast.error("Thời gian giao hàng không hợp lệ.");
+                setLoading(false);
+                return;
+            } else {
+                const data = { action: 'confirm', ...values }
+                setLoading(true);
+                const { message } = await donhangApi.update(MA_DH, data);
+                await dispatch(fetch_orders_pending({ _limit: pagination._limit, _page: pagination._page, status: JSON.stringify('[0]') }));
+                dispatch(fetch_orders({ _limit: pagination_order._limit, _page: pagination_order._page }));
+                dispatch(fetch_statistical())
+                setLoading(false);
+                toast.success(message);
+            }
         } catch (error) {
             setLoading(false);
             console.log({ error });
@@ -77,6 +82,10 @@ function OrderConfirm(props) {
 
     //     fetchOrdersPending();
     // }, [])
+
+    React.useEffect(() => {
+        console.log({ loading })
+    }, [loading])
 
     const columns = [
         {
